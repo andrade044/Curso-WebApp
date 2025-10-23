@@ -1,0 +1,7 @@
+psycopg2-binary
+Flask
+gunicorn
+mercadopago
+pyjwt
+python-dotenv
+sendgrid
