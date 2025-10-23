@@ -12,6 +12,7 @@ import time
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 # from api_mercadopago import api_pagamento
+from data import SIMULADO_DATA
 
 load_dotenv()
 
@@ -27,9 +28,8 @@ EMAIL_REMETENTE =  os.getenv('EMAIL_REMETENTE')
 TOKEN_LENGTH_BYTES= os.getenv('TOKEN_LENGTH_BYTES')
 TOKEN_EXPIRATION_HOURS= os.getenv('TOKEN_EXPIRATION_HOURS')
 
-URL_BASE_ATIVACAO = "https://seuwebapp.com/ativacao"
 
-from data import SIMULADO_DATA
+
 # --- Configuração de Sessão e Título ---
 st.set_page_config(
     page_title="Sistema de Cursos",
