@@ -5,3 +5,4 @@ mercadopago
 pyjwt
 python-dotenv
 sendgrid
+streamit
