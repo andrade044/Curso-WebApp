@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 import psycopg2 
+from python_http_client.exceptions import HTTPError
 # Carrega variáveis do arquivo .env (se existir)
 load_dotenv() 
 
@@ -230,56 +231,80 @@ def mercadopago_webhook():
 
 
 
-def enviar_email_ativacao_sendgrid(destinatario, nome_usuario, link_ativacao):
+def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str, link_ativacao: str) -> int:
     """
-    Função auxiliar para envio de e-mail. 
-    Chame esta função no Streamlit após o registro.
+    Envia o email de ativação com o link dinâmico usando o SendGrid.
+    Retorna o código de status HTTP (200, 202 em sucesso) ou o código de erro.
     """
-    if not CHAVE_API_SENDGRID:
-        print("ERRO: CHAVE_API_SENDGRID não configurada para envio.")
-        return False
+    api_key = CHAVE_API_SENDGRID
+    remetente = EMAIL_REMETENTE
 
+    if not api_key:
+        print("ERRO: CHAVE_API_SENDGRID não definida.")
+        return 500
+
+    # 1. Conteúdo em Texto Simples (Melhora a entregabilidade)
+    email_text = f"""
+    Olá, {nome_usuario},
+    
+    Obrigado por se registrar! Para ativar sua conta e liberar o acesso, por favor, visite o link:
+    
+    {link_ativacao}
+    
+    Atenciosamente,
+    Equipe do Curso.
+    """
+    
+    # 2. Conteúdo HTML (Copia da Função 1 ou 2, ambos são bons)
+    email_html = f"""
+    <html>
+      <body>
+        <p>Olá, <strong>{nome_usuario}</strong>,</p>
+        <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
+        
+        <p style="text-align: center;">
+            <a href="{link_ativacao}" 
+                style="background-color: #4CAF50; 
+                       color: white; 
+                       padding: 10px 20px; 
+                       text-decoration: none; 
+                       border-radius: 5px; 
+                       display: inline-block;">
+                ATIVAR MINHA CONTA
+            </a>
+        </p>
+        
+        <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
+        <p><small>{link_ativacao}</small></p>
+        
+        <p>Atenciosamente,<br>Equipe do Curso.</p>
+      </body>
+    </html>
+    """
+    
+    email = Mail(
+        from_email=remetente,
+        to_emails=destinatario,
+        subject='Ativação de Conta - Seu Curso de CNH',
+        html_content=email_html,
+        plain_text_content=email_text # Adicionando o texto simples
+    )
+
+    # 3. Tratamento de Erros Aprimorado
     try:
-        conta_sendgrid = SendGridAPIClient(CHAVE_API_SENDGRID)
-        
-        html_content = f"""
-        <html>
-          <body>
-            <p>Olá, <strong>{nome_usuario}</strong>,</p>
-            <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
-            
-            <p style="text-align: center;">
-                <a href="{link_ativacao}" 
-                    style="background-color: #4CAF50; 
-                           color: white; 
-                           padding: 10px 20px; 
-                           text-decoration: none; 
-                           border-radius: 5px; 
-                           display: inline-block;">
-                    ATIVAR MINHA CONTA
-                </a>
-            </p>
-            
-            <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
-            <p><small>{link_ativacao}</small></p>
-            
-            <p>Atenciosamente,<br>Equipe do Curso.</p>
-          </body>
-        </html>
-        """
-
-        email = Mail(from_email=EMAIL_REMETENTE, 
-                     to_emails=destinatario,
-                     subject='Ativação de Conta - Seu Curso de CNH',
-                     html_content=html_content)
-
+        conta_sendgrid = SendGridAPIClient(api_key)
         resposta = conta_sendgrid.send(email)
-        print(f"E-mail enviado. Status Code: {resposta.status_code}")
-        return resposta.status_code in [200, 202]
-        
+        print(f"Email enviado. Status Code: {resposta.status_code}")
+        return resposta.status_code
+    except HTTPError as e:
+        # Erro específico da API do SendGrid
+        print(f"Erro ao enviar email (Status {e.status_code}): {e.body}")
+        # Retorna o status code do erro para o chamador
+        return e.status_code 
     except Exception as e:
-        print(f"ERRO ao enviar e-mail com SendGrid: {e}")
-        return False
+        # Erro inesperado
+        print(f"Erro inesperado no envio de email: {e}")
+        return 500
 
 
 if __name__ == "__main__":
