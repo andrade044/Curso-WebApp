@@ -13,7 +13,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
-
+import requests
 load_dotenv()
 
 def get_secret(key, default=None):
@@ -38,7 +38,7 @@ TOKEN_EXPIRATION_HOURS= get_secret('TOKEN_EXPIRATION_HOURS')
 URL_BASE_ATIVACAO = get_secret("URL_BASE_ATIVACAO") 
 MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
 MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
-
+URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
 # --- Configuração de Sessão e Título ---
 st.set_page_config(
     page_title="Sistema de Cursos",
@@ -737,6 +737,37 @@ def tela_pagamento():
 
 
 # --- Lógica Principal (Controle de Página) ---
+query_params = st.experimental_get_query_params()
+token_de_ativacao = query_params.get("token", [None])[0] # Tenta pegar o valor do token
+
+# 2. Se o token existir, tentar ativar a conta
+if token_de_ativacao:
+    # URL do seu BACK-END (Render)
+    
+    
+    st.info("Detectamos um token de ativação. Tentando ativar sua conta...")
+    
+    try:
+        # 3. Fazer a chamada POST para o Back-end
+        response = requests.post(URL_API_ATIVACAO, json={"token": token_de_ativacao})
+        
+        # 4. Checar a resposta do Back-end (Render)
+        if response.status_code == 200:
+            st.success("🎉 Sua conta foi ativada com sucesso! Você já pode fazer login.")
+            # Opcional: Limpar o token da URL
+            st.experimental_set_query_params(token=None)
+            
+        else:
+            st.error(f"Falha na ativação. O servidor retornou: {response.status_code} - {response.text}")
+            
+    except requests.exceptions.RequestException as e:
+        st.error(f"Erro de conexão com o servidor de ativação (API no Render): {e}")
+
+# Lógica principal da página (seja ela a de Login ou Home)
+st.title("Página de Login")
+
+
+
 
 def main():
     
