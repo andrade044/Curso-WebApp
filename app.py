@@ -353,7 +353,7 @@ if token_de_ativacao:
 # --- Telas do Streamlit ---
 
 def tela_login():
-    """Mostra o formulário de login."""
+
 
     st.title("🔑 Login")
 
@@ -367,11 +367,17 @@ def tela_login():
         
         if user_data:
             user_id, nome, senha_hash_salva, assinante, ativo, token_ativacao = user_data
-            if not ativo:
-                    st.warning("⚠️ **Conta Não Ativada.** Por favor, verifique seu e-mail para ativar sua conta.")
             
-                
+            # 1. Checa a senha primeiro
             if verificar_senha(senha, senha_hash_salva):
+                
+                # 2. Se a senha está OK, checa a ativação
+                if not ativo:
+                    # Se não estiver ativo, MOSTRA O AVISO E SAÍMOS da função (return)
+                    st.warning("⚠️ **Conta Não Ativada.** Por favor, verifique seu e-mail para ativar sua conta.")
+                    return # <-- IMPEDE O CÓDIGO DE LOGIN DE SER EXECUTADO
+                
+                # 3. Se a senha está OK E a conta está ativa (fluxo normal de login)
                 st.session_state['logged_in'] = True
                 st.session_state['user_email'] = email
                 st.session_state['user_nome'] = nome
@@ -380,8 +386,10 @@ def tela_login():
                 st.success(f"Login bem-sucedido! Bem-vindo(a), {nome}.")
                 st.rerun()
             else:
+                # Senha incorreta
                 st.error("Email ou senha incorretos.")
         else:
+            # Usuário não encontrado
             st.error("Email ou senha incorretos.")
 
 
@@ -771,7 +779,7 @@ def tela_pagamento():
 
 
 def main():
-    
+   
 
     if "message" in st.query_params and st.query_params["message"] == "activated":
         
