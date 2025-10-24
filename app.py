@@ -351,16 +351,35 @@ if token_de_ativacao:
 def tela_login():
     """Mostra o formulário de login."""
 
-query_params = st.experimental_get_query_params()
-activation_message = query_params.get("message", [None])[0]
-user_id_activated = query_params.get("user", [None])[0]
+    st.title("🔑 Login")
 
-# Coloque este bloco no topo do seu `main()` ou antes de chamar a tela de login
-if activation_message == "activated":
-    st.balloons()
-    st.success("🎉 Sua conta foi ativada com sucesso! Você já pode fazer login.")
-    # Limpa a URL para não mostrar a mensagem em futuros reloads
-    st.experimental_set_query_params(message=None, user=None)
+    with st.form(key='login_form'):
+        email = st.text_input("Email")
+        senha = st.text_input("Senha", type="password")
+        login_button = st.form_submit_button(label='Entrar')
+
+    if login_button:
+        user_data = buscar_usuario(email)
+        
+        if user_data:
+            user_id, nome, senha_hash_salva, assinante, ativo, token_ativacao = user_data
+            if not ativo:
+                    st.warning("⚠️ **Conta Não Ativada.** Por favor, verifique seu e-mail para ativar sua conta.")
+            
+                
+            if verificar_senha(senha, senha_hash_salva):
+                st.session_state['logged_in'] = True
+                st.session_state['user_email'] = email
+                st.session_state['user_nome'] = nome
+                st.session_state['user_assinante'] = bool(assinante)
+                st.session_state['user_id'] = user_id
+                st.success(f"Login bem-sucedido! Bem-vindo(a), {nome}.")
+                st.rerun()
+            else:
+                st.error("Email ou senha incorretos.")
+        else:
+            st.error("Email ou senha incorretos.")
+
 
 
 query_params = st.experimental_get_query_params()
@@ -759,22 +778,30 @@ def tela_pagamento():
 
 def main():
     
-    # --- NOVO BLOCO: Intercepta a mensagem de ativação da URL ---
-    query_params = st.experimental_get_query_params()
-    activation_message = query_params.get("message", [None])[0]
-    
-    if activation_message == "activated":
+
+    if "message" in st.query_params and st.query_params["message"] == "activated":
+        
         st.balloons()
         st.success("🎉 Sua conta foi ativada com sucesso! Você já pode fazer login.")
         
-        # Limpa o parâmetro 'message' da URL para não aparecer em reloads futuros
-        # O parâmetro 'user' (se existir) também deve ser limpo, como no seu Flask
-        st.experimental_set_query_params(message=None, user=None) 
-
+        # Limpa os parâmetros 'message' e 'user' da URL
+        # O método recomendado para remover um parâmetro é usar 'del'
+        
+        # Tenta remover 'message'
+        if "message" in st.query_params:
+            del st.query_params["message"] 
+        
+        # Tenta remover 'user'
+        if "user" in st.query_params:
+            del st.query_params["user"]
+            
+        # Nota: Caso a remoção por 'del' não funcione na sua versão do Streamlit,
+        # você pode tentar usar: st.query_params.pop("message", None)
+    
     # -------------------------------------------------------------
     
     # Se o usuário NÃO está logado
-    if not st.session_state['logged_in']:
+    if not st.session_state.get('logged_in'):
         # Mostra as opções de Login e Cadastro na barra lateral
         pagina = st.sidebar.radio("Navegar", ["Login", "Cadastro"])
         
@@ -785,7 +812,8 @@ def main():
             
     # Se o usuário ESTÁ logado
     else:
-        st.sidebar.write(f"Bem-vindo(a), {st.session_state['user_nome']}!")
+        # Usando .get() para acesso seguro a session_state
+        st.sidebar.write(f"Bem-vindo(a), {st.session_state.get('user_nome')}!")
         
         if st.sidebar.button("Sair (Logout)"):
             st.session_state['logged_in'] = False
