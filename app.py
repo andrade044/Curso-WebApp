@@ -313,45 +313,66 @@ def proxima_pergunta():
     st.session_state['user_answer'] = None # Limpa a resposta para a próxima pergunta
 
 
+query_params = st.experimental_get_query_params()
+token_de_ativacao = query_params.get("token", [None])[0] # Tenta pegar o valor do token da URL
 
+if token_de_ativacao:
+    # 1. Tenta fazer a chamada POST para o Back-end (Render)
+    with st.spinner("Verificando e ativando sua conta..."):
+        try:
+            # st.info(f"Chamando API: {URL_API_ATIVACAO} com token...") # Opcional para debug
+            
+            response = requests.post(
+                URL_API_ATIVACAO, # URL do seu endpoint de ativação no Render
+                json={"token": token_de_ativacao}
+            )
+            
+            # 2. Verifica a resposta da API (Render)
+            if response.status_code == 200:
+                st.success("🎉 Conta ativada com sucesso! Você já pode fazer login.")
+                # Limpa o token da URL
+                st.experimental_set_query_params(token=None)
+                
+            elif response.status_code == 400:
+                # 400 = Bad Request (Token Inválido, Expirado, etc.)
+                st.error(f"❌ Falha na ativação. O link é inválido, expirou ou a conta já estava ativa. Status: 400.")
+                st.experimental_set_query_params(token=None)
+            
+            else:
+                # 500 = Internal Server Error ou outro erro da API
+                st.error(f"⚠️ Erro no servidor de ativação. Status: {response.status_code}. Tente novamente mais tarde.")
+
+        except requests.exceptions.RequestException as e:
+            st.error(f"🛑 Erro de conexão ao tentar ativar sua conta. Verifique se o servidor da API (Render) está ativo.")
+    
+    st.rerun()
 # --- Telas do Streamlit ---
 
 def tela_login():
     """Mostra o formulário de login."""
 
-    st.title("🔑 Login")
+query_params = st.experimental_get_query_params()
+activation_message = query_params.get("message", [None])[0]
+user_id_activated = query_params.get("user", [None])[0]
 
-    with st.form(key='login_form'):
-        email = st.text_input("Email")
-        senha = st.text_input("Senha", type="password")
-        login_button = st.form_submit_button(label='Entrar')
+# Coloque este bloco no topo do seu `main()` ou antes de chamar a tela de login
+if activation_message == "activated":
+    st.balloons()
+    st.success("🎉 Sua conta foi ativada com sucesso! Você já pode fazer login.")
+    # Limpa a URL para não mostrar a mensagem em futuros reloads
+    st.experimental_set_query_params(message=None, user=None)
 
-    if login_button:
-        user_data = buscar_usuario(email)
 
-        if user_data:
-            user_id, nome, senha_hash_salva, assinante, ativo, token_ativacao = user_data
+query_params = st.experimental_get_query_params()
+activation_message = query_params.get("message", [None])[0]
+user_id_activated = query_params.get("user", [None])[0]
 
-             # --------------------------------------------
-            # NOVO CÓDIGO CRÍTICO: INTERROMPE O LOGIN SE NÃO ESTIVER ATIVO
-            if not ativo:
-                st.warning("⚠️ **Conta Não Ativada.** Por favor, verifique seu e-mail para ativar sua conta.")
-                return  
-             # --------------------------------------------
+if activation_message == "activated":
+    st.balloons()
+    st.success("🎉 Sua conta foi ativada com sucesso! Você já pode fazer login.")
+    # Limpa a URL para não mostrar a mensagem em futuros reloads
+    st.experimental_set_query_params(message=None, user=None)
 
-            # Se chegou aqui, a conta está ATIVA.
-            if verificar_senha(senha, senha_hash_salva):
-                st.session_state['logged_in'] = True
-                st.session_state['user_email'] = email
-                st.session_state['user_nome'] = nome
-                st.session_state['user_assinante'] = bool(assinante)
-                st.session_state['user_id'] = user_id
-                st.success(f"Login bem-sucedido! Bem-vindo(a), {nome}.")
-                st.rerun()
-            else:
-                st.error("Email ou senha incorretos.")
-        else:
-            st.error("Email ou senha incorretos.")
 
 def tela_cadastro():
     """Mostra o formulário de cadastro."""
@@ -736,40 +757,21 @@ def tela_pagamento():
         """)
 
 
-# --- Lógica Principal (Controle de Página) ---
-query_params = st.experimental_get_query_params()
-token_de_ativacao = query_params.get("token", [None])[0] # Tenta pegar o valor do token
-
-# 2. Se o token existir, tentar ativar a conta
-if token_de_ativacao:
-    # URL do seu BACK-END (Render)
-    
-    
-    st.info("Detectamos um token de ativação. Tentando ativar sua conta...")
-    
-    try:
-        # 3. Fazer a chamada POST para o Back-end
-        response = requests.post(URL_API_ATIVACAO, json={"token": token_de_ativacao})
-        
-        # 4. Checar a resposta do Back-end (Render)
-        if response.status_code == 200:
-            st.success("🎉 Sua conta foi ativada com sucesso! Você já pode fazer login.")
-            # Opcional: Limpar o token da URL
-            st.experimental_set_query_params(token=None)
-            
-        else:
-            st.error(f"Falha na ativação. O servidor retornou: {response.status_code} - {response.text}")
-            
-    except requests.exceptions.RequestException as e:
-        st.error(f"Erro de conexão com o servidor de ativação (API no Render): {e}")
-
-# Lógica principal da página (seja ela a de Login ou Home)
-st.title("Página de Login")
-
-
-
-
 def main():
+    
+    # --- NOVO BLOCO: Intercepta a mensagem de ativação da URL ---
+    query_params = st.experimental_get_query_params()
+    activation_message = query_params.get("message", [None])[0]
+    
+    if activation_message == "activated":
+        st.balloons()
+        st.success("🎉 Sua conta foi ativada com sucesso! Você já pode fazer login.")
+        
+        # Limpa o parâmetro 'message' da URL para não aparecer em reloads futuros
+        # O parâmetro 'user' (se existir) também deve ser limpo, como no seu Flask
+        st.experimental_set_query_params(message=None, user=None) 
+
+    # -------------------------------------------------------------
     
     # Se o usuário NÃO está logado
     if not st.session_state['logged_in']:

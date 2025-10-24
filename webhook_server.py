@@ -108,53 +108,44 @@ def generate_activation_token(user_id):
         print(f"Erro ao gerar JWT: {e}")
         return None
 
-@app.route("/ativar_conta", methods=["GET"])
-def ativar_conta():
+@app.route("/api/ativar-conta", methods=["POST"])
+def api_ativar_conta():
     """
-    Recebe o token de ativação do e-mail, valida, atualiza o DB (ativo=1)
-    e redireciona o usuário para o Streamlit.
+    Endpoint chamado pelo Front-end (Streamlit) via POST para ativação.
+    Usa o token (JWT) no corpo do JSON, em vez de na URL.
     """
-    token = request.args.get('token')
-    
-    # 1. Checa se o token existe
-    if not token:
-        return "Erro: Token de ativação ausente.", 400
-
-    user_id = None
     try:
-        # 2. Decodifica e valida o token
+        data = request.get_json()
+        token = data.get('token')
+        
+        if not token:
+            return jsonify({"message": "Token de ativação ausente no corpo da requisição."}), 400
+
+        # O restante da lógica de decodificação e validação é igual ao seu GET /ativar_conta
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=['HS256'])
         user_id = payload.get('user_id')
         
         if isinstance(user_id,str):
-            user_id = int(user_id)
+             user_id = int(user_id)
 
         if not user_id:
-            return "Erro: Token inválido (ID de usuário ausente).", 400
+             return jsonify({"message": "Token inválido (ID de usuário ausente)."}), 400
+
+        # 3. Atualiza o status de ativação no DB (ativo = 1)
+        if update_user_status(user_id, 'ativo', 1):
+            print(f"SUCESSO: Usuário ID {user_id} ativado via API (POST).")
+            # Retorna 200 OK para o Streamlit
+            return jsonify({"message": "Conta ativada com sucesso!"}), 200
+        else:
+            return jsonify({"message": "Falha ao ativar a conta no banco de dados."}), 500
 
     except jwt.ExpiredSignatureError:
-        print(f"Erro: Token expirado para user_id: {user_id}")
-        return "Erro: O link de ativação expirou. Por favor, registre-se novamente.", 401
-    except jwt.InvalidTokenError as e:
-        print(f"Erro: Token inválido: {e}")
-        return "Erro: Token de ativação inválido.", 401
+        return jsonify({"message": "O link de ativação expirou."}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"message": "Token de ativação inválido."}), 401
     except Exception as e:
-        print(f"Erro inesperado na decodificação do JWT: {e}")
-        return "Erro interno do servidor.", 500
-
-    # 3. Atualiza o status de ativação no DB (ativo = 1)
-    if update_user_status(user_id, 'ativo', 1):
-        print(f"SUCESSO: Usuário ID {user_id} ativado via e-mail.")
-        
-        # 4. Redireciona para a tela de login do Streamlit (USANDO ENV VAR)
-        if STREAMLIT_LOGIN_URL:
-            # Redireciona para o Streamlit com o parâmetro 'activated'
-            return redirect(f"{STREAMLIT_LOGIN_URL}?message=activated&user={user_id}", code=302)
-        else:
-            return "SUCESSO: Conta ativada. Por favor, acesse o seu aplicativo Streamlit e faça login.", 200
-    else:
-        # Se a atualização falhar (usuário não encontrado ou erro de DB)
-        return "Erro: Falha ao ativar a conta no banco de dados.", 500
+        print(f"Erro inesperado na ativação POST: {e}")
+        return jsonify({"message": "Erro interno do servidor."}), 500
 
 
 @app.route("/mercadopago_webhook", methods=["POST"])
