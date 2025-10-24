@@ -16,19 +16,28 @@ from data import SIMULADO_DATA
 
 load_dotenv()
 
-MERCADO_PAGO_ACCESS_TOKEN = os.getenv('MERCADO_PAGO_ACCESS_TOKEN')
-# VALOR_ASSINATURA = os.getenv('VALOR_ASSINATURA')
-REFERENCIA_ASSINATURA = os.getenv('REFERENCIA_ASSINATURA')
+def get_secret(key, default=None):
+    
+    # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
+    if 'secrets' in st.session_state and key in st.secrets:
+        return st.secrets[key]
+    # 2. Tenta ler de os.environ (para Codespace/Local com .env)
+    return os.getenv(key, default)
 
-VALOR_ASSINATURA = 10
+MERCADO_PAGO_ACCESS_TOKEN = get_secret('MERCADO_PAGO_ACCESS_TOKEN')
+REFERENCIA_ASSINATURA = get_secret('REFERENCIA_ASSINATURA')
+
+VALOR_ASSINATURA = get_secret('VALOR_ASSINATURA') 
 TITULO_ASSINATURA = "Assinatura Premium do Curso de Python"
 
-CHAVE_API_SENDGRID = os.getenv('CHAVE_API_SENDGRID')
-EMAIL_REMETENTE =  os.getenv('EMAIL_REMETENTE')
-TOKEN_LENGTH_BYTES= os.getenv('TOKEN_LENGTH_BYTES')
-TOKEN_EXPIRATION_HOURS= os.getenv('TOKEN_EXPIRATION_HOURS')
+CHAVE_API_SENDGRID = get_secret('CHAVE_API_SENDGRID')
+EMAIL_REMETENTE =  get_secret('EMAIL_REMETENTE')
+TOKEN_LENGTH_BYTES= get_secret('TOKEN_LENGTH_BYTES')
+TOKEN_EXPIRATION_HOURS= get_secret('TOKEN_EXPIRATION_HOURS')
 
-
+URL_BASE_ATIVACAO = get_secret("URL_BASE_ATIVACAO") 
+MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
+MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
 
 # --- Configuração de Sessão e Título ---
 st.set_page_config(
@@ -605,13 +614,13 @@ def tela_simulados():
 ##########################################################################################
 #Pagamento
 
-try:
-    MP_ACCESS_TOKEN = st.secrets["MP_ACCESS_TOKEN"]
-    # NOTA: Em produção real, você usaria o link do servidor Webhook para MP_NOTIFICATION_URL
-    MP_NOTIFICATION_URL = st.secrets.get("MP_NOTIFICATION_URL", "https://exemplo.com/webhook")
-except KeyError:
-    st.error("ERRO: Credenciais do Mercado Pago não encontradas. Verifique seu secrets.toml.")
-    MP_ACCESS_TOKEN = None
+# try:
+#     MP_ACCESS_TOKEN = st.secrets["MP_ACCESS_TOKEN"]
+#     # NOTA: Em produção real, você usaria o link do servidor Webhook para MP_NOTIFICATION_URL
+#     MP_NOTIFICATION_URL = st.secrets.get("MP_NOTIFICATION_URL", "https://exemplo.com/webhook")
+# except KeyError:
+#     st.error("ERRO: Credenciais do Mercado Pago não encontradas. Verifique seu secrets.toml.")
+#     MP_ACCESS_TOKEN = None
 
 def criar_preferencia_pagamento():
     """
