@@ -15,13 +15,15 @@ load_dotenv()
 app = Flask(__name__)
 
 # --- Configuração do Banco de Dados e Variáveis de Ambiente ---
-DB_NAME = 'usuarios.db' # Deve ser o mesmo nome do DB do Streamlit
+DB_NAME = os.getenv('DB_NAME')
 MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
 MP_NOTIFICATION_URL = os.getenv("MP_NOTIFICATION_URL")
 CHAVE_API_SENDGRID = os.getenv('CHAVE_API_SENDGRID')
 JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-URL_BASE_ATIVACAO = os.getenv('URL_BASE_ATIVACAO') # URL base do seu servidor Flask (ex: https://seu-servidor.com)
+URL_BASE_ATIVACAO = os.getenv('URL_BASE_ATIVACAO') 
 DATABASE_URL = os.getenv("DATABASE_URL")
+EMAIL_REMETENTE = os.getenv('EMAIL_REMETENTE')
+
 # CORREÇÃO CRÍTICA: Converte para int e define default para expiração do token
 try:
     ACTIVATION_EXPIRATION_DAYS = int(os.getenv('ACTIVATION_EXPIRATION_DAYS', 7))
@@ -259,7 +261,7 @@ def enviar_email_ativacao_sendgrid(destinatario, nome_usuario, link_ativacao):
         </html>
         """
 
-        email = Mail(from_email='matheusandrade906@gmail.com', # TROQUE PELO SEU REMETENTE VERIFICADO!
+        email = Mail(from_email=EMAIL_REMETENTE, 
                      to_emails=destinatario,
                      subject='Ativação de Conta - Seu Curso de CNH',
                      html_content=html_content)
