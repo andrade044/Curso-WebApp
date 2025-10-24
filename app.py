@@ -318,7 +318,7 @@ def proxima_pergunta():
 
 def tela_login():
     """Mostra o formulário de login."""
-    
+
     st.title("🔑 Login")
 
     with st.form(key='login_form'):
@@ -328,13 +328,18 @@ def tela_login():
 
     if login_button:
         user_data = buscar_usuario(email)
-        
+
         if user_data:
             user_id, nome, senha_hash_salva, assinante, ativo, token_ativacao = user_data
+
+             # --------------------------------------------
+            # NOVO CÓDIGO CRÍTICO: INTERROMPE O LOGIN SE NÃO ESTIVER ATIVO
             if not ativo:
-                    st.warning("⚠️ **Conta Não Ativada.** Por favor, verifique seu e-mail para ativar sua conta.")
-            
-                
+                st.warning("⚠️ **Conta Não Ativada.** Por favor, verifique seu e-mail para ativar sua conta.")
+                return  
+             # --------------------------------------------
+
+            # Se chegou aqui, a conta está ATIVA.
             if verificar_senha(senha, senha_hash_salva):
                 st.session_state['logged_in'] = True
                 st.session_state['user_email'] = email
