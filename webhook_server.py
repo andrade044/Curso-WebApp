@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, redirect, url_for
-import sqlite3
 import os
 import mercadopago
 import jwt
@@ -62,11 +61,16 @@ def update_user_status(user_id, field_name, value):
             
         sql_query = f"UPDATE usuarios SET {field_name} = %s WHERE id = %s"
         
+
+        user_id_int = int(user_id) if isinstance(user_id, str) else user_id
         # Nota: Usamos %s para placeholders no psycopg2
-        c.execute(sql_query, (value, user_id))
+        c.execute(sql_query, (value, user_id_int))
         conn.commit()
         
         success = c.rowcount > 0
+        if not success:
+            print(f"AVISO: 0 linhas afetadas. user_id {user_id} não encontrado ou já atualizado.")
+  
         c.close()
         return success
 
@@ -121,6 +125,9 @@ def ativar_conta():
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=['HS256'])
         user_id = payload.get('user_id')
         
+        if isinstance(user_id,str):
+            user_id = int(user_id)
+
         if not user_id:
             return "Erro: Token inválido (ID de usuário ausente).", 400
 
