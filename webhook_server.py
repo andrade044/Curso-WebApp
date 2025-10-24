@@ -109,7 +109,7 @@ def generate_activation_token(user_id):
         print(f"Erro ao gerar JWT: {e}")
         return None
 
-@app.route("/ativar-conta", methods=["GET"])
+@app.route("/api/ativar-conta", methods=["GET"])
 def api_ativar_conta():
     # data = request.get_json()
     token = request.args.get('token')
