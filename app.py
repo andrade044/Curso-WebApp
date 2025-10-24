@@ -313,8 +313,9 @@ def proxima_pergunta():
     st.session_state['user_answer'] = None # Limpa a resposta para a próxima pergunta
 
 
-query_params = st.experimental_get_query_params()
-token_de_ativacao = query_params.get("token", [None])[0] # Tenta pegar o valor do token da URL
+ # Tenta pegar o valor do token da URL
+
+token_de_ativacao = st.query_params.get("token", None) 
 
 if token_de_ativacao:
     # 1. Tenta fazer a chamada POST para o Back-end (Render)
@@ -330,13 +331,16 @@ if token_de_ativacao:
             # 2. Verifica a resposta da API (Render)
             if response.status_code == 200:
                 st.success("🎉 Conta ativada com sucesso! Você já pode fazer login.")
-                # Limpa o token da URL
-                st.experimental_set_query_params(token=None)
+                # Limpa o token da URL usando a nova sintaxe
+                if "token" in st.query_params:
+                    del st.query_params["token"]
                 
             elif response.status_code == 400:
                 # 400 = Bad Request (Token Inválido, Expirado, etc.)
                 st.error(f"❌ Falha na ativação. O link é inválido, expirou ou a conta já estava ativa. Status: 400.")
-                st.experimental_set_query_params(token=None)
+                # Limpa o token da URL
+                if "token" in st.query_params:
+                    del st.query_params["token"]
             
             else:
                 # 500 = Internal Server Error ou outro erro da API
@@ -381,16 +385,6 @@ def tela_login():
             st.error("Email ou senha incorretos.")
 
 
-
-query_params = st.experimental_get_query_params()
-activation_message = query_params.get("message", [None])[0]
-user_id_activated = query_params.get("user", [None])[0]
-
-if activation_message == "activated":
-    st.balloons()
-    st.success("🎉 Sua conta foi ativada com sucesso! Você já pode fazer login.")
-    # Limpa a URL para não mostrar a mensagem em futuros reloads
-    st.experimental_set_query_params(message=None, user=None)
 
 
 def tela_cadastro():
