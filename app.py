@@ -180,12 +180,12 @@ def verificar_existencia(email, cpf):
 #     EMAIL_REMETENTE = "teste@exemplo.com"
 # # ---------------------------------------------------
 
-# def gerar_codigo_ativacao():
-#     """Gera e salva um código único para o link de ativação."""
-#     # Gera um código de 6 dígitos. UUIDs são mais seguros, mas um código simples é mais amigável.
-#     code = str(random.randint(100000, 999999))
-#     st.session_state['user_activation_code'] = code
-#     return code
+def gerar_codigo_ativacao():
+    """Gera e salva um código único para o link de ativação."""
+    # Gera um código de 6 dígitos. UUIDs são mais seguros, mas um código simples é mais amigável.
+    code = str(random.randint(100000, 999999))
+    st.session_state['user_activation_code'] = code
+    return code
 
 def gerar_token_ativacao():
     """Gera um token criptograficamente seguro e define a expiração."""
