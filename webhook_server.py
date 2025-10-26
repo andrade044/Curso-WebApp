@@ -148,7 +148,7 @@ def ativar_conta_post():
         print(f"DEBUG: FALHA AO ATUALIZAR DB para User ID: {user_id} (POST)")
         return jsonify({"message": "Falha ao ativar a conta."}), 500
 
-@app.route("/ativar_conta", methods=["GET"])
+@app.route("/api/ativar-conta", methods=["GET"])
 def ativar_conta_get():
     token = request.args.get('token')
     
