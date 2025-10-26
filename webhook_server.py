@@ -148,6 +148,8 @@ def ativar_conta_post():
         print(f"DEBUG: FALHA AO ATUALIZAR DB para User ID: {user_id} (POST)")
         return jsonify({"message": "Falha ao ativar a conta."}), 500
 
+
+
 @app.route("/api/ativar-conta", methods=["GET"])
 def ativar_conta_get():
     token = request.args.get('token')
@@ -182,8 +184,11 @@ def ativar_conta_get():
     if user_id and update_user_status(user_id, 'ativo', 1):
         print(f"DEBUG: SUCESSO! Usuário ID {user_id} ativado via GET.")
         
-        # 3. Redirecionamento para o Streamlit
-        return redirect(f"{STREAMLIT_LOGIN_URL}?message=activated&user={user_id}", code=302)
+        if STREAMLIT_LOGIN_URL:
+            return redirect(f"{STREAMLIT_LOGIN_URL}?message=activated&user={user_id}", code=302)
+        else:
+            return "SUCESSO: Conta ativada. Por favor, acesse o seu aplicativo Streamlit e faça login.", 200
+       
     else:
         print(f"DEBUG: FALHA AO ATUALIZAR DB para User ID: {user_id} (GET)")
         # Se a ativação falhar (ex: usuário já está ativo), ainda podemos redirecionar para uma mensagem neutra
