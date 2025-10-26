@@ -39,6 +39,8 @@ URL_BASE_ATIVACAO = get_secret("URL_BASE_ATIVACAO")
 MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
 MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
 URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
+URL_API_AUTH = get_secret("URL_API_AUTH")
+
 # --- Configuração de Sessão e Título ---
 st.set_page_config(
     page_title="Sistema de Cursos",
@@ -56,129 +58,129 @@ if 'user_email' not in st.session_state:
 # --- Configuração do Banco de Dados SQLite ---
 DB_NAME = 'usuarios.db'
 
-def init_db():
-    """Cria a tabela de usuários se ela não existir."""
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cpf TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            nome TEXT NOT NULL,
-            senha_hash TEXT NOT NULL, 
-            assinante BOOLEAN DEFAULT 0, 
-            ativo BOOLEAN DEFAULT 0,    
-            token_ativacao TEXT,        
-            token_expiracao INTEGER     
-        )
-    ''')
-    conn.commit()
-    conn.close()
+# def init_db():
+#     """Cria a tabela de usuários se ela não existir."""
+#     conn = sqlite3.connect(DB_NAME)
+#     c = conn.cursor()
+#     c.execute('''
+#         CREATE TABLE IF NOT EXISTS usuarios (
+#             id INTEGER PRIMARY KEY AUTOINCREMENT,
+#             cpf TEXT UNIQUE NOT NULL,
+#             email TEXT UNIQUE NOT NULL,
+#             nome TEXT NOT NULL,
+#             senha_hash TEXT NOT NULL, 
+#             assinante BOOLEAN DEFAULT 0, 
+#             ativo BOOLEAN DEFAULT 0,    
+#             token_ativacao TEXT,        
+#             token_expiracao INTEGER     
+#         )
+#     ''')
+#     conn.commit()
+#     conn.close()
 
-# Inicializa o banco de dados
-init_db()
+# # Inicializa o banco de dados
+# init_db()
 
 
 # --- Funções de Hashing e Verificação ---
 
-def hash_senha(senha):
-    """Gera o hash BCrypt da senha."""
-    senha_bytes = senha.encode('utf-8')
-    return bcrypt.hashpw(senha_bytes, bcrypt.gensalt())
+# def hash_senha(senha):
+#     """Gera o hash BCrypt da senha."""
+#     senha_bytes = senha.encode('utf-8')
+#     return bcrypt.hashpw(senha_bytes, bcrypt.gensalt())
 
-def verificar_senha(senha_digitada, senha_hash_salva):
-    """Verifica se a senha digitada corresponde ao hash salvo."""
-    senha_digitada_bytes = senha_digitada.encode('utf-8')
-    # O hash do banco precisa ser convertido para bytes se estiver em string
-    # Nota: No SQLite ele pode ser salvo como BLOB, aqui assumimos que é uma string de texto
-    if isinstance(senha_hash_salva, str):
-         senha_hash_salva = senha_hash_salva.encode('utf-8')
+# def verificar_senha(senha_digitada, senha_hash_salva):
+#     """Verifica se a senha digitada corresponde ao hash salvo."""
+#     senha_digitada_bytes = senha_digitada.encode('utf-8')
+#     # O hash do banco precisa ser convertido para bytes se estiver em string
+#     # Nota: No SQLite ele pode ser salvo como BLOB, aqui assumimos que é uma string de texto
+#     if isinstance(senha_hash_salva, str):
+#          senha_hash_salva = senha_hash_salva.encode('utf-8')
     
-    return bcrypt.checkpw(senha_digitada_bytes, senha_hash_salva)
+#     return bcrypt.checkpw(senha_digitada_bytes, senha_hash_salva)
 
 
 # --- Funções do Banco de Dados ---
 
-def cadastrar_usuario(cpf, email, nome, senha, assinante, ativo=0):
-    """
-    Cadastra um novo usuário no DB (PostgreSQL/Supabase),
-    removendo a necessidade dos campos de token de ativação.
-    """
-    conn = None # Inicializa a conexão
-    try:
-        # 1. Conexão ao PostgreSQL
-        # Adapte esta linha para a sua função de conexão real
-        DATABASE_URL = os.getenv("DATABASE_URL")
-        # conn = connect(DATABASE_URL) # <-- Use sua função de conexão aqui
+# def cadastrar_usuario(cpf, email, nome, senha, assinante, ativo=0):
+#     """
+#     Cadastra um novo usuário no DB (PostgreSQL/Supabase),
+#     removendo a necessidade dos campos de token de ativação.
+#     """
+#     conn = None # Inicializa a conexão
+#     try:
+#         # 1. Conexão ao PostgreSQL
+#         # Adapte esta linha para a sua função de conexão real
+#         DATABASE_URL = os.getenv("DATABASE_URL")
+#         # conn = connect(DATABASE_URL) # <-- Use sua função de conexão aqui
         
-        # --- SUBSTITUA A LINHA DE CONEXÃO ACIMA PELA SUA LÓGICA DE CONEXÃO AO DB ---
+#         # --- SUBSTITUA A LINHA DE CONEXÃO ACIMA PELA SUA LÓGICA DE CONEXÃO AO DB ---
         
-        c = conn.cursor()
-        hashed_password = hash_senha(senha)
+#         c = conn.cursor()
+#         hashed_password = hash_senha(senha)
         
-        # 2. SQL: Removemos token_ativacao e token_expiracao e usamos sintaxe PostgreSQL (%s)
-        sql_query = """
-            INSERT INTO usuarios (cpf, email, nome, senha_hash, assinante, ativo)
-            VALUES (%s, %s, %s, %s, %s, %s)
-            RETURNING user_id, nome; -- Pede para o DB retornar o ID e o NOME
-        """
+#         # 2. SQL: Removemos token_ativacao e token_expiracao e usamos sintaxe PostgreSQL (%s)
+#         sql_query = """
+#             INSERT INTO usuarios (cpf, email, nome, senha_hash, assinante, ativo)
+#             VALUES (%s, %s, %s, %s, %s, %s)
+#             RETURNING user_id, nome; -- Pede para o DB retornar o ID e o NOME
+#         """
         
-        c.execute(
-            sql_query,
-            (cpf, email, nome, hashed_password, assinante, ativo)
-        )
+#         c.execute(
+#             sql_query,
+#             (cpf, email, nome, hashed_password, assinante, ativo)
+#         )
         
-        # 3. Obtém o ID e o Nome retornado pelo DB
-        user_id, nome_retornado = c.fetchone()
+#         # 3. Obtém o ID e o Nome retornado pelo DB
+#         user_id, nome_retornado = c.fetchone()
         
-        conn.commit()
-        c.close()
+#         conn.commit()
+#         c.close()
         
-        # Retorna o ID e o Nome para que a rota de cadastro possa enviar o e-mail
-        return user_id, nome_retornado 
+#         # Retorna o ID e o Nome para que a rota de cadastro possa enviar o e-mail
+#         return user_id, nome_retornado 
 
-    except Exception as e:
-        # Captura erros de DB (ex: Email/CPF já existente - IntegrityError)
-        print(f"ERRO DE CADASTRO NO DB: {e}") 
+#     except Exception as e:
+#         # Captura erros de DB (ex: Email/CPF já existente - IntegrityError)
+#         print(f"ERRO DE CADASTRO NO DB: {e}") 
         
-        if conn:
-            conn.rollback() # Desfaz a transação em caso de erro
+#         if conn:
+#             conn.rollback() # Desfaz a transação em caso de erro
         
-        # Retorna False e None em caso de falha no registro
-        return False, None
+#         # Retorna False e None em caso de falha no registro
+#         return False, None
         
-    finally:
-        if conn:
-            conn.close()
+#     finally:
+#         if conn:
+#             conn.close()
 
-def buscar_usuario(email):
-    """Busca o usuário pelo email e retorna os dados."""
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    # Adicionando 'ativo', 'token_ativacao' e 'token_expiracao'
-    c.execute('SELECT id, nome, senha_hash, assinante, ativo, token_ativacao FROM usuarios WHERE email = ?', (email,)) 
-    user_data = c.fetchone()
-    conn.close()    
-    return user_data
+# def buscar_usuario(email):
+#     """Busca o usuário pelo email e retorna os dados."""
+#     conn = sqlite3.connect(DB_NAME)
+#     c = conn.cursor()
+#     # Adicionando 'ativo', 'token_ativacao' e 'token_expiracao'
+#     c.execute('SELECT id, nome, senha_hash, assinante, ativo, token_ativacao FROM usuarios WHERE email = ?', (email,)) 
+#     user_data = c.fetchone()
+#     conn.close()    
+#     return user_data
 # --- Funções de Validação de Input (Reutilizadas) ---
 
-def set_user_active(user_id):
-    """Define o status do usuário como ativo e limpa o token."""
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute('UPDATE usuarios SET ativo = 1, token_ativacao = NULL, token_expiracao = NULL WHERE id = ?', (user_id,))
-    conn.commit()
-    conn.close()
+# def set_user_active(user_id):
+#     """Define o status do usuário como ativo e limpa o token."""
+#     conn = sqlite3.connect(DB_NAME)
+#     c = conn.cursor()
+#     c.execute('UPDATE usuarios SET ativo = 1, token_ativacao = NULL, token_expiracao = NULL WHERE id = ?', (user_id,))
+#     conn.commit()
+#     conn.close()
 
 
-def update_user_token(user_id, token, expiration_timestamp):
-    """Atualiza o token de ativação do usuário no banco."""
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute('UPDATE usuarios SET token_ativacao = ?, token_expiracao = ? WHERE id = ?', (token, expiration_timestamp, user_id))
-    conn.commit()
-    conn.close()
+# def update_user_token(user_id, token, expiration_timestamp):
+#     """Atualiza o token de ativação do usuário no banco."""
+#     conn = sqlite3.connect(DB_NAME)
+#     c = conn.cursor()
+#     c.execute('UPDATE usuarios SET token_ativacao = ?, token_expiracao = ? WHERE id = ?', (token, expiration_timestamp, user_id))
+#     conn.commit()
+#     conn.close()
 
 
 
@@ -191,13 +193,13 @@ def validar_cpf(cpf):
 def validar_email(email):
     return bool(re.match(r"[^@]+@[^@]+\.[^@]+", email))
 
-def verificar_existencia(email, cpf):
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    c.execute('SELECT COUNT(*) FROM usuarios WHERE email = ? OR cpf = ?', (email, cpf))
-    count = c.fetchone()[0]
-    conn.close()
-    return count > 0
+# def verificar_existencia(email, cpf):
+#     conn = sqlite3.connect(DB_NAME)
+#     c = conn.cursor()
+#     c.execute('SELECT COUNT(*) FROM usuarios WHERE email = ? OR cpf = ?', (email, cpf))
+#     count = c.fetchone()[0]
+#     conn.close()
+#     return count > 0
 
 
 # try:
@@ -217,92 +219,92 @@ def gerar_codigo_ativacao():
     st.session_state['user_activation_code'] = code
     return code
 
-def gerar_token_ativacao():
-    """Gera um token criptograficamente seguro e define a expiração."""
-    # Gera um token forte (ex: 64 caracteres hexadecimais)
-    token = secrets.token_hex(32)
-    # Token expira em 24 horas (em segundos)
-    expiracao = int(time.time()) + (24 * 3600)
-    return token, expiracao
+# def gerar_token_ativacao():
+#     """Gera um token criptograficamente seguro e define a expiração."""
+#     # Gera um token forte (ex: 64 caracteres hexadecimais)
+#     token = secrets.token_hex(32)
+#     # Token expira em 24 horas (em segundos)
+#     expiracao = int(time.time()) + (24 * 3600)
+#     return token, expiracao
 
 
 
 
 
-def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str, link_ativacao: str) -> int:
-    """
-    Envia o email de ativação com o link dinâmico.
-    (Função aprimorada com tratamento de erro e texto simples, conforme combinado)
-    """
-    # 1. Obter credenciais de forma segura (já usando os.getenv/st.secrets)
-    api_key = CHAVE_API_SENDGRID # Assumindo que CHAVE_API_SENDGRID já está populada
-    remetente = EMAIL_REMETENTE
+# def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str, link_ativacao: str) -> int:
+#     """
+#     Envia o email de ativação com o link dinâmico.
+#     (Função aprimorada com tratamento de erro e texto simples, conforme combinado)
+#     """
+#     # 1. Obter credenciais de forma segura (já usando os.getenv/st.secrets)
+#     api_key = CHAVE_API_SENDGRID # Assumindo que CHAVE_API_SENDGRID já está populada
+#     remetente = EMAIL_REMETENTE
 
-    if not api_key:
-         print("ERRO: CHAVE_API_SENDGRID não definida.")
-         return 500
+#     if not api_key:
+#          print("ERRO: CHAVE_API_SENDGRID não definida.")
+#          return 500
 
-    from python_http_client.exceptions import HTTPError # Importação local para evitar erros globais
+#     from python_http_client.exceptions import HTTPError # Importação local para evitar erros globais
     
-    # 2. Conteúdo em Texto Simples (para melhor entregabilidade)
-    email_text = f"""
-    Olá, {nome_usuario},
+#     # 2. Conteúdo em Texto Simples (para melhor entregabilidade)
+#     email_text = f"""
+#     Olá, {nome_usuario},
     
-    Obrigado por se registrar! Para ativar sua conta e liberar o acesso, por favor, visite o link:
+#     Obrigado por se registrar! Para ativar sua conta e liberar o acesso, por favor, visite o link:
     
-    {link_ativacao}
+#     {link_ativacao}
     
-    Atenciosamente,
-    Equipe do Curso.
-    """
+#     Atenciosamente,
+#     Equipe do Curso.
+#     """
     
-    # 3. Conteúdo HTML
-    email_html = f"""
-    <html>
-      <body>
-        <p>Olá, <strong>{nome_usuario}</strong>,</p>
-        <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
+#     # 3. Conteúdo HTML
+#     email_html = f"""
+#     <html>
+#       <body>
+#         <p>Olá, <strong>{nome_usuario}</strong>,</p>
+#         <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
         
-        <p style="text-align: center;">
-            <a href="{link_ativacao}" 
-               style="background-color: #4CAF50; 
-                      color: white; 
-                      padding: 10px 20px; 
-                      text-decoration: none; 
-                      border-radius: 5px; 
-                      display: inline-block;">
-                ATIVAR MINHA CONTA
-            </a>
-        </p>
+#         <p style="text-align: center;">
+#             <a href="{link_ativacao}" 
+#                style="background-color: #4CAF50; 
+#                       color: white; 
+#                       padding: 10px 20px; 
+#                       text-decoration: none; 
+#                       border-radius: 5px; 
+#                       display: inline-block;">
+#                 ATIVAR MINHA CONTA
+#             </a>
+#         </p>
         
-        <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
-        <p><small>{link_ativacao}</small></p>
+#         <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
+#         <p><small>{link_ativacao}</small></p>
         
-        <p>Atenciosamente,<br>Equipe do Curso.</p>
-      </body>
-    </html>
-    """
+#         <p>Atenciosamente,<br>Equipe do Curso.</p>
+#       </body>
+#     </html>
+#     """
     
-    email = Mail(
-        from_email=remetente,
-        to_emails=destinatario,
-        subject='Ativação de Conta - Seu Curso de CNH',
-        html_content=email_html,
-        plain_text_content=email_text # Adiciona o conteúdo em texto simples
-    )
+#     email = Mail(
+#         from_email=remetente,
+#         to_emails=destinatario,
+#         subject='Ativação de Conta - Seu Curso de CNH',
+#         html_content=email_html,
+#         plain_text_content=email_text # Adiciona o conteúdo em texto simples
+#     )
 
-    # 4. Tratamento de Erros
-    try:
-        conta_sendgrid = SendGridAPIClient(api_key)
-        resposta = conta_sendgrid.send(email)
-        print(f"Email enviado. Status Code: {resposta.status_code}")
-        return resposta.status_code
-    except HTTPError as e:
-        st.error(f"Erro ao enviar email (Status {e.status_code}): {e.body}")
-        return e.status_code
-    except Exception as e:
-        st.error(f"Erro inesperado no envio de email: {e}")
-        return 500
+#     # 4. Tratamento de Erros
+#     try:
+#         conta_sendgrid = SendGridAPIClient(api_key)
+#         resposta = conta_sendgrid.send(email)
+#         print(f"Email enviado. Status Code: {resposta.status_code}")
+#         return resposta.status_code
+#     except HTTPError as e:
+#         st.error(f"Erro ao enviar email (Status {e.status_code}): {e.body}")
+#         return e.status_code
+#     except Exception as e:
+#         st.error(f"Erro inesperado no envio de email: {e}")
+#         return 500
 
 def reiniciar_simulado():
     """Reseta todas as variáveis do quiz."""
@@ -345,45 +347,45 @@ def proxima_pergunta():
 
  # Tenta pegar o valor do token da URL
 
-token_de_ativacao = st.query_params.get("token", None) 
+# token_de_ativacao = st.query_params.get("token", None) 
 
-if token_de_ativacao:
-    # 1. Tenta fazer a chamada POST para o Back-end (Render)
-    with st.spinner("Verificando e ativando sua conta..."):
-        try:
-            # st.info(f"Chamando API: {URL_API_ATIVACAO} com token...") # Opcional para debug
+# if token_de_ativacao:
+#     # 1. Tenta fazer a chamada POST para o Back-end (Render)
+#     with st.spinner("Verificando e ativando sua conta..."):
+#         try:
+#             # st.info(f"Chamando API: {URL_API_ATIVACAO} com token...") # Opcional para debug
             
-            response = requests.post(
-                URL_API_ATIVACAO, # URL do seu endpoint de ativação no Render
-                json={"token": token_de_ativacao}
-            )
+#             response = requests.post(
+#                 URL_API_ATIVACAO, # URL do seu endpoint de ativação no Render
+#                 json={"token": token_de_ativacao}
+#             )
             
-            # 2. Verifica a resposta da API (Render)
-            if response.status_code == 200:
-                st.success("🎉 Conta ativada com sucesso! Você já pode fazer login.")
-                # Limpa o token da URL usando a nova sintaxe
-                if "token" in st.query_params:
-                    del st.query_params["token"]
+#             # 2. Verifica a resposta da API (Render)
+#             if response.status_code == 200:
+#                 st.success("🎉 Conta ativada com sucesso! Você já pode fazer login.")
+#                 # Limpa o token da URL usando a nova sintaxe
+#                 if "token" in st.query_params:
+#                     del st.query_params["token"]
                 
-            elif response.status_code == 400:
-                # 400 = Bad Request (Token Inválido, Expirado, etc.)
-                st.error(f"❌ Falha na ativação. O link é inválido, expirou ou a conta já estava ativa. Status: 400.")
-                # Limpa o token da URL
-                if "token" in st.query_params:
-                    del st.query_params["token"]
+#             elif response.status_code == 400:
+#                 # 400 = Bad Request (Token Inválido, Expirado, etc.)
+#                 st.error(f"❌ Falha na ativação. O link é inválido, expirou ou a conta já estava ativa. Status: 400.")
+#                 # Limpa o token da URL
+#                 if "token" in st.query_params:
+#                     del st.query_params["token"]
             
-            else:
-                # 500 = Internal Server Error ou outro erro da API
-                st.error(f"⚠️ Erro no servidor de ativação. Status: {response.status_code}. Tente novamente mais tarde.")
+#             else:
+#                 # 500 = Internal Server Error ou outro erro da API
+#                 st.error(f"⚠️ Erro no servidor de ativação. Status: {response.status_code}. Tente novamente mais tarde.")
 
-        except requests.exceptions.RequestException as e:
-            st.error(f"🛑 Erro de conexão ao tentar ativar sua conta. Verifique se o servidor da API (Render) está ativo.")
+#         except requests.exceptions.RequestException as e:
+#             st.error(f"🛑 Erro de conexão ao tentar ativar sua conta. Verifique se o servidor da API (Render) está ativo.")
     
-    st.rerun()
+#     st.rerun()
 # --- Telas do Streamlit ---
 
 def tela_login():
-
+    """Mostra o formulário de login e envia dados para a API."""
 
     st.title("🔑 Login")
 
@@ -393,57 +395,69 @@ def tela_login():
         login_button = st.form_submit_button(label='Entrar')
 
     if login_button:
-        user_data = buscar_usuario(email)
+        # Prepara o payload para a API
+        payload = {
+            "action": "LOGIN", # <-- INDICA AO BACK-END QUE É UM LOGIN
+            "email": email,
+            "senha": senha
+        }
         
-        if user_data:
-            user_id, nome, senha_hash_salva, assinante, ativo, token_ativacao = user_data
+        st.info("Verificando credenciais...")
+
+        try:
+            # Chama a API de Autenticação/Cadastro Unificada
+            response = requests.post(URL_API_AUTH, json=payload)
             
-            # 1. Checa a senha primeiro
-            if verificar_senha(senha, senha_hash_salva):
+            # 1. Login Bem-Sucedido (Status 200)
+            if response.status_code == 200:
+                user_data = response.json().get("user_data", {})
                 
-                # 2. Se a senha está OK, checa a ativação
-                # if not ativo:
-                #     # Se não estiver ativo, MOSTRA O AVISO E SAÍMOS da função (return)
-                #     st.warning("⚠️ **Conta Não Ativada.** Por favor, verifique seu e-mail para ativar sua conta.")
-                #     return # <-- IMPEDE O CÓDIGO DE LOGIN DE SER EXECUTADO
-                
-                # 3. Se a senha está OK E a conta está ativa (fluxo normal de login)
+                # Assume que a API retorna os dados necessários no corpo da resposta JSON
                 st.session_state['logged_in'] = True
                 st.session_state['user_email'] = email
-                st.session_state['user_nome'] = nome
-                st.session_state['user_assinante'] = bool(assinante)
-                st.session_state['user_id'] = user_id
-                st.success(f"Login bem-sucedido! Bem-vindo(a), {nome}.")
+                st.session_state['user_nome'] = user_data.get('nome') # Nome vem da API
+                st.session_state['user_assinante'] = user_data.get('assinante') # Status vem da API
+                st.session_state['user_id'] = user_data.get('user_id') # ID vem da API
+                
+                st.success(f"Login bem-sucedido! Bem-vindo(a), {st.session_state['user_nome']}.")
                 st.rerun()
+
+            # 2. Falha de Login (Status 401 - Não Autorizado)
+            elif response.status_code == 401:
+                st.error(response.json().get("message", "Email ou senha incorretos."))
+            
+            # 3. Conta Inativa (Opcional: Se seu back-end ainda verifica isso)
+            elif response.status_code == 403: # 403 Forbidden
+                st.warning(response.json().get("message", "Conta inativa. Verifique seu e-mail."))
+            
+            # 4. Outros Erros
             else:
-                # Senha incorreta
-                st.error("Email ou senha incorretos.")
-        else:
-            # Usuário não encontrado
-            st.error("Email ou senha incorretos.")
+                st.error(response.json().get("message", "Erro desconhecido no login."))
+
+        except requests.exceptions.RequestException:
+            st.error("Erro de conexão com a API. Verifique se o servidor Flask está ativo.")
 
 
 
 
 def tela_cadastro():
-    """Mostra o formulário de cadastro."""
+    """Mostra o formulário de cadastro e envia dados para a API."""
     st.title("📝 Cadastro de Novo Usuário")
     
     with st.form(key='cadastro_form'):
+        # Campos de entrada
         cpf_input = st.text_input(label="CPF (apenas números)", max_chars=11, placeholder="12345678900")
         email_input = st.text_input(label="Email", placeholder="seu.email@exemplo.com")
         nome_input = st.text_input(label="Nome Completo", placeholder="Seu nome")
         senha_input = st.text_input(label="Senha", type="password")
         confirma_senha_input = st.text_input(label="Confirma senha", type="password")
         
-        
-        assinante_inicial = 0 # Inicia como não-assinante
-        
         submit_button = st.form_submit_button(label='Cadastrar')
 
     if submit_button:
         erros = False
         
+        # 1. Validações Locais (Front-end) - Rápido e evita chamadas desnecessárias
         if not validar_cpf(cpf_input):
             st.error("CPF inválido.")
             erros = True
@@ -456,48 +470,46 @@ def tela_cadastro():
         elif len(senha_input) < 6:
             st.error("A senha deve ter pelo menos 6 caracteres.")
             erros = True
-        
-        if not erros and verificar_existencia(email_input, cpf_input):
-            st.error("Este Email ou CPF já está cadastrado.")
-            erros = True
-        
-        if not senha_input == confirma_senha_input:
+        elif not senha_input == confirma_senha_input:
             st.error('Senhas diferentes')
             erros = True
+            
+        # REMOVIDA A VERIFICAÇÃO DE EXISTÊNCIA E A LÓGICA DE TOKEN/E-MAIL
 
         if not erros:
-            token_ativacao, expiracao_token = gerar_token_ativacao()
             
-            # 2. Monta o link de ativação dinâmico
-            # O link de ativação agora inclui o token seguro
-            # Se você usar Streamlit, talvez precise de um endpoint de API separado.
-            # Aqui, simulamos o link completo que o usuário deve clicar:
-            link_ativacao_completo = f"{URL_BASE_ATIVACAO}?token={token_ativacao}"
-
-            # 3. Cadastra o usuário com ativo=0 e o token
-            user_id = cadastrar_usuario(
-                cpf=cpf_input, 
-                email=email_input, 
-                nome=nome_input,
-                senha=senha_input, 
-                assinante=assinante_inicial,
-                ativo=0, # Inicia como não-ativo
-                token=token_ativacao,
-                token_exp=expiracao_token
-            )
-            if user_id:
-                # 4. Envia o email com o link dinâmico
-                status_envio = enviar_email_ativacao_sendgrid(
-                    destinatario=email_input,
-                    nome_usuario=nome_input,
-                    link_ativacao=link_ativacao_completo)
-                if status_envio == 202:
-                    st.success("Cadastro concluído! Enviamos um e-mail de ativação. Por favor, verifique sua caixa de entrada para liberar o acesso.")
-                else:
-                    st.warning("Cadastro concluído, mas falha no envio do e-mail de ativação. Tente o login para reenviar.")
+            # 2. Prepara o Payload para a API
+            payload = {
+                "action": "CADASTRO", # <-- INDICA AO BACK-END QUE É UM CADASTRO
+                "cpf": cpf_input,
+                "email": email_input,
+                "nome": nome_input,
+                "senha": senha_input,
+                "assinante": 0 
+                # O Back-end se encarrega de: hash da senha, salvar no DB, e enviar o e-mail
+            }
+            
+            st.info("Processando cadastro...")
+            
+            try:
+                # 3. Chama a API de Autenticação/Cadastro Unificada
+                response = requests.post(URL_API_AUTH, json=payload)
                 
-            else:
-                st.error("Falha ao salvar usuário no banco de dados.")
+                # 4. Trata a Resposta da API
+                if response.status_code == 201: # 201 Created (Sucesso no Cadastro)
+                    st.success(response.json().get("message", "Cadastro realizado! Verifique seu e-mail de boas-vindas."))
+                    
+                    time.sleep(2)
+                    st.session_state['tela_atual'] = 'login'
+                    st.rerun()
+                    
+                elif response.status_code == 409: # 409 Conflict (Email/CPF já existe)
+                    st.error(response.json().get("message", "Este e-mail ou CPF já está cadastrado."))
+                else:
+                    st.error(response.json().get("message", "Erro desconhecido no cadastro. Tente novamente."))
+                    
+            except requests.exceptions.RequestException as e:
+                st.error(f"Erro de conexão com a API: O servidor não respondeu. Verifique URL_API_AUTH.")
 
 def tela_curso():
     """Conteúdo do Curso (Acesso Condicional)."""
@@ -570,56 +582,56 @@ def tela_curso():
 
 
 
-def tela_verificacao_email():
-    """Tela para gerenciar o fluxo de verificação de e-mail."""
-    st.title("📧 Verificação de E-mail")
+# def tela_verificacao_email():
+#     """Tela para gerenciar o fluxo de verificação de e-mail."""
+#     st.title("📧 Verificação de E-mail")
 
-    if st.session_state['user_verificado']:
-        st.success("Seu e-mail já está verificado! Você já pode acessar todo o conteúdo.")
-        return
+#     if st.session_state['user_verificado']:
+#         st.success("Seu e-mail já está verificado! Você já pode acessar todo o conteúdo.")
+#         return
 
-    # --- Se o código de ativação ainda não foi gerado, ofereça o envio ---
-    if st.session_state['user_activation_code'] is None:
-        st.info(f"O seu e-mail **{st.session_state['user_email']}** precisa ser verificado para liberar o acesso.")
+#     # --- Se o código de ativação ainda não foi gerado, ofereça o envio ---
+#     if st.session_state['user_activation_code'] is None:
+#         st.info(f"O seu e-mail **{st.session_state['user_email']}** precisa ser verificado para liberar o acesso.")
         
-        if st.button("Enviar E-mail de Ativação"):
-            codigo = gerar_codigo_ativacao()
+#         if st.button("Enviar E-mail de Ativação"):
+#             codigo = gerar_codigo_ativacao()
             
-            if enviar_email_ativacao_sendgrid(
-                destinatario=st.session_state['user_email'],
-                nome_usuario=st.session_state['user_nome'],
-                codigo=codigo
-            ):
-                st.session_state['email_sent'] = True 
-                st.session_state['tentativas_codigo'] = 0 # Reinicia tentativas
-                st.rerun()
-            # Se o envio falhar, a mensagem de erro já foi exibida.
+#             if enviar_email_ativacao_sendgrid(
+#                 destinatario=st.session_state['user_email'],
+#                 nome_usuario=st.session_state['user_nome'],
+#                 codigo=codigo
+#             ):
+#                 st.session_state['email_sent'] = True 
+#                 st.session_state['tentativas_codigo'] = 0 # Reinicia tentativas
+#                 st.rerun()
+#             # Se o envio falhar, a mensagem de erro já foi exibida.
                 
-    # --- Se o e-mail foi enviado, peça o código ---
-    if st.session_state.get('email_sent', False) and not st.session_state['user_verificado']:
-        st.write(f"Enviamos o código para **{st.session_state['user_email']}**. Verifique sua caixa de entrada e insira-o abaixo.")
+#     # --- Se o e-mail foi enviado, peça o código ---
+#     if st.session_state.get('email_sent', False) and not st.session_state['user_verificado']:
+#         st.write(f"Enviamos o código para **{st.session_state['user_email']}**. Verifique sua caixa de entrada e insira-o abaixo.")
         
-        with st.form(key="form_verificacao"):
-            codigo_digitado = st.text_input("Insira o código de 6 dígitos:", max_chars=6)
-            submit_button = st.form_submit_button("Ativar Conta")
+#         with st.form(key="form_verificacao"):
+#             codigo_digitado = st.text_input("Insira o código de 6 dígitos:", max_chars=6)
+#             submit_button = st.form_submit_button("Ativar Conta")
             
-            if submit_button:
-                # Lógica de verificação do código
-                if codigo_digitado == st.session_state['user_activation_code']:
-                    st.session_state['user_verificado'] = True
-                    st.session_state['user_activation_code'] = None # Limpa o código
-                    st.success("✅ **Conta ativada com sucesso!** Redirecionando...")
-                    st.balloons()
-                    st.rerun()
-                else:
-                    st.session_state['tentativas_codigo'] = st.session_state.get('tentativas_codigo', 0) + 1
-                    st.error(f"Código incorreto. Tentativas restantes: {3 - st.session_state['tentativas_codigo']}")
+#             if submit_button:
+#                 # Lógica de verificação do código
+#                 if codigo_digitado == st.session_state['user_activation_code']:
+#                     st.session_state['user_verificado'] = True
+#                     st.session_state['user_activation_code'] = None # Limpa o código
+#                     st.success("✅ **Conta ativada com sucesso!** Redirecionando...")
+#                     st.balloons()
+#                     st.rerun()
+#                 else:
+#                     st.session_state['tentativas_codigo'] = st.session_state.get('tentativas_codigo', 0) + 1
+#                     st.error(f"Código incorreto. Tentativas restantes: {3 - st.session_state['tentativas_codigo']}")
                     
-                    if st.session_state['tentativas_codigo'] >= 3:
-                         st.warning("Muitas tentativas. Por segurança, por favor, envie um novo código.")
-                         st.session_state['email_sent'] = False
-                         st.session_state['user_activation_code'] = None
-                         st.rerun()
+#                     if st.session_state['tentativas_codigo'] >= 3:
+#                          st.warning("Muitas tentativas. Por segurança, por favor, envie um novo código.")
+#                          st.session_state['email_sent'] = False
+#                          st.session_state['user_activation_code'] = None
+#                          st.rerun()
 
 def tela_simulados():
     """Interface principal para a tela de Simulado."""
