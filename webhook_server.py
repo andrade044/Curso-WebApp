@@ -207,7 +207,7 @@ def cadastrar_usuario(cpf, email, nome, senha, assinante, ativo=0):
     Cadastra um novo usuário no DB (PostgreSQL/Supabase),
     removendo a necessidade dos campos de token de ativação.
     """
-    conn = None 
+    conn = None
     try:
         conn = get_db_connection() # Usa a função que você já definiu
         c = conn.cursor()
@@ -431,7 +431,124 @@ def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str, link_at
         print(f"Erro inesperado no envio de email: {e}")
         return 500
 
+@app.route("/auth", methods=["POST"]) # <--- É AQUI QUE VOCÊ COLOCA!
+def auth_handler():
+    """
+    Trata requisições POST para Login ou Cadastro, dependendo do campo 'action'.
+    """
+    data = request.get_json()
+    action = data.get('action') # 'CADASTRO' ou 'LOGIN'
+    
+    if not action:
+        return jsonify({"message": "Ação não especificada."}), 400
 
+    # LÓGICA DE CADASTRO
+    if action == "CADASTRO":
+        # 1. Extrair dados do payload
+        cpf = data.get('cpf')
+        email = data.get('email')
+        nome = data.get('nome')
+        senha = data.get('senha')
+        assinante = data.get('assinante', 0)
+        
+        # 2. Chamar a função de DB e obter ID/Nome
+        # Certifique-se que 'cadastrar_usuario' não exige mais os argumentos de token
+        user_id, nome_usuario = cadastrar_usuario(cpf, email, nome, senha, assinante, ativo=1) # ATIVO = 1 (Login imediato)
+        
+        if user_id:
+            # 3. Enviar o e-mail de boas-vindas
+            enviar_email_ativacao_sendgrid(email, nome_usuario)
+            return jsonify({"message": "Cadastro realizado com sucesso! Verifique seu e-mail de boas-vindas."}), 201
+        else:
+            # Erro de integridade (Email/CPF já existe)
+            return jsonify({"message": "Este e-mail ou CPF já está cadastrado."}), 409
+    
+    # LÓGICA DE LOGIN
+    elif action == "LOGIN":
+        email = data.get('email')
+        senha = data.get('senha')
+        
+        # 1. Buscar usuário no DB
+        user_data = buscar_usuario_com_dados_completos(email) 
+        
+        if user_data and verificar_senha(senha, user_data['senha_hash']):
+            # 2. Retornar dados completos do usuário logado
+            return jsonify({
+                "message": "Login bem-sucedido",
+                "user_data": {
+                    "user_id": user_data['id'],
+                    "nome": user_data['nome'],
+                    "assinante": user_data['assinante']
+                }
+            }), 200
+        else:
+            return jsonify({"message": "Email ou senha incorretos."}), 401
+        
+    else:
+        return jsonify({"message": "Ação desconhecida."}), 400
+
+def verificar_senha(senha_digitada, senha_hash_salva):
+    """Verifica se a senha digitada corresponde ao hash salvo."""
+    senha_digitada_bytes = senha_digitada.encode('utf-8')
+    # O hash do banco precisa ser convertido para bytes se estiver em string
+    # Nota: No SQLite ele pode ser salvo como BLOB, aqui assumimos que é uma string de texto
+    if isinstance(senha_hash_salva, str):
+         senha_hash_salva = senha_hash_salva.encode('utf-8')
+    
+    return bcrypt.checkpw(senha_digitada_bytes, senha_hash_salva)
+
+
+def get_db_connection():
+    """Conecta ao seu banco de dados (ex: PostgreSQL/Supabase)."""
+    try:
+        DATABASE_URL = os.getenv("DATABASE_URL")
+        # Exemplo com psycopg2:
+        # conn = psycopg2.connect(DATABASE_URL) 
+        # return conn
+        
+        # Por enquanto, retorne um erro ou um mock se estiver testando:
+        raise Exception("SUBSTITUIR: Implemente sua conexão ao PostgreSQL/Supabase aqui.")
+    except Exception as e:
+        print(f"Erro de Conexão com o DB: {e}")
+        return None
+
+def buscar_usuario_com_dados_completos(email):
+    """
+    Busca um usuário pelo email no DB (PostgreSQL) e retorna todos os dados necessários.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return None # Falha na conexão
+
+    try:
+        with conn.cursor() as c:
+            # 1. SQL: Seleciona todos os campos necessários para o login e a sessão
+            sql_query = """
+                SELECT id, nome, senha_hash, assinante, ativo 
+                FROM usuarios 
+                WHERE email = %s;
+            """
+            
+            c.execute(sql_query, (email,))
+            user_data = c.fetchone()
+            
+            if user_data:
+                # O fetchone retorna uma tupla. Para facilitar, mapeamos para um dicionário.
+                
+                # Campos na ordem do SELECT:
+                fields = ['id', 'nome', 'senha_hash', 'assinante', 'ativo']
+                
+                return dict(zip(fields, user_data))
+            else:
+                return None # Usuário não encontrado
+
+    except Exception as e:
+        # print(f"ERRO DE BUSCA NO DB: {e}")
+        return None
+        
+    finally:
+        if conn:
+            conn.close()        
 if __name__ == "__main__":
     # Roda o servidor Flask na porta 5000
     app.run(port=5000, debug=True)
