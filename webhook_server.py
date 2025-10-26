@@ -8,6 +8,8 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 import psycopg2 
 from python_http_client.exceptions import HTTPError
+import bcrypt
+
 # Carrega variáveis do arquivo .env (se existir)
 load_dotenv() 
 
@@ -194,6 +196,95 @@ def generate_activation_token(user_id):
 #         # Se a ativação falhar (ex: usuário já está ativo), ainda podemos redirecionar para uma mensagem neutra
 #         return redirect(f"{STREAMLIT_LOGIN_URL}?message=already_active", code=302)
 
+
+def hash_senha(senha):
+    """Gera o hash BCrypt da senha."""
+    senha_bytes = senha.encode('utf-8')
+    return bcrypt.hashpw(senha_bytes, bcrypt.gensalt())
+
+def cadastrar_usuario(cpf, email, nome, senha, assinante, ativo=0):
+    """
+    Cadastra um novo usuário no DB (PostgreSQL/Supabase),
+    removendo a necessidade dos campos de token de ativação.
+    """
+    conn = None 
+    try:
+        conn = get_db_connection() # Usa a função que você já definiu
+        c = conn.cursor()
+        hashed_password = hash_senha(senha)
+        
+        # SQL: Removemos token_ativacao e token_expiracao
+        sql_query = """
+            INSERT INTO usuarios (cpf, email, nome, senha_hash, assinante, ativo)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id, nome; -- Assumindo que o ID da tabela é 'id'
+        """
+        
+        c.execute(
+            sql_query,
+            (cpf, email, nome, hashed_password, assinante, ativo)
+        )
+        
+        user_id, nome_retornado = c.fetchone()
+        
+        conn.commit()
+        c.close()
+        
+        return user_id, nome_retornado 
+
+    except psycopg2.errors.UniqueViolation as e:
+        print(f"ERRO DE CADASTRO - VIOLAÇÃO DE UNICIDADE (Email ou CPF já existe): {e}")
+        if conn:
+            conn.rollback()
+        return False, None
+        
+    except Exception as e:
+        print(f"ERRO DE CADASTRO NO DB: {e}") 
+        if conn:
+            conn.rollback()
+        return False, None
+        
+    finally:
+        if conn:
+            conn.close()
+
+
+
+@app.route("/cadastro", methods=["POST"])
+def cadastro():
+    data = request.get_json()
+    email = data.get('email')
+    senha = data.get('senha')
+    cpf = data.get('cpf')
+    nome = data.get('nome')
+    assinante = 0 # Assume 0 no cadastro inicial
+    
+    if not all([email, senha, cpf, nome]):
+        return jsonify({"message": "Campos obrigatórios ausentes."}), 400
+
+    # user_id e nome são retornados
+    user_id, nome_usuario = cadastrar_usuario(cpf, email, nome, senha, assinante)
+    
+    if user_id:
+        
+        try:
+            # Envia o e-mail de boas-vindas
+            enviar_email_ativacao_sendgrid(email, nome_usuario)
+            print(f"DEBUG: E-mail de boas-vindas enviado para {email}")
+            
+        except Exception as e:
+            # Loga, mas não impede o sucesso do cadastro
+            print(f"ERRO: Falha ao enviar e-mail de boas-vindas: {e}") 
+        
+        # Retorna sucesso para o Streamlit
+        return jsonify({"message": "Cadastro realizado com sucesso! Verifique seu e-mail de boas-vindas."}), 201
+    
+    else:
+        # Erro comum: usuário já existe (IntegrityError capturado em cadastrar_usuario)
+        return jsonify({"message": "Este e-mail ou CPF já está cadastrado."}), 40
+
+
+
 @app.route("/mercadopago_webhook", methods=["POST"])
 def mercadopago_webhook():
     """Endpoint para receber as notificações (Webhooks) do Mercado Pago."""
@@ -284,9 +375,8 @@ def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str, link_at
     email_text = f"""
     Olá, {nome_usuario},
     
-    Obrigado por se registrar! Para ativar sua conta e liberar o acesso, por favor, visite o link:
+    Obrigado por se registrar! Bem-vindo(a) à Plataforma! Seu Cadastro foi Concluído
     
-    {link_ativacao}
     
     Atenciosamente,
     Equipe do Curso.
@@ -295,27 +385,25 @@ def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str, link_at
     # 2. Conteúdo HTML (Copia da Função 1 ou 2, ambos são bons)
     email_html = f"""
     <html>
-      <body>
-        <p>Olá, <strong>{nome_usuario}</strong>,</p>
-        <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
-        
-        <p style="text-align: center;">
-            <a href="{link_ativacao}" 
-                style="background-color: #4CAF50; 
-                       color: white; 
-                       padding: 10px 20px; 
-                       text-decoration: none; 
-                       border-radius: 5px; 
-                       display: inline-block;">
-                ATIVAR MINHA CONTA
+        <body>
+            <p>Olá, **{nome_usuario}**!</p>
+            
+            <p>Ficamos muito felizes em ter você a bordo. Seu cadastro foi concluído com sucesso e você já pode acessar todo o nosso conteúdo exclusivo na plataforma.</p>
+            
+            <p>Seus dados de login são:</p>
+            <ul>
+                <li><strong>E-mail:</strong> {destinatario}</li>
+            </ul>
+            
+            <p>Para começar, basta clicar no link abaixo e usar seu e-mail e senha cadastrados:</p>
+            
+            <a href="{os.getenv('STREAMLIT_LOGIN_URL')}" style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px; display: inline-block;">
+                Acessar Minha Conta
             </a>
-        </p>
-        
-        <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
-        <p><small>{link_ativacao}</small></p>
-        
-        <p>Atenciosamente,<br>Equipe do Curso.</p>
-      </body>
+            
+            <p style="margin-top: 20px;">Se tiver qualquer dúvida, é só nos responder!</p>
+            <p>Atenciosamente,<br>A Equipe de Suporte</p>
+        </body>
     </html>
     """
     

@@ -100,27 +100,57 @@ def verificar_senha(senha_digitada, senha_hash_salva):
 
 # --- Funções do Banco de Dados ---
 
-def cadastrar_usuario(cpf, email, nome, senha, assinante, ativo=0, token=None, token_exp=None):
+def cadastrar_usuario(cpf, email, nome, senha, assinante, ativo=0):
+    """
+    Cadastra um novo usuário no DB (PostgreSQL/Supabase),
+    removendo a necessidade dos campos de token de ativação.
+    """
+    conn = None # Inicializa a conexão
     try:
-        hashed_password = hash_senha(senha)
-        conn = sqlite3.connect(DB_NAME)
-        c = conn.cursor()
+        # 1. Conexão ao PostgreSQL
+        # Adapte esta linha para a sua função de conexão real
+        DATABASE_URL = os.getenv("DATABASE_URL")
+        # conn = connect(DATABASE_URL) # <-- Use sua função de conexão aqui
         
-        # Inserindo os novos campos 'ativo', 'token_ativacao', 'token_expiracao'
+        # --- SUBSTITUA A LINHA DE CONEXÃO ACIMA PELA SUA LÓGICA DE CONEXÃO AO DB ---
+        
+        c = conn.cursor()
+        hashed_password = hash_senha(senha)
+        
+        # 2. SQL: Removemos token_ativacao e token_expiracao e usamos sintaxe PostgreSQL (%s)
+        sql_query = """
+            INSERT INTO usuarios (cpf, email, nome, senha_hash, assinante, ativo)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING user_id, nome; -- Pede para o DB retornar o ID e o NOME
+        """
+        
         c.execute(
-            "INSERT INTO usuarios (cpf, email, nome, senha_hash, assinante, ativo, token_ativacao, token_expiracao) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (cpf, email, nome, hashed_password, assinante, ativo, token, token_exp)
+            sql_query,
+            (cpf, email, nome, hashed_password, assinante, ativo)
         )
+        
+        # 3. Obtém o ID e o Nome retornado pelo DB
+        user_id, nome_retornado = c.fetchone()
+        
         conn.commit()
-        # Retorna o ID do usuário recém-criado para uso no token update, se necessário.
-        user_id = c.lastrowid
-        conn.close()
-        return user_id
-    except sqlite3.IntegrityError:
-        return False # Indica que CPF ou Email já existe
+        c.close()
+        
+        # Retorna o ID e o Nome para que a rota de cadastro possa enviar o e-mail
+        return user_id, nome_retornado 
+
     except Exception as e:
-        st.error(f"Erro no cadastro: {e}")
-        return False
+        # Captura erros de DB (ex: Email/CPF já existente - IntegrityError)
+        print(f"ERRO DE CADASTRO NO DB: {e}") 
+        
+        if conn:
+            conn.rollback() # Desfaz a transação em caso de erro
+        
+        # Retorna False e None em caso de falha no registro
+        return False, None
+        
+    finally:
+        if conn:
+            conn.close()
 
 def buscar_usuario(email):
     """Busca o usuário pelo email e retorna os dados."""
