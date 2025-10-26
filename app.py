@@ -372,10 +372,10 @@ def tela_login():
             if verificar_senha(senha, senha_hash_salva):
                 
                 # 2. Se a senha está OK, checa a ativação
-                if not ativo:
-                    # Se não estiver ativo, MOSTRA O AVISO E SAÍMOS da função (return)
-                    st.warning("⚠️ **Conta Não Ativada.** Por favor, verifique seu e-mail para ativar sua conta.")
-                    return # <-- IMPEDE O CÓDIGO DE LOGIN DE SER EXECUTADO
+                # if not ativo:
+                #     # Se não estiver ativo, MOSTRA O AVISO E SAÍMOS da função (return)
+                #     st.warning("⚠️ **Conta Não Ativada.** Por favor, verifique seu e-mail para ativar sua conta.")
+                #     return # <-- IMPEDE O CÓDIGO DE LOGIN DE SER EXECUTADO
                 
                 # 3. Se a senha está OK E a conta está ativa (fluxo normal de login)
                 st.session_state['logged_in'] = True
@@ -781,27 +781,6 @@ def tela_pagamento():
 def main():
    
 
-    if "message" in st.query_params and st.query_params["message"] == "activated":
-        
-        st.balloons()
-        st.success("🎉 Sua conta foi ativada com sucesso! Você já pode fazer login.")
-        
-        # Limpa os parâmetros 'message' e 'user' da URL
-        # O método recomendado para remover um parâmetro é usar 'del'
-        
-        # Tenta remover 'message'
-        if "message" in st.query_params:
-            del st.query_params["message"] 
-        
-        # Tenta remover 'user'
-        if "user" in st.query_params:
-            del st.query_params["user"]
-            
-        # Nota: Caso a remoção por 'del' não funcione na sua versão do Streamlit,
-        # você pode tentar usar: st.query_params.pop("message", None)
-    
-    # -------------------------------------------------------------
-    
     # Se o usuário NÃO está logado
     if not st.session_state.get('logged_in'):
         # Mostra as opções de Login e Cadastro na barra lateral
