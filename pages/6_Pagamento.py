@@ -29,6 +29,7 @@ MERCADO_PAGO_ACCESS_TOKEN = get_secret('MERCADO_PAGO_ACCESS_TOKEN')
 REFERENCIA_ASSINATURA = get_secret('REFERENCIA_ASSINATURA')
 
 VALOR_ASSINATURA = get_secret('VALOR_ASSINATURA') 
+VALOR_ASSINATURA = float(VALOR_ASSINATURA)
 TITULO_ASSINATURA = "Assinatura Premium do Curso de Python"
 
 CHAVE_API_SENDGRID = get_secret('CHAVE_API_SENDGRID')
@@ -186,5 +187,5 @@ def tela_pagamento():
         # Redireciona para Home após logout
         st.switch_page("Home.py") 
         st.stop()
-        
+
 tela_pagamento()
