@@ -391,7 +391,7 @@ def tela_login():
 
     # Adiciona um link para a página de Cadastro
     
-    st.page_link("pages/2_Cadastro.py", label="Novo por aqui? Cadastre-se aqui")
+    st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? Cadastre-se aqui")
 
     with st.form(key='login_form'):
         email = st.text_input("Email")
