@@ -1,5 +1,4 @@
 import streamlit as st
-import sqlite3
 import re
 import bcrypt
 import os 
@@ -14,6 +13,7 @@ from sendgrid.helpers.mail import Mail
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
 import requests
+from auth import cadastro
 
 def get_secret(key, default=None):
     
@@ -46,6 +46,8 @@ if 'user_email' not in st.session_state:
     st.session_state['user_email'] = None
 
 
+
+
 # --- Configuração do Banco de Dados SQLite ---
 DB_NAME = 'usuarios.db'
 
@@ -67,7 +69,21 @@ def tela_cadastro():
     
     
     st.title("📝 Cadastro de Novo Usuário")
-    
+        
+
+    nome = st.text_input("Nome")
+    email = st.text_input("Email")
+    senha = st.text_input("Senha", type="password")
+    if st.button("Cadastrar"):
+        sucesso, msg = cadastro(nome, email, senha)
+        if sucesso:
+            st.success(msg)
+            st.experimental_rerun()
+        else:
+            st.error(msg)
+
+
+
     with st.form(key='cadastro_form'):
         # Campos de entrada
         cpf_input = st.text_input(label="CPF (apenas números)", max_chars=11, placeholder="12345678900")
@@ -155,5 +171,12 @@ def tela_cadastro():
             except requests.exceptions.RequestException as e:
                 # Catch-all para outros erros de requisição
                 st.error(f"Erro inesperado de requisição: {e}")
+    if response.status_code == 201:
+        st.session_state['logged_in'] = True
+        st.session_state['user_email'] = email_input
+        st.session_state['user_nome'] = nome_input
+        st.session_state['token'] = response.json().get("token")
+        st.switch_page("pages/4_Curso.py")
+
 
 tela_cadastro()

@@ -15,6 +15,7 @@ from sendgrid.helpers.mail import Mail
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
 import requests
+from auth import verifica_login, verifica_assinante, logout
 
 def get_secret(key, default=None):
     
@@ -122,7 +123,7 @@ def tela_pagamento():
         st.stop()
 
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
-    st.title("Página de Simulados")
+ 
     
     # A linha que estava dando erro, agora segura:
     if not st.session_state['user_assinante']:
@@ -137,6 +138,20 @@ def tela_pagamento():
     st.title("💳 Área de Pagamento")
     st.markdown(f"Olá, **{st.session_state['user_nome']}**.") 
     
+    st.write("📘 Conteúdo gratuito do curso.")
+
+# Conteúdo premium
+    if verifica_assinante():
+        st.success("🎉 Conteúdo premium desbloqueado!")
+        st.write("💎 Aqui está o conteúdo exclusivo para assinantes...")
+    else:
+        st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
+
+    if st.button("Sair"):
+        logout()
+        st.success("Você saiu da conta.")
+        st.experimental_rerun()
+
     if st.session_state['user_assinante']:
         st.success("Você já é um assinante premium e tem acesso total! Obrigado!")
         

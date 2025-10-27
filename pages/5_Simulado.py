@@ -14,7 +14,7 @@ from sendgrid.helpers.mail import Mail
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
 import requests
-
+from auth import verifica_login, verifica_assinante, logout
 def get_secret(key, default=None):
     
     # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
@@ -93,16 +93,30 @@ def tela_simulados():
     # --- 1. GUARDA DE SEGURANÇA (Adicione este bloco no início) ---
     
     # Verifica se o usuário está logado e se a chave de assinatura foi carregada
-    if 'user_assinante' not in st.session_state:
-        st.error("Acesso negado. Por favor, faça login para acessar os Simulados.")
-        # Redireciona o usuário para a página de login/home
+    # if 'user_assinante' not in st.session_state:
+    #     st.error("Acesso negado. Por favor, faça login para acessar os Simulados.")
+    #     # Redireciona o usuário para a página de login/home
 
-        st.page_link("Home.py", label="Mude para a pagina de login")
-        st.stop()
+    #     st.page_link("Home.py", label="Mude para a pagina de login")
+    #     st.stop()
     
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
     st.title("Página de Simulados")
-    
+    st.write("📘 Conteúdo gratuito do curso.")
+
+# Conteúdo premium
+    if verifica_assinante():
+        st.success("🎉 Conteúdo premium desbloqueado!")
+        st.write("💎 Aqui está o conteúdo exclusivo para assinantes...")
+    else:
+        st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
+
+    if st.button("Sair"):
+        logout()
+        st.success("Você saiu da conta.")
+        st.experimental_rerun()
+
+
     # A linha que estava dando erro, agora segura:
     if not st.session_state['user_assinante']:
         # Lógica para usuário Free

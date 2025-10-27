@@ -14,7 +14,7 @@ from sendgrid.helpers.mail import Mail
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
 import requests
-
+from auth import verifica_login, logout, verifica_assinante
 
 def get_secret(key, default=None):
     
@@ -40,6 +40,7 @@ MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
 MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
 URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
 URL_API_AUTH = get_secret("URL_API_AUTH")
+URL_PERFIL = get_secret("URL_PERFIL")
 
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
@@ -50,7 +51,32 @@ if 'user_email' not in st.session_state:
 # --- Configuração do Banco de Dados SQLite ---
 DB_NAME = 'usuarios.db'
 
+if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
+    st.warning("Você precisa estar logado para acessar esta página.")
+    st.stop()
+
+# Se quiser, podemos validar o token direto na API
+token = st.session_state.get('token')
+
+headers = {"Authorization": token}
+try:
+    resp = requests.get(URL_PERFIL, headers=headers)
+    if resp.status_code != 200:
+        st.warning("Sessão inválida ou expirada. Faça login novamente.")
+        st.session_state['logged_in'] = False
+        st.stop()
+except Exception as e:
+    st.error(f"Erro ao verificar sessão: {e}")
+    st.stop()
+
+# Usuário está logado e token válido, mostra o conteúdo do curso
+st.title(f"Bem-vindo(a), {st.session_state['user_nome']}!")
+st.write("Aqui está o conteúdo do seu curso...")
+
+
 def tela_curso():
+    
+    
     if 'user_nome' not in st.session_state:
         st.error("Acesso negado. Por favor, faça login para acessar o Curso.")
         # Se você tiver uma página de login, use o st.page_link para redirecionar.
@@ -61,7 +87,24 @@ def tela_curso():
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
     # Linha que estava causando o erro, agora segura:
     st.title(f"Bem-vindo(a) ao Curso, {st.session_state['user_nome']}!")
+    
+    verifica_login()  # só continua se estiver logado
 
+    st.title(f"Bem-vindo(a), {st.session_state['user_nome']}!")
+    st.write("Aqui está o conteúdo do seu curso...")
+
+    if verifica_assinante():
+        st.success("🎉 Conteúdo premium desbloqueado!")
+        st.write("💎 Aqui está o conteúdo exclusivo para assinantes...")
+    else:
+        st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
+
+
+
+    if st.button("Sair"):
+        logout()
+        st.success("Você saiu da conta.")
+        st.experimental_rerun()
    
     """Conteúdo do Curso (Acesso Condicional)."""
     st.title(f"Bem-vindo(a) ao Curso, {st.session_state['user_nome']}!")
@@ -124,4 +167,6 @@ def tela_curso():
             st.warning("🔒 **CONTEÚDO EXCLUSIVO PARA ASSINANTES.**")
             st.write("Adquira sua assinatura na aba 'Pagamento' para liberar este e outros módulos avançados.")
 
+
+    
 tela_curso()
