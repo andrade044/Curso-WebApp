@@ -81,14 +81,6 @@ def gerar_codigo_ativacao():
     return code
 
 
-def reiniciar_simulado():
-    """Reseta todas as variáveis do quiz."""
-    st.session_state['current_question'] = 0
-    st.session_state['score'] = 0
-    st.session_state['quiz_finished'] = False
-    st.session_state['user_answer'] = None
-    st.rerun()
-
 if 'current_question' not in st.session_state:
     st.session_state['current_question'] = 0
 if 'score' not in st.session_state:
@@ -109,21 +101,32 @@ if 'user_answer' not in st.session_state:
 def tela_login():
     """Mostra o formulário de login e autentica o usuário via API."""
     
+    # Adicionando verificação para redirecionar se o usuário já estiver logado
+    if st.session_state.get('logged_in'):
+        st.info(f"Bem-vindo de volta, {st.session_state.get('user_nome', 'Usuário')}!")
+        st.switch_page("pages/4_Curso.py")
+        st.stop()
+        return
+
     st.title("🚪 Login")
 
-    # Adiciona um link para a página de Cadastro
+    # --- REMOVIDOS OS CAMPOS DUPLICADOS AQUI ---
+    # email = st.text_input("Email")
+    # senha = st.text_input("Senha", type="password")
 
-    email = st.text_input("Email")
-    senha = st.text_input("Senha", type="password")
-
+    # APENAS UM FORMULÁRIO DE LOGIN DEVE EXISTIR
     with st.form(key='login_form'):
-        email = st.text_input("Email")
-        senha = st.text_input("Senha", type="password")
+        email = st.text_input("Email", key="login_email")
+        senha = st.text_input("Senha", type="password", key="login_senha")
         submitted = st.form_submit_button("Entrar")
         st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? Cadastre-se aqui")
 
 
     if submitted:
+        # Placeholder para mensagens de status
+        status_message = st.empty()
+        status_message.info("Autenticando...")
+
         # Prepara o Payload para a API
         payload = {
             "action": "LOGIN",
@@ -132,63 +135,42 @@ def tela_login():
         }
 
         try:
-            st.info("Autenticando...")
             # 1. Chama a API
-            response = requests.post("URL_API_AUTH_AQUI", json=payload)
+            response = requests.post(URL_API_AUTH, json=payload)
             
             # 2. Trata a Resposta
             if response.status_code == 200:
-                user_data = response.json().get('user', {})
-                
-                # 3. DEFINE AS CHAVES DE SESSÃO (CRÍTICO)
-                st.session_state['user_nome'] = user_data.get('nome', 'Usuário')
-                st.session_state['user_assinante'] = user_data.get('assinante', False)
-                st.session_state['user_email'] = user_data.get('email')
-                
-                st.success(f"Login bem-sucedido! Olá, {st.session_state['user_nome']}.")
-                
-                # 🚨 4. REDIRECIONAMENTO PARA O CURSO
-                # st.switch_page("pages/4_Curso.py")
-                st.stop() # 🛑 Garante que o redirecionamento ocorra imediatamente.
-            
-            elif response.status_code == 401:
-                st.error("Credenciais inválidas. Verifique seu email e senha.")
-            else:
-                st.error("Erro no servidor de autenticação.")
-
-        except requests.exceptions.RequestException:
-            st.error("Erro de conexão com o servidor. Verifique se a API está online.")
-    if response.status_code == 200:
-        st.session_state['logged_in'] = True
-        st.session_state['user_email'] = email
-        st.session_state['user_nome'] = response.json().get("nome")
-        st.session_state['token'] = response.json().get("token")
-        st.page_link("pages/4_Curso.py")
-        st.session_state['logged_in'] = True
-    if response.status_code == 200:
                 data = response.json()
                 user_data = data.get('user', {})
-                token = data.get('token')
+                token = data.get('token') # Captura o token
 
-    st.session_state['token'] = token
-    
+                # 3. DEFINE AS CHAVES DE SESSÃO (CRÍTICO)
+                st.session_state['logged_in'] = True
+                st.session_state['user_nome'] = user_data.get('nome', 'Usuário')
+                st.session_state['user_assinante'] = user_data.get('assinante', False)
+                st.session_state['user_email'] = user_data.get('email', email)
+                st.session_state['token'] = token
+                
+                status_message.success(f"Login bem-sucedido! Olá, {st.session_state['user_nome']}.")
+                
+                # 🚨 4. REDIRECIONAMENTO CORRETO
+                st.switch_page("pages/4_Curso.py")
+                # st.stop() é opcional após switch_page, mas garante a parada imediata.
+                st.stop()
+            
+            elif response.status_code == 401:
+                status_message.error("Credenciais inválidas. Verifique seu email e senha.")
+            
+            else:
+                # Trata outros erros HTTP
+                error_msg = response.json().get('detail', f"Erro no servidor: Código {response.status_code}")
+                status_message.error(error_msg)
+
+        except requests.exceptions.RequestException:
+            status_message.error("Erro de conexão com o servidor. Verifique se a API está online.")
 
 # ----------------------------------------------------------------------
 # FUNÇÃO PRINCIPAL DA PÁGINA (CONTROLADOR DE TELAS)
 # ----------------------------------------------------------------------
 
 tela_login()
-
-# def main_auth():
-#     # --- 🚨 1. GUARDA DE REDIRECIONAMENTO (Executa antes de tudo) ---
-#     # if 'user_nome' in st.session_state:
-#     #     st.success(f"Você já está logado como {st.session_state['user_nome']}. Redirecionando para o Curso...")
-#     #     # Redirecionamento imediato para a página do curso
-#     #     st.switch_page("pages/4_Curso.py")
-#     #     st.stop() # CRÍTICO: Não executa o restante do código.
-
-#     # --- 2. MOSTRA A TELA DE LOGIN ---
-#     tela_login()
-
-# if __name__ == '__main__':
-#     main_auth()
