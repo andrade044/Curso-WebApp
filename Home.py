@@ -158,7 +158,7 @@ def tela_login():
                 st.success(f"Login bem-sucedido! Olá, {st.session_state['user_nome']}.")
                 
                 # 🚨 4. REDIRECIONAMENTO PARA O CURSO
-                st.switch_page("pages/4_Curso.py")
+                # st.switch_page("pages/4_Curso.py")
                 st.stop() # 🛑 Garante que o redirecionamento ocorra imediatamente.
             
             elif response.status_code == 401:
