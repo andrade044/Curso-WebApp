@@ -56,7 +56,7 @@ def tela_curso():
         # Se você tiver uma página de login, use o st.page_link para redirecionar.
         st.page_link("Home.py", label="Ir para a página inicial e fazer login")
         time.sleep(1)
-        st.switch_page("pages/1_Login.py")
+        st.switch_page("1_Login.py")
         st.stop() # Interrompe a execução do restante do código da página
 
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
