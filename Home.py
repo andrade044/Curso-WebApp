@@ -189,11 +189,11 @@ def tela_login():
 
 def main_auth():
     # --- 🚨 1. GUARDA DE REDIRECIONAMENTO (Executa antes de tudo) ---
-    if 'user_nome' in st.session_state:
-        st.success(f"Você já está logado como {st.session_state['user_nome']}. Redirecionando para o Curso...")
-        # Redirecionamento imediato para a página do curso
-        st.switch_page("pages/4_Curso.py")
-        st.stop() # CRÍTICO: Não executa o restante do código.
+    # if 'user_nome' in st.session_state:
+    #     st.success(f"Você já está logado como {st.session_state['user_nome']}. Redirecionando para o Curso...")
+    #     # Redirecionamento imediato para a página do curso
+    #     st.switch_page("pages/4_Curso.py")
+    #     st.stop() # CRÍTICO: Não executa o restante do código.
 
     # --- 2. MOSTRA A TELA DE LOGIN ---
     tela_login()

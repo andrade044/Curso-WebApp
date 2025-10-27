@@ -71,16 +71,16 @@ def tela_cadastro():
     st.title("📝 Cadastro de Novo Usuário")
         
 
-    nome = st.text_input("Nome")
-    email = st.text_input("Email")
-    senha = st.text_input("Senha", type="password")
-    if st.button("Cadastrar"):
-        sucesso, msg = cadastro(nome, email, senha)
-        if sucesso:
-            st.success(msg)
-            st.experimental_rerun()
-        else:
-            st.error(msg)
+    # nome = st.text_input("Nome")
+    # email = st.text_input("Email")
+    # senha = st.text_input("Senha", type="password")
+    # if st.button("Cadastrar"):
+    #     sucesso, msg = cadastro(nome, email, senha)
+    #     if sucesso:
+    #         st.success(msg)
+    #         st.experimental_rerun()
+    #     else:
+    #         st.error(msg)
 
 
 
