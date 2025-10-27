@@ -113,6 +113,27 @@ def criar_preferencia_pagamento():
 
 def tela_pagamento():
     """Tela para trocar o status de assinante com fluxo de pagamento profissional."""
+    
+    if 'user_assinante' not in st.session_state:
+        st.error("Acesso negado. Por favor, faça login para acessar os Simulados.")
+        # Redireciona o usuário para a página de login/home
+        time.sleep(1)
+        st.switch_page("pages/1_Login.py")
+        
+
+    # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
+    st.title("Página de Simulados")
+    
+    # A linha que estava dando erro, agora segura:
+    if not st.session_state['user_assinante']:
+        # Lógica para usuário Free
+        st.warning("Recurso de Simulado Ilimitado apenas para Assinantes.")
+        st.markdown("Clique  para assinar e liberar acesso total.")
+    else:
+        # Lógica para usuário Assinante
+        st.success("Acesso ilimitado liberado!")
+        st.info("Parabéns! Você pode iniciar todos os simulados disponíveis abaixo.")
+    
     st.title("💳 Área de Pagamento")
     st.markdown(f"Olá, **{st.session_state['user_nome']}**.") 
     

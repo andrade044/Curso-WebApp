@@ -58,6 +58,13 @@ def validar_email(email):
 
 def tela_cadastro():
     """Mostra o formulário de cadastro e envia dados para a API."""
+    
+    if 'user_nome' in st.session_state:
+        st.warning("Você já está logado, Redirecionando para o curso")    
+        time.sleep(1)
+        st.switch_page("pages/4_Curso.py")
+    
+    
     st.title("📝 Cadastro de Novo Usuário")
     
     with st.form(key='cadastro_form'):
@@ -126,3 +133,5 @@ def tela_cadastro():
                     
             except requests.exceptions.RequestException as e:
                 st.error(f"Erro de conexão com a API: O servidor não respondeu. Verifique URL_API_AUTH.")
+
+tela_cadastro()

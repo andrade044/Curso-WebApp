@@ -69,6 +69,8 @@ if 'user_answer' not in st.session_state:
 def proxima_pergunta():
     """Lógica para avançar para a próxima pergunta e verificar a resposta."""
     
+    
+    
     # Se o usuário respondeu, verifica
     if st.session_state['user_answer'] is not None:
         pergunta_atual = SIMULADO_DATA[st.session_state['current_question']]
@@ -87,6 +89,27 @@ def proxima_pergunta():
 def tela_simulados():
     """Interface principal para a tela de Simulado."""
     """Interface principal para a tela de Simulado com acesso restrito a assinantes."""
+    
+    # --- 1. GUARDA DE SEGURANÇA (Adicione este bloco no início) ---
+    
+    # Verifica se o usuário está logado e se a chave de assinatura foi carregada
+    if 'user_assinante' not in st.session_state:
+        st.error("Acesso negado. Por favor, faça login para acessar os Simulados.")
+        # Redireciona o usuário para a página de login/home
+        time.sleep(1)
+        st.switch_page("pages/1_Login.py")
+    # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
+    st.title("Página de Simulados")
+    
+    # A linha que estava dando erro, agora segura:
+    if not st.session_state['user_assinante']:
+        # Lógica para usuário Free
+        st.warning("Recurso de Simulado Ilimitado apenas para Assinantes.")
+        # ...
+    else:
+        # Lógica para usuário Assinante
+        st.success("Acesso ilimitado liberado!")
+    
     st.title("🧠 Simulado de Conhecimento")
 
     # ------------------ VERIFICAÇÃO DE ACESSO (NOVA LÓGICA) ------------------
