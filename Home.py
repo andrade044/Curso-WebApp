@@ -1,5 +1,5 @@
 import streamlit as st
-import sqlite3
+
 import re
 import bcrypt
 import os 
@@ -492,7 +492,7 @@ def tela_cadastro():
             
             try:
                 # 3. Chama a API de Autenticação/Cadastro Unificada
-                response = requests.post(URL_API_AUTH, json=payload)
+                response = requests.post(f"{URL_API_AUTH}/auth", json=payload)
                 
                 # 4. Trata a Resposta da API
                 if response.status_code == 201: # 201 Created (Sucesso no Cadastro)
