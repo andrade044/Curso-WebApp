@@ -390,7 +390,8 @@ def tela_login():
     st.title("🚪 Login")
 
     # Adiciona um link para a página de Cadastro
-    st.markdown(f"Novo por aqui? [Cadastre-se aqui](pages/2_CADASTRO.py)")
+    
+    st.page_link("Home.py", label="Novo por aqui? Cadastre-se aqui")
 
     with st.form(key='login_form'):
         email = st.text_input("Email")
@@ -436,10 +437,6 @@ def tela_login():
 # ----------------------------------------------------------------------
 # FUNÇÃO PRINCIPAL DA PÁGINA (CONTROLADOR DE TELAS)
 # ----------------------------------------------------------------------
-
-
-
-
 
 
 def tela_cadastro():
