@@ -63,6 +63,7 @@ def tela_cadastro():
         st.warning("Você já está logado, Redirecionando para o curso")    
         time.sleep(1)
         st.switch_page("pages/4_Curso.py")
+        st.stop()
     
     
     st.title("📝 Cadastro de Novo Usuário")

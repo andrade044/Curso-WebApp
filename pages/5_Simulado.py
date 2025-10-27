@@ -96,8 +96,10 @@ def tela_simulados():
     if 'user_assinante' not in st.session_state:
         st.error("Acesso negado. Por favor, faça login para acessar os Simulados.")
         # Redireciona o usuário para a página de login/home
-        time.sleep(1)
+
         st.switch_page("pages/1_Login.py")
+        st.stop()
+    
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
     st.title("Página de Simulados")
     
