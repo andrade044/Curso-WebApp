@@ -112,8 +112,6 @@ def tela_login():
     st.title("🚪 Login")
 
     # Adiciona um link para a página de Cadastro
-    
-    
 
     email = st.text_input("Email")
     senha = st.text_input("Senha", type="password")
@@ -179,16 +177,18 @@ def tela_login():
 # FUNÇÃO PRINCIPAL DA PÁGINA (CONTROLADOR DE TELAS)
 # ----------------------------------------------------------------------
 
-def main_auth():
-    # --- 🚨 1. GUARDA DE REDIRECIONAMENTO (Executa antes de tudo) ---
-    # if 'user_nome' in st.session_state:
-    #     st.success(f"Você já está logado como {st.session_state['user_nome']}. Redirecionando para o Curso...")
-    #     # Redirecionamento imediato para a página do curso
-    #     st.switch_page("pages/4_Curso.py")
-    #     st.stop() # CRÍTICO: Não executa o restante do código.
+tela_login()
 
-    # --- 2. MOSTRA A TELA DE LOGIN ---
-    tela_login()
+# def main_auth():
+#     # --- 🚨 1. GUARDA DE REDIRECIONAMENTO (Executa antes de tudo) ---
+#     # if 'user_nome' in st.session_state:
+#     #     st.success(f"Você já está logado como {st.session_state['user_nome']}. Redirecionando para o Curso...")
+#     #     # Redirecionamento imediato para a página do curso
+#     #     st.switch_page("pages/4_Curso.py")
+#     #     st.stop() # CRÍTICO: Não executa o restante do código.
 
-if __name__ == '__main__':
-    main_auth()
+#     # --- 2. MOSTRA A TELA DE LOGIN ---
+#     tela_login()
+
+# if __name__ == '__main__':
+#     main_auth()
