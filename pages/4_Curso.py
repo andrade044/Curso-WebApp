@@ -75,97 +75,98 @@ st.write("Aqui está o conteúdo do seu curso...")
 
 
 def tela_curso():
-    
-    
-    if 'user_nome' not in st.session_state:
+    """Conteúdo do Curso (Acesso Condicional e Protegido)."""
+
+    # 1. GUARDA DE LOGIN (CRÍTICO)
+    # Se não estiver logado, exibe erro, oferece link de login e para a execução.
+    if not st.session_state.get('user_nome'):
         st.error("Acesso negado. Por favor, faça login para acessar o Curso.")
-        # Se você tiver uma página de login, use o st.page_link para redirecionar.
         
-        st.page_link("Home.py", label="Mude para a pagina de login")
+        # Redireciona para a página principal ou login
+        st.page_link("Home.py", label="Ir para a página de Login")
+        
         st.stop() # Interrompe a execução do restante do código da página
-
-    # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
-    # Linha que estava causando o erro, agora segura:
-    st.title(f"Bem-vindo(a) ao Curso, {st.session_state['user_nome']}!")
+        return
+        
+    # --- 2. INÍCIO DO CONTEÚDO (Executa SOMENTE se a guarda passar) ---
     
-    verifica_login()  # só continua se estiver logado
+    # 2.1. Cabeçalho e Status
+    nome_usuario = st.session_state['user_nome']
+    is_assinante = st.session_state.get('user_assinante', False)
+    
+    st.title(f"🎓 Bem-vindo(a) ao Curso, {nome_usuario}!")
+    
+    status_label = "Assinante Premium 👑" if is_assinante else "Usuário Básico"
+    st.subheader(f"Seu Status: {status_label}")
 
-    st.title(f"Bem-vindo(a), {st.session_state['user_nome']}!")
-    st.write("Aqui está o conteúdo do seu curso...")
-
-    if verifica_assinante():
+    # Mensagem de status consolidada
+    if is_assinante:
         st.success("🎉 Conteúdo premium desbloqueado!")
-        st.write("💎 Aqui está o conteúdo exclusivo para assinantes...")
     else:
         st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
 
-
-
-    if st.button("Sair"):
-        logout()
-        st.success("Você saiu da conta.")
-        st.experimental_rerun()
-   
-    """Conteúdo do Curso (Acesso Condicional)."""
-    st.title(f"Bem-vindo(a) ao Curso, {st.session_state['user_nome']}!")
-    
-    status = "Assinante" if st.session_state['user_assinante'] else "Usuário Básico (Não-Assinante)"
-    st.subheader(f"Seu Status: {status}")
-
-    # Conteúdo Gratuito
     st.markdown("---")
     
-    # Expander para o Módulo 1 (Sempre aberto ou facilmente acessível)
+    # 2.2. Botão de Logout (Consolidado)
+    if st.button("Sair da Conta"):
+        logout()
+        st.success("Você saiu da conta. Redirecionando...")
+        # Usa switch_page para redirecionar para o login/home
+        st.switch_page("Home.py") 
+        st.stop()
+
+    st.markdown("---")
+
+    # 3. MÓDULO 1: CONTEÚDO GRATUITO
     with st.expander("📚 Módulo 1: Introdução e Primeiros Passos (Grátis)", expanded=True):
         st.info("Este conteúdo está liberado para todos os usuários.")
 
         # VÍDEO 1.1 (GRÁTIS)
         with st.expander("▶️ Aula 1.1: Configurando o Ambiente"):
-            st.video('https://www.youtube.com/watch?v=ZZ4B0QUHuNc&list=PLtqF5YXg7GLmCvTswG32NqQypOuYkPRUE') 
+            # Nota: Este link parece ser de uma playlist. Streamlit pode não tocar a playlist.
+            st.video('https://www.youtube.com/watch?v=ZZ4B0QUHuNc') 
             st.write("Descrição: Introdução ao tema e instalação das ferramentas necessárias.")
         
         # VÍDEO 1.2 (GRÁTIS)
         with st.expander("▶️ Aula 1.2: Visão Geral e Estrutura Básica"):
-            st.video('https://www.youtube.com/watch?v=VIDEO_GRATUITO_2') 
+            # Substitua 'VIDEO_GRATUITO_2' pela URL real do vídeo
+            st.video('https://www.youtube.com/watch?v=VIDEO_GRATUITO_2_URL_AQUI') 
             st.write("Descrição: Conceitos fundamentais e a primeira linha de código.")
 
-    # Conteúdo Pago
     st.markdown("---")
     st.header("Módulo 2: Conteúdo Avançado")
-    
-        
-    
-        # ACESSO LIBERADO
-    st.markdown("---")
-    
-    # Verifica o status de assinante para liberar o Módulo 2
-    if st.session_state['user_assinante']:
-        
-        # Expander para o Módulo 2 (Liberado para Assinantes)
-        with st.expander("👑 Módulo 2: Conteúdo Avançado e Práticas Profissionais", expanded=False):
-            st.success("🎉 ACESSO LIBERADO! Conteúdo exclusivo para Assinantes.")
+
+    # 4. MÓDULO 2: CONTEÚDO PAGO (Acesso Condicional)
+    if is_assinante:
+        # CONTEÚDO LIBERADO
+        with st.expander("👑 Módulo 2: Conteúdo Avançado e Práticas Profissionais (Assinantes)", expanded=True):
+            st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
             # VÍDEO 2.1 (PAGO)
             with st.expander("🔒 Aula 2.1: Hashing e Segurança (BCrypt na Prática)"):
-                st.video('https://www.youtube.com/watch?v=8M20LyCZDOY&list=PLtqF5YXg7GLmCvTswG32NqQypOuYkPRUE&index=2') 
-                st.write("Descrição: Detalhamento sobre hasheamento de senhas e proteção contra SQL Injection.")
+                st.video('https://www.youtube.com/watch?v=8M20LyCZDOY') 
+                st.write("Descrição: Detalhamento sobre hasheamento de senhas e proteção contra ameaças.")
 
             # VÍDEO 2.2 (PAGO)
             with st.expander("🔒 Aula 2.2: Integração com Bancos NoSQL e Desempenho"):
-                video_file = open('video.mp4','rb')
-                video_byts = video_file.read()
-                st.video(video_byts) 
-                st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
+                # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
+                # e que arquivos grandes podem ser lentos em deploys como o Render.
+                try:
+                    video_file = open('video.mp4', 'rb')
+                    video_byts = video_file.read()
+                    st.video(video_byts) 
+                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
+                except FileNotFoundError:
+                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
                 
             st.markdown("---")
             st.write("Material complementar e exercícios práticos do Módulo 2.")
             
     else:
         # CONTEÚDO BLOQUEADO
-        # Exibe um expender com aviso de bloqueio
-        with st.expander("🔒 Módulo 2: Conteúdo Avançado e Práticas Profissionais"):
+        with st.expander("🔒 Módulo 2: Conteúdo Avançado e Práticas Profissionais (Bloqueado)"):
             st.warning("🔒 **CONTEÚDO EXCLUSIVO PARA ASSINANTES.**")
-            st.write("Adquira sua assinatura na aba 'Pagamento' para liberar este e outros módulos avançados.")
+            st.write("Adquira sua assinatura para liberar este e outros módulos avançados.")
 
 
     
