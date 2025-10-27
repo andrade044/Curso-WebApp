@@ -28,6 +28,7 @@ if 'user_email' not in st.session_state:
 # Função: login
 # ---------------------------
 def login(email, senha):
+    
     payload = {"action": "LOGIN", "email": email, "senha": senha}
     try:
         resp = requests.post(URL_API_AUTH, json=payload)
@@ -74,6 +75,12 @@ def verifica_login():
     try:
         resp = requests.get(URL_PERFIL, headers=headers)
         if resp.status_code == 200:
+            user_data = resp.json().get('user', {})
+            # ... outras chaves
+            st.session_state['user_email'] = user_data.get('email')
+            
+            # Adicione a chave 'user_id' aqui, se o backend a retornar!
+            st.session_state['user_id'] = user_data.get('id')
             return True
         else:
             st.warning("Sessão inválida ou expirada. Faça login novamente.")
@@ -83,6 +90,7 @@ def verifica_login():
         st.error(f"Erro ao verificar sessão: {e}")
         st.stop()
 
+    
 # ---------------------------
 # Função: logout
 # ---------------------------
