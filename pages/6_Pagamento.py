@@ -17,6 +17,8 @@ from data import SIMULADO_DATA
 import requests
 from auth import verifica_login, verifica_assinante, logout
 
+
+
 def get_secret(key, default=None):
     
     # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
@@ -42,6 +44,7 @@ MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
 MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
 URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
 URL_API_AUTH = get_secret("URL_API_AUTH")
+URL_CURSO = get_secret("URL_CURSO")
 
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
@@ -107,9 +110,9 @@ def criar_preferencia_pagamento():
             # URLs de redirecionamento após o pagamento no checkout do Mercado Pago
             "back_urls": {
                 # Em um app real, estas URLs apontariam para endpoints públicos do seu Streamlit
-                "success": meu_link_ngrok, # Substitua pela sua URL real
-                "pending": meu_link_ngrok, # Substitua pela sua URL real
-                "failure": meu_link_ngrok # Substitua pela sua URL real
+                "success": URL_CURSO, # Substitua pela sua URL real
+                "pending": URL_CURSO, # Substitua pela sua URL real
+                "failure": URL_CURSO # Substitua pela sua URL real
             },
             "auto_return": "approved"
         }
@@ -119,7 +122,7 @@ def criar_preferencia_pagamento():
         
         if preference_response["status"] == 201:
             # Retorna o link de checkout (sandbox_init_point para testes, init_point para produção)
-            return preference_response["response"]["init_point"]
+            return preference_response["response"]["sandbox_init_point"]
         else:
             # Para debug profissional, inclua a resposta completa para análise
             st.error(f"Erro ao criar preferência: {preference_response['response']['message']}")
