@@ -54,9 +54,8 @@ def tela_curso():
     if 'user_nome' not in st.session_state:
         st.error("Acesso negado. Por favor, faça login para acessar o Curso.")
         # Se você tiver uma página de login, use o st.page_link para redirecionar.
-        st.page_link("Home.py", label="Ir para a página inicial e fazer login")
-        time.sleep(1)
-        st.switch_page("1_Login.py")
+        
+        st.page_link("1_Login.py", label="Mude para a pagina de login")
         st.stop() # Interrompe a execução do restante do código da página
 
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---

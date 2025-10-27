@@ -117,8 +117,8 @@ def tela_pagamento():
     if 'user_assinante' not in st.session_state:
         st.error("Acesso negado. Por favor, faça login para acessar os Simulados.")
         # Redireciona o usuário para a página de login/home
-
-        st.switch_page("1_Login.py")
+        st.page_link("1_Login.py", label="Mude para a pagina de login")
+    
         st.stop()
 
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---

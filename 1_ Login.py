@@ -385,57 +385,59 @@ def proxima_pergunta():
 # --- Telas do Streamlit ---
 
 def tela_login():
-    """Mostra o formulário de login e envia dados para a API."""
+    """Mostra o formulário de login e autentica o usuário via API."""
+    
+    st.title("🚪 Login")
 
-    st.title("🔑 Login")
+    # Adiciona um link para a página de Cadastro
+    st.markdown(f"Novo por aqui? [Cadastre-se aqui](pages/2_CADASTRO.py)")
 
     with st.form(key='login_form'):
         email = st.text_input("Email")
         senha = st.text_input("Senha", type="password")
-        login_button = st.form_submit_button(label='Entrar')
+        submitted = st.form_submit_button("Entrar")
 
-    if login_button:
-        # Prepara o payload para a API
+    if submitted:
+        # Prepara o Payload para a API
         payload = {
-            "action": "LOGIN", # <-- INDICA AO BACK-END QUE É UM LOGIN
+            "action": "LOGIN",
             "email": email,
             "senha": senha
         }
-        
-        st.info("Verificando credenciais...")
 
         try:
-            # Chama a API de Autenticação/Cadastro Unificada
-            response = requests.post(URL_API_AUTH, json=payload)
+            st.info("Autenticando...")
+            # 1. Chama a API
+            response = requests.post("URL_API_AUTH_AQUI", json=payload)
             
-            # 1. Login Bem-Sucedido (Status 200)
+            # 2. Trata a Resposta
             if response.status_code == 200:
-                user_data = response.json().get("user_data", {})
+                user_data = response.json().get('user', {})
                 
-                # Assume que a API retorna os dados necessários no corpo da resposta JSON
-                st.session_state['logged_in'] = True
-                st.session_state['user_email'] = email
-                st.session_state['user_nome'] = user_data.get('nome') # Nome vem da API
-                st.session_state['user_assinante'] = user_data.get('assinante') # Status vem da API
-                st.session_state['user_id'] = user_data.get('user_id') # ID vem da API
+                # 3. DEFINE AS CHAVES DE SESSÃO (CRÍTICO)
+                st.session_state['user_nome'] = user_data.get('nome', 'Usuário')
+                st.session_state['user_assinante'] = user_data.get('assinante', False)
+                st.session_state['user_email'] = user_data.get('email')
                 
-                st.success(f"Login bem-sucedido! Bem-vindo(a), {st.session_state['user_nome']}.")
-                st.rerun()
-
-            # 2. Falha de Login (Status 401 - Não Autorizado)
+                st.success(f"Login bem-sucedido! Olá, {st.session_state['user_nome']}.")
+                
+                # 🚨 4. REDIRECIONAMENTO PARA O CURSO
+                st.switch_page("pages/4_Curso.py")
+                st.stop() # 🛑 Garante que o redirecionamento ocorra imediatamente.
+            
             elif response.status_code == 401:
-                st.error(response.json().get("message", "Email ou senha incorretos."))
-            
-            # 3. Conta Inativa (Opcional: Se seu back-end ainda verifica isso)
-            elif response.status_code == 403: # 403 Forbidden
-                st.warning(response.json().get("message", "Conta inativa. Verifique seu e-mail."))
-            
-            # 4. Outros Erros
+                st.error("Credenciais inválidas. Verifique seu email e senha.")
             else:
-                st.error(response.json().get("message", "Erro desconhecido no login."))
+                st.error("Erro no servidor de autenticação.")
 
         except requests.exceptions.RequestException:
-            st.error("Erro de conexão com a API. Verifique se o servidor Flask está ativo.")
+            st.error("Erro de conexão com o servidor. Verifique se a API está online.")
+
+# ----------------------------------------------------------------------
+# FUNÇÃO PRINCIPAL DA PÁGINA (CONTROLADOR DE TELAS)
+# ----------------------------------------------------------------------
+
+
 
 
 
@@ -820,40 +822,16 @@ def tela_pagamento():
         """)
 
 
-def main():
-   
+def main_auth():
+    # --- 🚨 1. GUARDA DE REDIRECIONAMENTO (Executa antes de tudo) ---
+    if 'user_nome' in st.session_state:
+        st.success(f"Você já está logado como {st.session_state['user_nome']}. Redirecionando para o Curso...")
+        # Redirecionamento imediato para a página do curso
+        st.switch_page("pages/4_Curso.py")
+        st.stop() # CRÍTICO: Não executa o restante do código.
 
-    # Se o usuário NÃO está logado
-    if not st.session_state.get('logged_in'):
-        # Mostra as opções de Login e Cadastro na barra lateral
-        pagina = st.sidebar.radio("Navegar", ["Login", "Cadastro"])
-        
-        if pagina == "Login":
-            tela_login()
-        elif pagina == "Cadastro":
-            tela_cadastro()
-            
-    # Se o usuário ESTÁ logado
-    else:
-        # Usando .get() para acesso seguro a session_state
-        st.sidebar.write(f"Bem-vindo(a), {st.session_state.get('user_nome')}!")
-        
-        if st.sidebar.button("Sair (Logout)"):
-            st.session_state['logged_in'] = False
-            st.session_state['user_email'] = None
-            st.session_state['user_nome'] = None
-            st.session_state['user_assinante'] = None
-            st.info("Você foi desconectado.")
-            st.rerun() # Recarrega para voltar à tela de Login
-            
-        # Mostra as telas do sistema logado
-        pagina = st.sidebar.radio("Sistema", ["Curso","Simulados", "Pagamento"])
-        
-        if pagina == "Curso":
-            tela_curso()
-        elif pagina == "Simulados": 
-            tela_simulados()
-        elif pagina == "Pagamento":
-            tela_pagamento()
+    # --- 2. MOSTRA A TELA DE LOGIN ---
+    tela_login()
 
-tela_login()
+if __name__ == '__main__':
+    main_auth()
