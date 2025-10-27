@@ -61,26 +61,26 @@ def validar_email(email):
 def tela_cadastro():
     """Mostra o formulário de cadastro e envia dados para a API."""
     
-    if 'user_nome' in st.session_state:
-        st.warning("Você já está logado, Redirecionando para o curso")     
-        time.sleep(1)
-        st.switch_page("pages/4_Curso.py")
-        st.stop()
+    # if 'user_nome' in st.session_state:
+    #     st.warning("Você já está logado, Redirecionando para o curso")     
+    #     time.sleep(1)
+    #     st.switch_page("pages/4_Curso.py")
+    #     st.stop()
     
     
     st.title("📝 Cadastro de Novo Usuário")
         
 
-    # nome = st.text_input("Nome")
-    # email = st.text_input("Email")
-    # senha = st.text_input("Senha", type="password")
-    # if st.button("Cadastrar"):
-    #     sucesso, msg = cadastro(nome, email, senha)
-    #     if sucesso:
-    #         st.success(msg)
-    #         st.experimental_rerun()
-    #     else:
-    #         st.error(msg)
+    nome = st.text_input("Nome")
+    email = st.text_input("Email")
+    senha = st.text_input("Senha", type="password")
+    if st.button("Cadastrar"):
+        sucesso, msg = cadastro(nome, email, senha)
+        if sucesso:
+            st.success(msg)
+            st.experimental_rerun()
+        else:
+            st.error(msg)
 
 
 

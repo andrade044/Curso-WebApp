@@ -117,21 +117,13 @@ def tela_login():
 
     email = st.text_input("Email")
     senha = st.text_input("Senha", type="password")
-    if st.button("Entrar"):
-        sucesso, msg = login(email, senha)
-        if sucesso:
-            st.success(msg)
-            st.experimental_rerun()  # redireciona para a página protegida
-        else:
-            st.error(msg)
-
-
-    st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? Cadastre-se aqui")
 
     with st.form(key='login_form'):
         email = st.text_input("Email")
         senha = st.text_input("Senha", type="password")
         submitted = st.form_submit_button("Entrar")
+        st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? Cadastre-se aqui")
+
 
     if submitted:
         # Prepara o Payload para a API
