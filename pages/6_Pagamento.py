@@ -113,51 +113,34 @@ def criar_preferencia_pagamento():
 
 
 def tela_pagamento():
-    """Tela para trocar o status de assinante com fluxo de pagamento profissional."""
+    """Tela para gerenciar o status de assinante com fluxo de pagamento profissional."""
     
-    if 'user_assinante' not in st.session_state:
-        st.error("Acesso negado. Por favor, faça login para acessar os Simulados.")
-        # Redireciona o usuário para a página de login/home
-        st.page_link("Home.py", label="Mude para a pagina de login")
-    
+    # 1. GUARDA DE LOGIN (Usando 'user_nome' ou 'logged_in' é mais seguro)
+    if not st.session_state.get('user_nome'):
+        st.error("Acesso negado. Por favor, faça login para acessar esta página.")
+        st.page_link("Home.py", label="Ir para a página de Login")
         st.stop()
+        return
 
-    # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
- 
+    # 2. DEFINIÇÕES INICIAIS
+    is_assinante = st.session_state.get('user_assinante', False)
     
-    # A linha que estava dando erro, agora segura:
-    if not st.session_state['user_assinante']:
-        # Lógica para usuário Free
-        st.warning("Recurso de Simulado Ilimitado apenas para Assinantes.")
-        st.markdown("Clique  para assinar e liberar acesso total.")
-    else:
-        # Lógica para usuário Assinante
-        st.success("Acesso ilimitado liberado!")
-        st.info("Parabéns! Você pode iniciar todos os simulados disponíveis abaixo.")
-    
-    st.title("💳 Área de Pagamento")
+    st.title("💳 Área de Assinatura e Pagamento")
     st.markdown(f"Olá, **{st.session_state['user_nome']}**.") 
-    
-    st.write("📘 Conteúdo gratuito do curso.")
+    st.markdown("---")
 
-# Conteúdo premium
-    if verifica_assinante():
-        st.success("🎉 Conteúdo premium desbloqueado!")
-        st.write("💎 Aqui está o conteúdo exclusivo para assinantes...")
-    else:
-        st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
-
-    if st.button("Sair"):
-        logout()
-        st.success("Você saiu da conta.")
-        st.experimental_rerun()
-
-    if st.session_state['user_assinante']:
+    # 3. CONTEÚDO BASEADO NO STATUS DE ASSINANTE (CONSOLIDADO)
+    if is_assinante:
         st.success("Você já é um assinante premium e tem acesso total! Obrigado!")
+        st.info("Aqui você gerenciaria sua assinatura e datas de renovação.")
         
     else:
-        st.subheader("Assine o Plano Premium")
-        st.markdown(f"#### **Valor: R$ {VALOR_ASSINATURA:.2f}**")
+        # Lógica para Usuário Não-Assinante
+        st.subheader("Assine o Plano Premium e Libere Acesso Ilimitado")
+        
+        st.warning("Recurso de Simulado Ilimitado apenas para Assinantes.")
+        
+        st.markdown(f"#### **Valor Único: R$ {VALOR_ASSINATURA:.2f}**")
         st.write("Libere o Módulo 2 e todos os Simulados com pagamento único.")
         
         # --- Botão para iniciar o Checkout ---
@@ -171,27 +154,37 @@ def tela_pagamento():
                 # 2. Redireciona o usuário (Usando HTML para abertura segura)
                 st.session_state['payment_link'] = link_pagamento
                 
+                # Usando um componente Streamlit para ser mais limpo, se possível, 
+                # ou mantendo o HTML para o link de checkout:
                 st.markdown(f"""
-                    <a href="{link_pagamento}" target="_blank">
+                    <a href="{link_pagamento}" target="_blank" style="text-decoration: none;">
                         <button style="background-color:#009ee3; color:white; padding: 10px 20px; border:none; border-radius:5px; font-size: 16px; cursor: pointer;">
                             Ir para o Checkout de Pagamento Seguro 🔒
                         </button>
                     </a>
                 """, unsafe_allow_html=True)
                 
-                st.info("Você será redirecionado para o ambiente seguro do Mercado Pago para concluir a transação. Não manipulamos seus dados de cartão.")
-                
-                # Opcional: Mostrar o link de teste para depuração
-                # st.caption(f"Link Gerado: {link_pagamento}")
+                st.info("Você será redirecionado para o ambiente seguro do Mercado Pago para concluir a transação.")
             else:
                 st.error("Não foi possível iniciar o processo de pagamento. Tente novamente mais tarde.")
 
-        st.markdown("---")
-        st.warning("""
-        **NOTA IMPORTANTE (Profissionalismo):**
-        O *status de assinante* (liberação do acesso) só pode ser atualizado após o Mercado Pago confirmar o pagamento, o que é feito por meio de um **Webhook**.
-        Em uma aplicação real, este Streamlit precisaria de um **Servidor Backend (Ex: Flask/FastAPI)** para receber o Webhook e atualizar o status do usuário no banco de dados.
-        O simples redirecionamento de volta (`back_urls`) não garante a confirmação.
-        """)
+    st.markdown("---")
+    
+    # 4. AVISO DE WEBHOOK (Mantido, pois é uma excelente prática)
+    st.warning("""
+    **NOTA IMPORTANTE (Profissionalismo):**
+    O *status de assinante* (liberação do acesso) só pode ser atualizado após o Mercado Pago confirmar o pagamento, o que é feito por meio de um **Webhook**.
+    Em uma aplicação real, este Streamlit precisaria de um **Servidor Backend (Ex: Flask/FastAPI)** para receber o Webhook e atualizar o status do usuário no banco de dados.
+    """)
 
+    st.markdown("---")
+
+    # 5. BOTÃO DE LOGOUT (Consolidado)
+    if st.button("Sair da Conta", key="logout_button_pagamento"):
+        logout()
+        st.success("Você saiu da conta.")
+        # Redireciona para Home após logout
+        st.switch_page("Home.py") 
+        st.stop()
+        
 tela_pagamento()
