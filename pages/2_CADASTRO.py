@@ -60,7 +60,7 @@ def tela_cadastro():
     """Mostra o formulário de cadastro e envia dados para a API."""
     
     if 'user_nome' in st.session_state:
-        st.warning("Você já está logado, Redirecionando para o curso")    
+        st.warning("Você já está logado, Redirecionando para o curso")     
         time.sleep(1)
         st.switch_page("pages/4_Curso.py")
         st.stop()
@@ -115,24 +115,45 @@ def tela_cadastro():
             
             st.info("Processando cadastro...")
             
+            # --- DEBUG TEMPORÁRIO ---
+            # EXIBE A URL SENDO USADA. CONFIRME SE ELA ESTÁ CORRETA.
+            st.code(f"URL de Requisição: {URL_API_AUTH}", language="text")
+            # --- FIM DEBUG TEMPORÁRIO ---
+
             try:
-                # 3. Chama a API de Autenticação/Cadastro Unificada
-                response = requests.post(URL_API_AUTH, json=payload)
+                # 3. Chama a API de Autenticação/Cadastro Unificada com TIMEOUT
+                response = requests.post(
+                    URL_API_AUTH, 
+                    json=payload, 
+                    timeout=10 # Adiciona um timeout de 10 segundos
+                )
                 
                 # 4. Trata a Resposta da API
                 if response.status_code == 201: # 201 Created (Sucesso no Cadastro)
                     st.success(response.json().get("message", "Cadastro realizado! Verifique seu e-mail de boas-vindas."))
                     
+                    # Loga o usuário diretamente após o cadastro
+                    st.session_state['logged_in'] = True
+                    st.session_state['user_email'] = email_input
+                    st.session_state['user_nome'] = nome_input # Assumindo que o nome de usuário é retornado no 201 ou pode ser o nome_input
+                    
                     time.sleep(2)
-                    st.session_state['tela_atual'] = 'login'
-                    st.rerun()
+                    st.switch_page("pages/4_Curso.py")
                     
                 elif response.status_code == 409: # 409 Conflict (Email/CPF já existe)
                     st.error(response.json().get("message", "Este e-mail ou CPF já está cadastrado."))
-                else:
-                    st.error(response.json().get("message", "Erro desconhecido no cadastro. Tente novamente."))
-                    
+                elif response.status_code >= 400 and response.status_code < 500:
+                    # Trata outros erros do cliente (400 Bad Request, 401 Unauthorized, etc.)
+                     st.error(response.json().get("message", f"Erro na API (Status {response.status_code}): Requisição inválida."))
+                else: # Erros 5xx ou outros desconhecidos
+                    st.error(response.json().get("message", f"Erro desconhecido no cadastro (Status {response.status_code}). Tente novamente."))
+                        
+            except requests.exceptions.Timeout:
+                 st.error("Erro de conexão com a API: Tempo limite esgotado (Timeout). O servidor Render pode estar hibernando. Tente novamente em alguns segundos.")
+            except requests.exceptions.ConnectionError:
+                 st.error(f"Erro de conexão com a API: Não foi possível se conectar a {URL_API_AUTH}. Verifique a URL e o status do servidor.")
             except requests.exceptions.RequestException as e:
-                st.error(f"Erro de conexão com a API: O servidor não respondeu. Verifique URL_API_AUTH.")
+                # Catch-all para outros erros de requisição
+                st.error(f"Erro inesperado de requisição: {e}")
 
 tela_cadastro()
