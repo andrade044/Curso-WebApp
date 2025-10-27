@@ -856,5 +856,4 @@ def main():
         elif pagina == "Pagamento":
             tela_pagamento()
 
-if __name__ == '__main__':
-    main()
+tela_login()
