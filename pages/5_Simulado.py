@@ -40,6 +40,14 @@ MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
 URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
 URL_API_AUTH = get_secret("URL_API_AUTH")
 
+if 'logged_in' not in st.session_state:
+    st.session_state['logged_in'] = False
+if 'user_email' not in st.session_state:
+    st.session_state['user_email'] = None
+
+
+# --- Configuração do Banco de Dados SQLite ---
+DB_NAME = 'usuarios.db'
 
 def reiniciar_simulado():
     """Reseta todas as variáveis do quiz."""
