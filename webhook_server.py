@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify, redirect, url_for
+from flask_cors import CORS # NOVO: Importa a extensão CORS
 import os
 import mercadopago
 import jwt
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone 
 from dotenv import load_dotenv
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
@@ -10,11 +11,13 @@ import psycopg2
 from python_http_client.exceptions import HTTPError
 import bcrypt
 
+
 # Carrega variáveis do arquivo .env (se existir)
 load_dotenv() 
 
 # --- Configuração do Flask ---
 app = Flask(__name__)
+CORS(app)
 
 # --- Configuração do Banco de Dados e Variáveis de Ambiente ---
 DB_NAME = os.getenv('DB_NAME')
