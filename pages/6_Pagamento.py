@@ -58,19 +58,35 @@ def criar_preferencia_pagamento():
     Esta função usa o Access Token e deve ser considerada "lógica de backend"
     em um ambiente de Streamlit.
     """
+    
+    # 1. PEGA O EMAIL DE FORMA SEGURA (JÁ EXISTE NO CÓDIGO)
+    id_para_mp = st.session_state.get('user_email') 
+
+    if not id_para_mp:
+        # Se nem o email estiver na sessão (o que seria um bug de login)
+        raise ValueError("Identificador de usuário ausente na sessão.")
+    
     if not MP_ACCESS_TOKEN:
         st.error("Falha na configuração do pagamento: Access Token ausente.")
         return None
 
     try:
+        # 2. CORREÇÃO: PEGA O USER_ID DE FORMA SEGURA, COM FALLBACK PARA O EMAIL
+        # Se 'user_id' não existir (dando o erro), ele usa o 'id_para_mp' (email) como fallback na referência.
+        user_id_ref = st.session_state.get('user_id', id_para_mp) 
+        
+        # 3. GERAÇÃO DA REFERÊNCIA AGORA SEGURA
+        # Se user_id existe, usa: REF-123-UUID
+        # Se user_id não existe, usa: REF-email@exemplo.com-UUID
+        ref_id = f"REF-{user_id_ref}-{uuid.uuid4()}"
+        
         # Inicializa o SDK
         sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
         
-        # Gera uma referência única para rastreamento
-        ref_id = f"REF-{st.session_state['user_id']}-{uuid.uuid4()}"
-        
         streamlit_base_url = MP_NOTIFICATION_URL.replace("/mercadopago_webhook", "")
-        meu_link_ngrok = "https://quizzically-ungymnastic-lamar.ngrok-free.dev"
+        # A URL do ngrok DEVE ser uma variável global ou de ambiente, não hardcoded.
+        meu_link_ngrok = "https://quizzically-ungymnastic-lamar.ngrok-free.dev" 
+        
         preference_data = {
             "items": [
                 {
@@ -80,7 +96,9 @@ def criar_preferencia_pagamento():
                 }
             ],
             "payer": {
-                "email": st.session_state['user_email'],
+                # 4. CORREÇÃO: AQUI TAMBÉM PODE FALHAR SE O EMAIL SUMIR
+                # Usando o id_para_mp, que já foi checado.
+                "email": id_para_mp,
             },
             # Metadados para identificar a transação no seu sistema
             "external_reference": ref_id,
@@ -89,7 +107,6 @@ def criar_preferencia_pagamento():
             # URLs de redirecionamento após o pagamento no checkout do Mercado Pago
             "back_urls": {
                 # Em um app real, estas URLs apontariam para endpoints públicos do seu Streamlit
-                # Ex: "https://seu-app-streamlit.com/?status=success"
                 "success": meu_link_ngrok, # Substitua pela sua URL real
                 "pending": meu_link_ngrok, # Substitua pela sua URL real
                 "failure": meu_link_ngrok # Substitua pela sua URL real
@@ -102,10 +119,11 @@ def criar_preferencia_pagamento():
         
         if preference_response["status"] == 201:
             # Retorna o link de checkout (sandbox_init_point para testes, init_point para produção)
-            # Usando init_point que funciona tanto em teste quanto em produção
             return preference_response["response"]["init_point"]
         else:
+            # Para debug profissional, inclua a resposta completa para análise
             st.error(f"Erro ao criar preferência: {preference_response['response']['message']}")
+            st.code(preference_response) # Opcional: para ver o erro detalhado da API do MP
             return None
 
     except Exception as e:
