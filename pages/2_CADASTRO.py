@@ -14,7 +14,7 @@ from sendgrid.helpers.mail import Mail
 from data import SIMULADO_DATA
 import requests
 from auth import cadastro
-from webhook_server import send_welcome_email_sendgrid
+from webhook_server import send_welcome_email_sendgrid, enviar_email_ativacao_sendgrid
 
 
 def get_secret(key, default=None):
