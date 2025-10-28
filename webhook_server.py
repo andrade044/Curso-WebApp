@@ -70,14 +70,21 @@ def login():
         nome = data.get("nome")
         email = data.get("email")
         senha = data.get("senha")
+        cpf = data.get("cpf") # OK: Coletando o novo campo
 
-        if not all([nome, email, senha]):
-            return jsonify({"message": "Todos os campos são obrigatórios"}), 400
+        # CORREÇÃO 1: Incluir 'cpf' na verificação de campos obrigatórios
+        if not all([nome, email, senha, cpf]):
+            return jsonify({"message": "Todos os campos (nome, email, senha, cpf) são obrigatórios"}), 400
 
         # Verifica se o e-mail já existe
-        existing = supabase.table("usuarios").select("*").eq("email", email).execute()
-        if existing.data:
+        existing_email = supabase.table("usuarios").select("*").eq("email", email).execute()
+        if existing_email.data:
             return jsonify({"message": "E-mail já cadastrado"}), 409
+
+        # RECOMENDAÇÃO: Verifica se o CPF já existe
+        existing_cpf = supabase.table("usuarios").select("*").eq("cpf", cpf).execute()
+        if existing_cpf.data:
+            return jsonify({"message": "CPF já cadastrado"}), 409
 
         # Criptografa a senha
         senha_hash = bcrypt.hashpw(senha.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
@@ -89,10 +96,12 @@ def login():
                 "email": email,
                 "senha_hash": senha_hash,
                 "ativo": 1,
-                "assinante": 0
+                "assinante": 0, # CORREÇÃO 2: Adicionada a vírgula aqui
+                "cpf": cpf # OK: Inserindo o novo campo
             }).execute()
         except Exception as e:
-            return jsonify({"message": f"Erro ao inserir usuário: {e}"}), 500
+            # Em um ambiente real, você deve logar 'e' e retornar uma mensagem mais genérica
+            return jsonify({"message": f"Erro ao inserir usuário no banco de dados."}), 500
 
         # Gera token JWT
         token = jwt.encode(
@@ -111,7 +120,9 @@ def login():
             "nome": nome
         }), 201
 
+    # O resto da função de LOGIN está OK, pois o login não usa o campo 'cpf'
     elif action == "LOGIN":
+        # ... (código do LOGIN continua aqui) ...
         email = data.get("email")
         senha = data.get("senha")
 
