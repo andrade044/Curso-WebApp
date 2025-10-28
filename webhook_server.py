@@ -259,7 +259,7 @@ def enviar_email_ativacao_sendgrid(destinatario:str, nome_usuario:str,
         </p>
         
         <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
-        # <p><small>{link_ativacao}</small></p>
+        # <p><small>{URL_CURSO}</small></p>
         
         <p>Atenciosamente,<br>Equipe do Curso.</p>
       </body>
