@@ -100,7 +100,7 @@ def tela_curso():
     st.subheader(f"Seu Status: {status_label}")
 
     # Mensagem de status consolidada
-    if is_assinante:
+    if verifica_assinante:
         st.success("🎉 Conteúdo premium desbloqueado!")
     else:
         st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
@@ -137,7 +137,7 @@ def tela_curso():
     st.header("Módulo 2: Conteúdo Avançado")
 
     # 4. MÓDULO 2: CONTEÚDO PAGO (Acesso Condicional)
-    if is_assinante:
+    if verifica_assinante():
         # CONTEÚDO LIBERADO
         with st.expander("👑 Módulo 2: Conteúdo Avançado e Práticas Profissionais (Assinantes)", expanded=True):
             st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
