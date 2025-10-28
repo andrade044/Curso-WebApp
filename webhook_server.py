@@ -296,27 +296,24 @@ def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str) -> int:
         return response.status_code
 
     except BadRequestsError as e:
-        # 4. TRATAMENTO DO ERRO 4XX (BadRequestsError) - CRUCIAL
+        # 4. TRATAMENTO DO ERRO 4XX (BadRequestsError)
         print("--- ERRO FATAL DO SENDGRID (BadRequestsError) ---")
-        print(f"Status Code: {e.status_code}")
-        # AQUI O ERRO DETALHADO ESTÁ ESCONDIDO, PRECISAMOS EXIBI-LO
         
-        # O corpo do erro é uma string de bytes. Tentamos decodificá-lo.
+        # O status code está diretamente no objeto e
+        print(f"Status Code: {e.status_code}")
+        
+        # Acesso correto ao corpo da resposta de erro da API
         try:
-            error_details = e.response_body.decode('utf-8')
+            # e.response é o objeto de resposta completo
+            error_details = e.response.text 
             print(f"Detalhes do Erro da API: {error_details}")
-        except Exception:
-            print(f"Detalhes do Erro (Bytes): {e.response_body}")
+        except Exception as body_e:
+            print(f"Erro ao obter o corpo da resposta: {body_e}")
             
         print("--------------------------------------------------")
         
         # Retorna o status code do erro (geralmente 400, 401, 403)
         return e.status_code
-
-    except Exception as e:
-        # 5. Outros erros inesperados (conexão, etc.)
-        print(f"Erro inesperado no envio de email: {e}")
-        return 500 # Retorna 500 para indicar um erro interno
 
 
 if __name__ == "__main__":
