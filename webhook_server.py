@@ -49,6 +49,7 @@ MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
 MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
 URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
 URL_API_AUTH = get_secret("URL_API_AUTH")
+URL_CURSO = get_secret("URL_CURSO")
 
 # Carrega variáveis de ambiente
 load_dotenv()
