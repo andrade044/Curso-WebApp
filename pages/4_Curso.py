@@ -70,8 +70,6 @@ except Exception as e:
     st.stop()
 
 # Usuário está logado e token válido, mostra o conteúdo do curso
-st.title(f"Bem-vindo(a), {st.session_state['user_nome']}!")
-st.write("Aqui está o conteúdo do seu curso...")
 
 nome_usuario = st.session_state['user_nome']
 
@@ -97,16 +95,11 @@ def tela_curso():
     
     st.title(f"🎓 Bem-vindo(a) ao Curso, {nome_usuario}!")
     
-    status_label = "Assinante Premium 👑" if is_assinante else "Usuário Básico"
-    st.subheader(f"Seu Status: {status_label}")
-
     # Mensagem de status consolidada
     if verifica_assinante:
         st.success("🎉 Conteúdo premium desbloqueado!")
     else:
         st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
-
-    st.markdown("---")
     
     # 2.2. Botão de Logout (Consolidado)
 

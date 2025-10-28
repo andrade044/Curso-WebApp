@@ -140,7 +140,7 @@ def tela_pagamento():
     # 1. GUARDA DE LOGIN (Usando 'user_nome' ou 'logged_in' é mais seguro)
     if verifica_assinante():
         st.warning("Você já tem a assinatura.")
-        st.link("Home.py", label="Ir para a página inicial")
+        st.page_link("Home.py", label="Ir para a página inicial")
         st.stop()        
 
     if not st.session_state.get('user_nome'):
