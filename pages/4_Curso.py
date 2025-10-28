@@ -73,6 +73,7 @@ except Exception as e:
 st.title(f"Bem-vindo(a), {st.session_state['user_nome']}!")
 st.write("Aqui está o conteúdo do seu curso...")
 
+nome_usuario = st.session_state['user_nome']
 
 def tela_curso():
     """Conteúdo do Curso (Acesso Condicional e Protegido)."""

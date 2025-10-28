@@ -150,7 +150,6 @@ def tela_login():
                 st.session_state['user_assinante'] = user_data.get('assinante', False)
                 st.session_state['user_email'] = user_data.get('email', email)
                 st.session_state['token'] = token   
-                st.session_state['user_nome'] = user_data.get('nome')
                 
                 status_message.success(f"Login bem-sucedido! Olá, {st.session_state['user_nome']}.")
                 
