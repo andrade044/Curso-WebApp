@@ -140,6 +140,10 @@ def tela_cadastro():
                     st.session_state['user_email'] = email_input
                     st.session_state['user_nome'] = nome_input 
                     st.session_state['token'] = token
+                    email_usuario = cadastro_data['email']
+                    nome_usuario = cadastro_data['nome']
+                    send_welcome_email_sendgrid(email_usuario, nome_usuario)
+
                     
                     time.sleep(1) # Dá tempo para o usuário ver a mensagem de sucesso
                     st.switch_page("pages/4_Curso.py")

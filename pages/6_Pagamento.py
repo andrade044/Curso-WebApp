@@ -122,7 +122,7 @@ def criar_preferencia_pagamento():
         
         if preference_response["status"] == 201:
             # Retorna o link de checkout (sandbox_init_point para testes, init_point para produção)
-            return preference_response["response"]["sandbox_init_point"]
+            return preference_response["response"]["init_point"]
         else:
             # Para debug profissional, inclua a resposta completa para análise
             st.error(f"Erro ao criar preferência: {preference_response['response']['message']}")

@@ -533,6 +533,8 @@ def login():
         return jsonify({"message": "Ação inválida"}), 400
 
 
+
+
 # ------------------------------------------------------
 # 🔒 ROTA TESTE - EXIGE TOKEN (opcional)
 # ------------------------------------------------------
@@ -557,6 +559,56 @@ def perfil():
     except jwt.InvalidTokenError:
         return jsonify({"message": "Token inválido"}), 401
 
+def send_welcome_email_sendgrid(recipient_email, recipient_name):
+    """
+    Envia um email HTML de boas-vindas usando o SDK do SendGrid.
+    """
+    if not SENDGRID_API_KEY or not SENDER_EMAIL:
+        print("Erro: A chave de API ou o e-mail remetente do SendGrid estão ausentes.")
+        return False
+        
+    try:
+        # Conteúdo HTML da mensagem
+        html_content = f"""
+        <html>
+            <body>
+                <h2 style="color: #007bff;">🎉 Olá, {recipient_name}!</h2>
+                <p>Obrigado por se juntar à nossa comunidade.</p>
+                <p>Seu cadastro foi concluído com sucesso. Você já pode acessar:</p>
+                <ul>
+                    <li><strong>Email:</strong> {recipient_email}</li>
+                    <li><strong>Link para login:</strong> <a href="https://seu-app-streamlit.com/Home">Clique aqui para começar!</a></li>
+                </ul>
+                <p>Em caso de dúvidas, não hesite em nos contatar.</p>
+                <p>Atenciosamente,<br>A Equipe do Curso</p>
+            </body>
+        </html>
+        """
+        
+        # Cria o objeto Mail
+        message = Mail(
+            from_email=SENDER_EMAIL,
+            to_emails=recipient_email,
+            subject='🎉 Bem-vindo(a) à Plataforma do Curso!',
+            html_content=html_content
+        )
+        
+        # Inicializa o cliente SendGrid e envia o email
+        sg = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
+        response = sg.client.mail.send.post(request_body=message.get())
+        
+        # Verifica se a API do SendGrid aceitou o envio (status 200 ou 202)
+        if response.status_code in [200, 202]:
+            print(f"E-mail de boas-vindas enviado com sucesso para {recipient_email}.")
+            # Se você quiser mais debug: print(response.body, response.headers)
+            return True
+        else:
+            print(f"Falha na API do SendGrid (Status {response.status_code}): {response.body}")
+            return False
+
+    except Exception as e:
+        print(f"Erro inesperado durante o envio com SendGrid: {e}")
+        return False
 
 if __name__ == "__main__":
     app.run(debug=True)
