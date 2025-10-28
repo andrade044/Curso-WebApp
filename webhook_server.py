@@ -5,6 +5,51 @@ from supabase_client import supabase
 from dotenv import load_dotenv
 import os, bcrypt, jwt, datetime
 
+import streamlit as st
+import sqlite3
+import re
+import bcrypt
+import os 
+from dotenv import load_dotenv
+import random
+import mercadopago
+import uuid
+import secrets
+import time
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
+# from api_mercadopago import api_pagamento
+from data import SIMULADO_DATA
+import requests
+from auth import verifica_login, verifica_assinante, logout
+
+
+def get_secret(key, default=None):
+    
+    # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
+    if 'secrets' in st.session_state and key in st.secrets:
+        return st.secrets[key]
+    # 2. Tenta ler de os.environ (para Codespace/Local com .env)
+    return os.getenv(key, default)
+
+
+MERCADO_PAGO_ACCESS_TOKEN = get_secret('MERCADO_PAGO_ACCESS_TOKEN')
+REFERENCIA_ASSINATURA = get_secret('REFERENCIA_ASSINATURA')
+
+VALOR_ASSINATURA = get_secret('VALOR_ASSINATURA') 
+TITULO_ASSINATURA = "Assinatura Premium do Curso de Python"
+
+CHAVE_API_SENDGRID = get_secret('CHAVE_API_SENDGRID')
+EMAIL_REMETENTE =  get_secret('EMAIL_REMETENTE')
+TOKEN_LENGTH_BYTES= get_secret('TOKEN_LENGTH_BYTES')
+TOKEN_EXPIRATION_HOURS= get_secret('TOKEN_EXPIRATION_HOURS')
+
+URL_BASE_ATIVACAO = get_secret("URL_BASE_ATIVACAO") 
+MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
+MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
+URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
+URL_API_AUTH = get_secret("URL_API_AUTH")
+
 # Carrega variáveis de ambiente
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
@@ -140,7 +185,7 @@ def send_welcome_email_sendgrid(recipient_email, recipient_name):
     """
     Envia um email HTML de boas-vindas usando o SDK do SendGrid.
     """
-    if not SENDGRID_API_KEY or not SENDER_EMAIL:
+    if not CHAVE_API_SENDGRID or not EMAIL_REMETENTE:
         print("Erro: A chave de API ou o e-mail remetente do SendGrid estão ausentes.")
         return False
         
@@ -164,14 +209,14 @@ def send_welcome_email_sendgrid(recipient_email, recipient_name):
         
         # Cria o objeto Mail
         message = Mail(
-            from_email=SENDER_EMAIL,
+            from_email=EMAIL_REMETENTE,
             to_emails=recipient_email,
             subject='🎉 Bem-vindo(a) à Plataforma do Curso!',
             html_content=html_content
         )
         
         # Inicializa o cliente SendGrid e envia o email
-        sg = sendgrid.SendGridAPIClient(SENDGRID_API_KEY)
+        sg = sendgrid.SendGridAPIClient(CHAVE_API_SENDGRID)
         response = sg.client.mail.send.post(request_body=message.get())
         
         # Verifica se a API do SendGrid aceitou o envio (status 200 ou 202)

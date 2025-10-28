@@ -16,6 +16,7 @@ from data import SIMULADO_DATA
 import requests
 from auth import login
 
+
 load_dotenv()
 
 def get_secret(key, default=None):
@@ -25,6 +26,7 @@ def get_secret(key, default=None):
         return st.secrets[key]
     # 2. Tenta ler de os.environ (para Codespace/Local com .env)
     return os.getenv(key, default)
+
 
 MERCADO_PAGO_ACCESS_TOKEN = get_secret('MERCADO_PAGO_ACCESS_TOKEN')
 REFERENCIA_ASSINATURA = get_secret('REFERENCIA_ASSINATURA')
