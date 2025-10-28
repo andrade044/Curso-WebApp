@@ -233,7 +233,7 @@ def send_welcome_email_sendgrid(recipient_email, recipient_name):
         return False
 
 def enviar_email_ativacao_sendgrid(destinatario:str, nome_usuario:str, 
-                                   link_ativacao:str)-> int:
+                                   )-> int:
     conta_sendgrid = SendGridAPIClient(CHAVE_API_SENDGRID)
     
     email = Mail(from_email=EMAIL_REMETENTE,
@@ -246,7 +246,7 @@ def enviar_email_ativacao_sendgrid(destinatario:str, nome_usuario:str,
         <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
         
         <p style="text-align: center;">
-            <a href="{link_ativacao}" 
+            <a href="{URL_CURSO}" 
                style="background-color: #4CAF50; 
                       color: white; 
                       padding: 10px 20px; 
