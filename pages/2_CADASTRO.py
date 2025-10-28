@@ -142,7 +142,8 @@ def tela_cadastro():
                     st.session_state['token'] = token
                     email_usuario = payload['email'] # <<-- MUDANÇA
                     nome_usuario = payload['nome']
-                    send_welcome_email_sendgrid(email_usuario, nome_usuario)
+                    send_welcome_email_sendgrid(
+                        email_input, nome_input)
 
 
                     time.sleep(1) # Dá tempo para o usuário ver a mensagem de sucesso
