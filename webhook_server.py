@@ -21,7 +21,10 @@ from sendgrid.helpers.mail import Mail
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
 import requests
+import sendgrid
 from auth import verifica_login, verifica_assinante, logout
+from python_http_client.exceptions import BadRequestsError
+
 
 
 def get_secret(key, default=None):
