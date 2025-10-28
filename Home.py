@@ -146,7 +146,7 @@ def tela_login():
 
                 # 3. DEFINE AS CHAVES DE SESSÃO (CRÍTICO)
                 st.session_state['logged_in'] = True
-                st.session_state['user_nome'] = user_data.get('nome', 'Usuário')
+                st.session_state['user_nome'] = data.get('nome', 'Usuário')
                 st.session_state['user_assinante'] = user_data.get('assinante', False)
                 st.session_state['user_email'] = user_data.get('email', email)
                 st.session_state['token'] = token   

@@ -138,7 +138,7 @@ def tela_pagamento():
     """Tela para gerenciar o status de assinante com fluxo de pagamento profissional."""
     
     # 1. GUARDA DE LOGIN (Usando 'user_nome' ou 'logged_in' é mais seguro)
-    if verifica_assinante() is False:
+    if verifica_assinante():
         st.warning("Você já tem a assinatura.")
         st.link("Home.py", label="Ir para a página inicial")
         st.stop()        
