@@ -244,41 +244,76 @@ def send_welcome_email_sendgrid(recipient_email, recipient_name):
         print(f"Erro inesperado durante o envio com SendGrid: {e}")
         return False
 
-def enviar_email_ativacao_sendgrid(destinatario:str, nome_usuario:str, 
-                                   )-> int:
-    conta_sendgrid = SendGridAPIClient(CHAVE_API_SENDGRID)
+def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str) -> int:
+    """
+    Envia um e-mail de ativação usando o SendGrid e retorna o status code.
+    """
     
-    email = Mail(from_email=EMAIL_REMETENTE,
-                 to_emails=destinatario,
-                 subject='Ativação de Conta - Seu Curso de CNH',
-                 html_content=f"""
-    <html>
-      <body>
-        <p>Olá, <strong>{nome_usuario}</strong>,</p>
-        <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
-        
-        <p style="text-align: center;">
-            <a href="{URL_CURSO}" 
-               style="background-color: #4CAF50; 
-                      color: white; 
-                      padding: 10px 20px; 
-                      text-decoration: none; 
-                      border-radius: 5px; 
-                      display: inline-block;">
-                ATIVAR MINHA CONTA
-            </a>
-        </p>
-        
-        <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
-        # <p><small>{URL_CURSO}</small></p>
-        
-        <p>Atenciosamente,<br>Equipe do Curso.</p>
-      </body>
-    </html>
-    """)
+    # 1. Definição do Email (Como estava, presumindo que URL_CURSO está resolvida)
+    email = Mail(
+        from_email=EMAIL_REMETENTE,
+        to_emails=destinatario,
+        subject='Ativação de Conta - Seu Curso de CNH',
+        html_content=f"""
+        <html>
+            <body>
+                <p>Olá, <strong>{nome_usuario}</strong>,</p>
+                <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
+                
+                <p style="text-align: center;">
+                    <a href="{URL_CURSO}" 
+                       style="background-color: #4CAF50; 
+                              color: white; 
+                              padding: 10px 20px; 
+                              text-decoration: none; 
+                              border-radius: 5px; 
+                              display: inline-block;">
+                        ATIVAR MINHA CONTA
+                    </a>
+                </p>
+                
+                <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
+                <p><small>{URL_CURSO}</small></p>
+                
+                <p>Atenciosamente,<br>Equipe do Curso.</p>
+            </body>
+        </html>
+        """
+    )
 
-    resposta = conta_sendgrid.send(email)
-    print(resposta.status_code)
+    try:
+        # 2. Inicializa o cliente SendGrid e envia o email
+        conta_sendgrid = sendgrid.SendGridAPIClient(CHAVE_API_SENDGRID)
+        response = conta_sendgrid.send(email)
+        
+        # 3. Imprime o status de sucesso para o log
+        print(f"E-mail enviado com sucesso. Status: {response.status_code}")
+        
+        # Retorna o status code
+        return response.status_code
+
+    except BadRequestsError as e:
+        # 4. TRATAMENTO DO ERRO 4XX (BadRequestsError) - CRUCIAL
+        print("--- ERRO FATAL DO SENDGRID (BadRequestsError) ---")
+        print(f"Status Code: {e.status_code}")
+        # AQUI O ERRO DETALHADO ESTÁ ESCONDIDO, PRECISAMOS EXIBI-LO
+        
+        # O corpo do erro é uma string de bytes. Tentamos decodificá-lo.
+        try:
+            error_details = e.response_body.decode('utf-8')
+            print(f"Detalhes do Erro da API: {error_details}")
+        except Exception:
+            print(f"Detalhes do Erro (Bytes): {e.response_body}")
+            
+        print("--------------------------------------------------")
+        
+        # Retorna o status code do erro (geralmente 400, 401, 403)
+        return e.status_code
+
+    except Exception as e:
+        # 5. Outros erros inesperados (conexão, etc.)
+        print(f"Erro inesperado no envio de email: {e}")
+        return 500 # Retorna 500 para indicar um erro interno
 
 
 if __name__ == "__main__":
