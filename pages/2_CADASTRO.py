@@ -140,11 +140,11 @@ def tela_cadastro():
                     st.session_state['user_email'] = email_input
                     st.session_state['user_nome'] = nome_input 
                     st.session_state['token'] = token
-                    email_usuario = cadastro_data['email']
-                    nome_usuario = cadastro_data['nome']
+                    email_usuario = payload['email'] # <<-- MUDANÇA
+                    nome_usuario = payload['nome']
                     send_welcome_email_sendgrid(email_usuario, nome_usuario)
 
-                    
+
                     time.sleep(1) # Dá tempo para o usuário ver a mensagem de sucesso
                     st.switch_page("pages/4_Curso.py")
                 
@@ -159,9 +159,9 @@ def tela_cadastro():
                     status_message.error(response.json().get("message", f"Erro desconhecido no cadastro (Status {response.status_code}). Tente novamente."))
                         
             except requests.exceptions.Timeout:
-                status_message.error("Erro de conexão com a API: Tempo limite esgotado (Timeout).")
+                status_message.error("Erro de conexão Tempo limite esgotado (Timeout).")
             except requests.exceptions.ConnectionError:
-                status_message.error(f"Erro de conexão com a API: Não foi possível se conectar a {URL_API_AUTH}.")
+                status_message.error(f"Erro de conexão Não foi possível se conectar .")
             except requests.exceptions.RequestException as e:
                 # Catch-all para outros erros de requisição
                 status_message.error(f"Erro inesperado de requisição: {e}")
