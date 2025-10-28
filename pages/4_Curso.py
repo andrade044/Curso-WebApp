@@ -108,12 +108,6 @@ def tela_curso():
     st.markdown("---")
     
     # 2.2. Botão de Logout (Consolidado)
-    if st.button("Sair da Conta"):
-        logout()
-        st.success("Você saiu da conta. Redirecionando...")
-        # Usa switch_page para redirecionar para o login/home
-        st.switch_page("Home.py") 
-        st.stop()
 
     st.markdown("---")
 
@@ -168,6 +162,12 @@ def tela_curso():
             st.warning("🔒 **CONTEÚDO EXCLUSIVO PARA ASSINANTES.**")
             st.write("Adquira sua assinatura para liberar este e outros módulos avançados.")
 
+    if st.button("Sair da Conta"):
+        logout()
+        st.success("Você saiu da conta. Redirecionando...")
+        # Usa switch_page para redirecionar para o login/home
+        st.switch_page("Home.py") 
+        st.stop()
 
     
 tela_curso()
