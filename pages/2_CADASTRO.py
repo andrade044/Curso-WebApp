@@ -13,7 +13,7 @@ from sendgrid.helpers.mail import Mail
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
 import requests
-from auth import cadastro
+from auth import cadastro, send_welcome_email_sendgrid
 
 def get_secret(key, default=None):
     
