@@ -232,5 +232,42 @@ def send_welcome_email_sendgrid(recipient_email, recipient_name):
         print(f"Erro inesperado durante o envio com SendGrid: {e}")
         return False
 
+def enviar_email_ativacao_sendgrid(destinatario:str, nome_usuario:str, 
+                                   link_ativacao:str)-> int:
+    conta_sendgrid = SendGridAPIClient(CHAVE_API_SENDGRID)
+    
+    email = Mail(from_email=EMAIL_REMETENTE,
+                 to_emails=destinatario,
+                 subject='Ativação de Conta - Seu Curso de CNH',
+                 html_content=f"""
+    <html>
+      <body>
+        <p>Olá, <strong>{nome_usuario}</strong>,</p>
+        <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
+        
+        <p style="text-align: center;">
+            <a href="{link_ativacao}" 
+               style="background-color: #4CAF50; 
+                      color: white; 
+                      padding: 10px 20px; 
+                      text-decoration: none; 
+                      border-radius: 5px; 
+                      display: inline-block;">
+                ATIVAR MINHA CONTA
+            </a>
+        </p>
+        
+        <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
+        # <p><small>{link_ativacao}</small></p>
+        
+        <p>Atenciosamente,<br>Equipe do Curso.</p>
+      </body>
+    </html>
+    """)
+
+    resposta = conta_sendgrid.send(email)
+    print(resposta.status_code)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
