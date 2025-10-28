@@ -126,7 +126,7 @@ def tela_cadastro():
                 response = requests.post(
                     URL_API_AUTH, 
                     json=payload, 
-                    timeout=10 # Adiciona um timeout de 10 segundos
+                    timeout=20 # Adiciona um timeout de 10 segundos
                 )
                 
                 # 4. Trata a Resposta da API
