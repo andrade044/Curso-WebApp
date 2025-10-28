@@ -138,6 +138,11 @@ def tela_pagamento():
     """Tela para gerenciar o status de assinante com fluxo de pagamento profissional."""
     
     # 1. GUARDA DE LOGIN (Usando 'user_nome' ou 'logged_in' é mais seguro)
+    if verifica_assinante() is False:
+        st.warning("Você já tem a assinatura.")
+        st.link("Home.py", label="Ir para a página inicial")
+        st.stop()        
+
     if not st.session_state.get('user_nome'):
         st.error("Acesso negado. Por favor, faça login para acessar esta página.")
         st.page_link("Home.py", label="Ir para a página de Login")
@@ -193,11 +198,6 @@ def tela_pagamento():
     st.markdown("---")
     
     # 4. AVISO DE WEBHOOK (Mantido, pois é uma excelente prática)
-    st.warning("""
-    **NOTA IMPORTANTE (Profissionalismo):**
-    O *status de assinante* (liberação do acesso) só pode ser atualizado após o Mercado Pago confirmar o pagamento, o que é feito por meio de um **Webhook**.
-    Em uma aplicação real, este Streamlit precisaria de um **Servidor Backend (Ex: Flask/FastAPI)** para receber o Webhook e atualizar o status do usuário no banco de dados.
-    """)
 
     st.markdown("---")
 
