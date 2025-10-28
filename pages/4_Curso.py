@@ -96,7 +96,7 @@ def tela_curso():
     st.title(f"🎓 Bem-vindo(a) ao Curso, {nome_usuario}!")
     
     # Mensagem de status consolidada
-    if verifica_assinante:
+    if verifica_assinante():
         st.success("🎉 Conteúdo premium desbloqueado!")
     else:
         st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
