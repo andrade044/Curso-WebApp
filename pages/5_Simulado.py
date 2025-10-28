@@ -90,15 +90,7 @@ def tela_simulados():
     """Interface principal para a tela de Simulado."""
     """Interface principal para a tela de Simulado com acesso restrito a assinantes."""
     
-    # --- 1. GUARDA DE SEGURANÇA (Adicione este bloco no início) ---
-    
-    # Verifica se o usuário está logado e se a chave de assinatura foi carregada
-    # if 'user_assinante' not in st.session_state:
-    #     st.error("Acesso negado. Por favor, faça login para acessar os Simulados.")
-    #     # Redireciona o usuário para a página de login/home
 
-    #     st.page_link("Home.py", label="Mude para a pagina de login")
-    #     st.stop()
     
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
     st.title("Página de Simulados")
@@ -111,10 +103,6 @@ def tela_simulados():
     else:
         st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
 
-    if st.button("Sair"):
-        logout()
-        st.success("Você saiu da conta.")
-        st.experimental_rerun()
 
 
     # A linha que estava dando erro, agora segura:
@@ -190,5 +178,10 @@ def tela_simulados():
                         st.session_state['user_answer'] = escolha
                         proxima_pergunta()
                         st.rerun()
+    
+    if st.button("Sair"):
+        logout()
+        st.success("Você saiu da conta.")
+        st.experimental_rerun()
 
 tela_simulados()

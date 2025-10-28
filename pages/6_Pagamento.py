@@ -196,10 +196,6 @@ def tela_pagamento():
                 st.error("Não foi possível iniciar o processo de pagamento. Tente novamente mais tarde.")
 
     st.markdown("---")
-    
-    # 4. AVISO DE WEBHOOK (Mantido, pois é uma excelente prática)
-
-    st.markdown("---")
 
     # 5. BOTÃO DE LOGOUT (Consolidado)
     if st.button("Sair da Conta", key="logout_button_pagamento"):
