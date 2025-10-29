@@ -283,15 +283,18 @@ def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str) -> int:
         </html>
         """
     )
-
+    print(f"DEBUG 1: Destinatário: {destinatario}")
+    print(f"DEBUG 1: Remetente: {EMAIL_REMETENTE}")
+    
     try:
+        print("DEBUG 2: Objeto Email criado com sucesso.")
         # 2. Inicializa o cliente SendGrid e envia o email
         conta_sendgrid = sendgrid.SendGridAPIClient(CHAVE_API_SENDGRID)
+        print("DEBUG 3: Cliente SendGrid inicializado. Tentando enviar...")
         response = conta_sendgrid.send(email)
-        
         # 3. Imprime o status de sucesso para o log
         print(f"E-mail enviado com sucesso. Status: {response.status_code}")
-        
+        print(f"DEBUG 4: Resposta da API recebida. Status: {response.status_code}")
         # Retorna o status code
         return response.status_code
 
