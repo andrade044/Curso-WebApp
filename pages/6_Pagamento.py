@@ -53,7 +53,6 @@ if 'user_email' not in st.session_state:
 
 
 # --- Configuração do Banco de Dados SQLite ---
-DB_NAME = 'usuarios.db'
 
 def criar_preferencia_pagamento():
     """

@@ -287,26 +287,33 @@ def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str) -> int:
 
 
 from supabase_client import create_client, Client
-
+supabase_service = create_client(SUPABASE_URL, SUPABASE_KEY)
 def atualizar_assinante_supabase(user_id_or_email) -> bool:
-    """Atualiza o campo 'assinante' para True no Supabase pelo email."""
+    """
+    Atualiza o campo 'assinante' para True no Supabase pelo email, 
+    usando o cliente de serviço (Service Role Key) para ignorar as RLS.
+    """
+    
+    # IMPORTANTE: A tabela em Supabase está como 'usuarios'
+    TABELA_USUARIOS = 'usuarios' 
+    
+    # --- LOG DE DEBUG ADICIONADO ---
+    print(f"DEBUG: Tentando atualizar o usuário com email: {user_id_or_email}")
+    
     try:
-        # Inicializa o cliente Supabase com as chaves de backend
-        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
-        
-        # 1. Faz a atualização
-        response = supabase.table('usuarios') \
+        # 1. Utiliza o cliente de serviço inicializado globalmente
+        response = supabase_service.table(TABELA_USUARIOS) \
             .update({'assinante': True}) \
             .eq('email', user_id_or_email) \
             .execute()
         
         # O Supabase retorna uma resposta complexa. Verifica se houve linhas afetadas.
         if response.data and len(response.data) > 0:
-            print(f"SUCESSO: Usuário {user_id_or_email} atualizado no Supabase.")
+            print(f"SUCESSO: Usuário {user_id_or_email} atualizado no Supabase (Service Key).")
+            # Adicione um LOG aqui, se possível, para ter certeza
             return True
         else:
-            print(f"AVISO: Usuário {user_id_or_email} não encontrado no Supabase para atualização.")
-            # Logue o erro ou o fato de não ter achado o usuário
+            print(f"AVISO: Usuário {user_id_or_email} não encontrado na tabela '{TABELA_USUARIOS}'. Resposta Supabase: {response.data}")
             return False
 
     except Exception as e:
