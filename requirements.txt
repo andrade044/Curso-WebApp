@@ -8,3 +8,4 @@ sendgrid
 streamlit
 bcrypt
 flask-cors
+supabase
