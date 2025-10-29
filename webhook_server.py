@@ -105,6 +105,9 @@ def login():
         except Exception as e:
             # Em um ambiente real, você deve logar 'e' e retornar uma mensagem mais genérica
             return jsonify({"message": f"Erro ao inserir usuário no banco de dados."}), 500
+        
+        enviar_email_ativacao_sendgrid(email, nome)
+
 
         # Gera token JWT
         token = jwt.encode(
