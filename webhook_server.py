@@ -302,8 +302,10 @@ def atualizar_assinante_supabase(user_id_or_email) -> bool:
     
     try:
         # 1. Utiliza o cliente de serviço inicializado globalmente
+        # CORREÇÃO APLICADA: 'assinante' agora recebe o inteiro 1 (em vez de True)
+        # para corresponder ao tipo INTEGER do banco de dados.
         response = supabase_service.table(TABELA_USUARIOS) \
-            .update({'assinante': True}) \
+            .update({'assinante': 1}) \
             .eq('email', user_id_or_email) \
             .execute()
         
