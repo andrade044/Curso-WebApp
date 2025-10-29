@@ -14,7 +14,7 @@ from sendgrid.helpers.mail import Mail
 from data import SIMULADO_DATA
 import requests
 from auth import cadastro
-from webhook_server import send_welcome_email_sendgrid, enviar_email_ativacao_sendgrid
+from webhook_server import enviar_email_ativacao_sendgrid
 
 
 def get_secret(key, default=None):
@@ -143,8 +143,7 @@ def tela_cadastro():
                     st.session_state['user_email'] = email_input
                     st.session_state['user_nome'] = nome_input 
                     st.session_state['token'] = token
-                    email_usuario = payload['email'] # <<-- MUDANÇA
-                    nome_usuario = payload['nome']
+
                     enviar_email_ativacao_sendgrid(
                     email_input, nome_input)
 
