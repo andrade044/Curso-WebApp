@@ -7,4 +7,4 @@ python-dotenv
 sendgrid
 streamlit
 bcrypt
-
+flask_cors
