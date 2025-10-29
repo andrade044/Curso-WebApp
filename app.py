@@ -443,7 +443,7 @@ def tela_curso():
     
         
     
-        # ACESSO LIBERADO
+    # ACESSO LIBERADO
     st.markdown("---")
     
     # Verifica o status de assinante para liberar o Módulo 2
