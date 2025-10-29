@@ -53,6 +53,9 @@ MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
 URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
 URL_API_AUTH = get_secret("URL_API_AUTH")
 URL_CURSO = get_secret("URL_CURSO")
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
 
 # Carrega variáveis de ambiente
 load_dotenv()
@@ -199,56 +202,6 @@ def perfil():
     except jwt.InvalidTokenError:
         return jsonify({"message": "Token inválido"}), 401
 
-def send_welcome_email_sendgrid(recipient_email, recipient_name):
-    """
-    Envia um email HTML de boas-vindas usando o SDK do SendGrid.
-    """
-    if not CHAVE_API_SENDGRID or not EMAIL_REMETENTE:
-        print("Erro: A chave de API ou o e-mail remetente do SendGrid estão ausentes.")
-        return False
-        
-    try:
-        # Conteúdo HTML da mensagem
-        html_content = f"""
-        <html>
-            <body>
-                <h2 style="color: #007bff;">🎉 Olá, {recipient_name}!</h2>
-                <p>Obrigado por se juntar à nossa comunidade.</p>
-                <p>Seu cadastro foi concluído com sucesso. Você já pode acessar:</p>
-                <ul>
-                    <li><strong>Email:</strong> {recipient_email}</li>
-                    <li><strong>Link para login:</strong> <a href="https://seu-app-streamlit.com/Home">Clique aqui para começar!</a></li>
-                </ul>
-                <p>Em caso de dúvidas, não hesite em nos contatar.</p>
-                <p>Atenciosamente,<br>A Equipe do Curso</p>
-            </body>
-        </html>
-        """
-        
-        # Cria o objeto Mail
-        message = Mail(
-            from_email=EMAIL_REMETENTE,
-            to_emails=recipient_email,
-            subject='🎉 Bem-vindo(a) à Plataforma do Curso!',
-            html_content=html_content
-        )
-        
-        # Inicializa o cliente SendGrid e envia o email
-        sg = sendgrid.SendGridAPIClient(CHAVE_API_SENDGRID)
-        response = sg.client.mail.send.post(request_body=message.get())
-        
-        # Verifica se a API do SendGrid aceitou o envio (status 200 ou 202)
-        if response.status_code in [200, 202]:
-            print(f"E-mail de boas-vindas enviado com sucesso para {recipient_email}.")
-            # Se você quiser mais debug: print(response.body, response.headers)
-            return True
-        else:
-            print(f"Falha na API do SendGrid (Status {response.status_code}): {response.body}")
-            return False
-
-    except Exception as e:
-        print(f"Erro inesperado durante o envio com SendGrid: {e}")
-        return False
 
 def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str) -> int:
     """
@@ -259,45 +212,56 @@ def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str) -> int:
     email = Mail(
         from_email=EMAIL_REMETENTE,
         to_emails=destinatario,
-        subject='Ativação de Conta - Seu Curso de CNH',
+        subject='Felicitações de boas vindas - Seu Curso de CNH',
         html_content=f"""
         <html>
-            <body>
-                <p>Olá, <strong>{nome_usuario}</strong>,</p>
-                <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
-                
-                <p style="text-align: center;">
-                    <a href="{URL_CURSO}" 
-                       style="background-color: #4CAF50; 
-                              color: white; 
-                              padding: 10px 20px; 
-                              text-decoration: none; 
-                              border-radius: 5px; 
-                              display: inline-block;">
-                        ATIVAR MINHA CONTA
-                    </a>
-                </p>
-                
-                <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
-                <p><small>{URL_CURSO}</small></p>
-                
-                <p>Atenciosamente,<br>Equipe do Curso.</p>
-            </body>
-        </html>
-        """
-    )
-    print(f"DEBUG 1: Destinatário: {destinatario}")
-    print(f"DEBUG 1: Remetente: {EMAIL_REMETENTE}")
+    <body>
+        <h1 style="color: #007bff; text-align: center;">🎉 Bem-vindo(a) à Família do Curso!</h1>
+
+        <p>Olá, <strong>{nome_usuario}</strong>,</p>
+
+        <p>
+            Sua jornada para a aprovação no exame teórico acaba de começar! Estamos muito animados por ter você conosco.
+            Seu cadastro foi realizado com sucesso.
+        </p>
+        
+        <p>Para ativar sua conta e liberar imediatamente seu acesso à plataforma de estudos, basta clicar no botão abaixo:</p>
+        
+        <p style="text-align: center;">
+            <a href="{URL_CURSO}" 
+               style="background-color: #4CAF50; 
+                      color: white; 
+                      padding: 10px 20px; 
+                      text-decoration: none; 
+                      border-radius: 5px; 
+                      display: inline-block;
+                      font-weight: bold;">
+                ACESSAR AGORA E ATIVAR MINHA CONTA
+            </a>
+        </p>
+        
+        <p style="margin-top: 20px;">Se o botão não funcionar (alguns clientes de e-mail bloqueiam botões), copie e cole o seguinte link no seu navegador:</p>
+        <p><small><a href="{URL_CURSO}">{URL_CURSO}</a></small></p>
+        
+        <p>
+            Em caso de dúvidas ou problemas com o acesso, nossa equipe de suporte está à disposição.
+        </p>
+        
+        <p>Bons estudos!<br>Atenciosamente,<br>A Equipe do Curso.</p>
+    </body>
+</html>   """
+ )
+    
     
     try:
-        print("DEBUG 2: Objeto Email criado com sucesso.")
+       
         # 2. Inicializa o cliente SendGrid e envia o email
         conta_sendgrid = sendgrid.SendGridAPIClient(CHAVE_API_SENDGRID)
-        print("DEBUG 3: Cliente SendGrid inicializado. Tentando enviar...")
+       
         response = conta_sendgrid.send(email)
         # 3. Imprime o status de sucesso para o log
         print(f"E-mail enviado com sucesso. Status: {response.status_code}")
-        print(f"DEBUG 4: Resposta da API recebida. Status: {response.status_code}")
+        
         # Retorna o status code
         return response.status_code
 
@@ -321,6 +285,93 @@ def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str) -> int:
         # Retorna o status code do erro (geralmente 400, 401, 403)
         return e.status_code
 
+
+from supabase_client import create_client, Client
+
+def atualizar_assinante_supabase(user_id_or_email) -> bool:
+    """Atualiza o campo 'assinante' para True no Supabase pelo email."""
+    try:
+        # Inicializa o cliente Supabase com as chaves de backend
+        supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+        
+        # 1. Faz a atualização
+        response = supabase.table('usuarios') \
+            .update({'assinante': True}) \
+            .eq('email', user_id_or_email) \
+            .execute()
+        
+        # O Supabase retorna uma resposta complexa. Verifica se houve linhas afetadas.
+        if response.data and len(response.data) > 0:
+            print(f"SUCESSO: Usuário {user_id_or_email} atualizado no Supabase.")
+            return True
+        else:
+            print(f"AVISO: Usuário {user_id_or_email} não encontrado no Supabase para atualização.")
+            # Logue o erro ou o fato de não ter achado o usuário
+            return False
+
+    except Exception as e:
+        print(f"ERRO SUPABASE: Falha ao atualizar assinante {user_id_or_email}. Erro: {e}")
+        return False
+
+
+@app.route('/mercadopago_webhook', methods=['POST'])
+def mercadopago_webhook():
+    try:
+        data_payload = request.get_json()
+        
+        # Validação básica
+        topic = data_payload.get('topic')
+        resource_url = data_payload.get('resource') 
+
+        if not topic or not resource_url:
+            return jsonify({"status": "error", "message": "Payload inválido"}), 400
+
+        # O Mercado Pago geralmente envia a URL completa (ex: /v1/payments/{id})
+        if topic == 'payment':
+            payment_id = resource_url.split('/')[-1]
+        elif topic == 'merchant_order':
+            # Se você estiver usando Merchant Orders (menos comum)
+            # Você precisará de uma lógica diferente para o ID
+            return jsonify({"status": "ignored", "message": "Tipo merchant_order ignorado"}), 200
+        else:
+            return jsonify({"status": "ignored", "message": f"Tipo {topic} não processado"}), 200
+
+        # 1. BUSCA OS DETALHES DO PAGAMENTO NA API DO MP
+        sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
+        payment_info = sdk.payment().get(payment_id)
+        
+        if payment_info["status"] != 200:
+            print(f"ERRO MP: Falha ao buscar pagamento {payment_id}. Status: {payment_info['status']}")
+            return jsonify({"status": "error", "message": "Falha ao consultar MP"}), 500
+
+        payment = payment_info["response"]
+        status = payment.get("status")
+        external_reference = payment.get("external_reference") 
+
+        # 2. VERIFICAÇÃO DE APROVAÇÃO E ATUALIZAÇÃO
+        if status == 'approved':
+            # Extrai o ID do usuário/email (baseado na sua estrutura: REF-{user_id_ref}-{uuid.uuid4()})
+            try:
+                # Pega a segunda parte, que é o email (ou ID)
+                user_id_or_email = external_reference.split('-')[1] 
+            except IndexError:
+                print(f"ERRO MP: external_reference mal formatado: {external_reference}")
+                return jsonify({"status": "error", "message": "Referência externa inválida"}), 400
+            
+            # Chama a função que altera o Supabase
+            if atualizar_assinante_supabase(user_id_or_email):
+                return jsonify({"status": "success", "message": "Assinante atualizado"}), 200
+            else:
+                # Logou o erro no Supabase, mas retorna 200 para o MP não tentar de novo
+                return jsonify({"status": "warning", "message": "Falha ao atualizar Supabase"}), 200
+        
+        # Retorna 200 para o MP em caso de status não-aprovado (pendente, rejeitado)
+        return jsonify({"status": "ignored", "message": f"Pagamento não aprovado. Status: {status}"}), 200
+
+    except Exception as e:
+        # Erro geral (importante para evitar loop de retentativa do MP)
+        print(f"ERRO FATAL no Webhook: {e}")
+        return jsonify({"status": "error", "message": "Erro interno do servidor"}), 500
 
 if __name__ == "__main__":
     app.run(debug=True)

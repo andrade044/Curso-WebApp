@@ -86,10 +86,6 @@ def criar_preferencia_pagamento():
         # Inicializa o SDK
         sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
         
-        streamlit_base_url = MP_NOTIFICATION_URL.replace("/mercadopago_webhook", "")
-        # A URL do ngrok DEVE ser uma variável global ou de ambiente, não hardcoded.
-        meu_link_ngrok = "https://quizzically-ungymnastic-lamar.ngrok-free.dev" 
-        
         preference_data = {
             "items": [
                 {
