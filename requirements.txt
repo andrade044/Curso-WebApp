@@ -7,3 +7,9 @@ python-dotenv
 sendgrid
 streamlit
 bcrypt
+<<<<<<< HEAD
+=======
+flask-cors
+flask-bcrypt 
+supabase
+>>>>>>> 582b12b604b7fb908887303117097d1ef9bf1cef

@@ -1,278 +1,326 @@
-from flask import Flask, request, jsonify, redirect, url_for
-import sqlite3
-import os
-import mercadopago
-import jwt
-from datetime import datetime, timedelta, timezone
+
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from supabase_client import supabase
 from dotenv import load_dotenv
+import os, bcrypt, jwt, datetime
+
+import streamlit as st
+import sqlite3
+import re
+import bcrypt
+import os 
+from dotenv import load_dotenv
+import random
+import mercadopago
+import uuid
+import secrets
+import time
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-import psycopg2 
-# Carrega variáveis do arquivo .env (se existir)
-load_dotenv() 
+# from api_mercadopago import api_pagamento
+from data import SIMULADO_DATA
+import requests
+import sendgrid
+from auth import verifica_login, verifica_assinante, logout
+from python_http_client.exceptions import BadRequestsError
 
-# --- Configuração do Flask ---
+
+
+def get_secret(key, default=None):
+    
+    # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
+    if 'secrets' in st.session_state and key in st.secrets:
+        return st.secrets[key]
+    # 2. Tenta ler de os.environ (para Codespace/Local com .env)
+    return os.getenv(key, default)
+
+
+MERCADO_PAGO_ACCESS_TOKEN = get_secret('MERCADO_PAGO_ACCESS_TOKEN')
+REFERENCIA_ASSINATURA = get_secret('REFERENCIA_ASSINATURA')
+
+VALOR_ASSINATURA = get_secret('VALOR_ASSINATURA') 
+TITULO_ASSINATURA = "Assinatura Premium do Curso de Python"
+
+CHAVE_API_SENDGRID = get_secret('CHAVE_API_SENDGRID')
+EMAIL_REMETENTE =  get_secret('EMAIL_REMETENTE')
+TOKEN_LENGTH_BYTES= get_secret('TOKEN_LENGTH_BYTES')
+TOKEN_EXPIRATION_HOURS= get_secret('TOKEN_EXPIRATION_HOURS')
+
+URL_BASE_ATIVACAO = get_secret("URL_BASE_ATIVACAO") 
+MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
+MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
+URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
+URL_API_AUTH = get_secret("URL_API_AUTH")
+URL_CURSO = get_secret("URL_CURSO")
+
+# Carrega variáveis de ambiente
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
+
 app = Flask(__name__)
+CORS(app)
 
-# --- Configuração do Banco de Dados e Variáveis de Ambiente ---
-DB_NAME = 'usuarios.db' # Deve ser o mesmo nome do DB do Streamlit
-MP_ACCESS_TOKEN = os.getenv("MP_ACCESS_TOKEN")
-MP_NOTIFICATION_URL = os.getenv("MP_NOTIFICATION_URL")
-CHAVE_API_SENDGRID = os.getenv('CHAVE_API_SENDGRID')
-JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
-URL_BASE_ATIVACAO = os.getenv('URL_BASE_ATIVACAO') # URL base do seu servidor Flask (ex: https://seu-servidor.com)
-DATABASE_URL = os.getenv("DATABASE_URL")
-# CORREÇÃO CRÍTICA: Converte para int e define default para expiração do token
-try:
-    ACTIVATION_EXPIRATION_DAYS = int(os.getenv('ACTIVATION_EXPIRATION_DAYS', 7))
-except ValueError:
-    ACTIVATION_EXPIRATION_DAYS = 7
-    print("Aviso: ACTIVATION_EXPIRATION_DAYS inválido, usando default de 7 dias.")
+# ------------------------------------------------------
+# 📌 ROTA /auth → cadastro e login no mesmo endpoint
+# ------------------------------------------------------
+@app.route("/auth", methods=["POST"])
+def login():
+    data = request.get_json()
+    action = data.get("action")
 
-# NOVO ENV VAR: URL para onde o usuário será redirecionado após a ativação por e-mail
-STREAMLIT_LOGIN_URL = os.getenv('STREAMLIT_LOGIN_URL')
+    if action == "CADASTRO":
+        nome = data.get("nome")
+        email = data.get("email")
+        senha = data.get("senha")
+        cpf = data.get("cpf") # OK: Coletando o novo campo
 
+        # CORREÇÃO 1: Incluir 'cpf' na verificação de campos obrigatórios
+        if not all([nome, email, senha, cpf]):
+            return jsonify({"message": "Todos os campos (nome, email, senha, cpf) são obrigatórios"}), 400
 
-if not MP_ACCESS_TOKEN:
-    print("ERRO: MP_ACCESS_TOKEN não configurado no ambiente.")
-    sdk = None # Define sdk como None para evitar erro
-else:
-    sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
+        # Verifica se o e-mail já existe
+        existing_email = supabase.table("usuarios").select("*").eq("email", email).execute()
+        if existing_email.data:
+            return jsonify({"message": "E-mail já cadastrado"}), 409
 
-def get_db_connection():
-    """Conecta ao PostgreSQL usando a URL de ambiente."""
-    if not DATABASE_URL:
-        raise ConnectionError("DATABASE_URL não está configurada.")
-    
-    # Adiciona ?sslmode=require para compatibilidade com a maioria dos hosts em nuvem
-    return psycopg2.connect(DATABASE_URL + "?sslmode=require")
+        # RECOMENDAÇÃO: Verifica se o CPF já existe
+        existing_cpf = supabase.table("usuarios").select("*").eq("cpf", cpf).execute()
+        if existing_cpf.data:
+            return jsonify({"message": "CPF já cadastrado"}), 409
 
+        # Criptografa a senha
+        senha_hash = bcrypt.hashpw(senha.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
-def update_user_status(user_id, field_name, value):
-    """Função genérica para atualizar um campo (ativo/assinante) no DB (PostgreSQL)."""
-    conn = None
-    try:
-        conn = get_db_connection()
-        c = conn.cursor()
+        # Cria usuário
+        try:
+            supabase.table("usuarios").insert({
+                "nome": nome,
+                "email": email,
+                "senha_hash": senha_hash,
+                "ativo": 1,
+                "assinante": 0, # CORREÇÃO 2: Adicionada a vírgula aqui
+                "cpf": cpf # OK: Inserindo o novo campo
+            }).execute()
+        except Exception as e:
+            # Em um ambiente real, você deve logar 'e' e retornar uma mensagem mais genérica
+            return jsonify({"message": f"Erro ao inserir usuário no banco de dados."}), 500
         
-        if field_name not in ['assinante', 'ativo']:
-            raise ValueError("Nome do campo de atualização inválido.")
-            
-        sql_query = f"UPDATE usuarios SET {field_name} = %s WHERE id = %s"
-        
-        # Nota: Usamos %s para placeholders no psycopg2
-        c.execute(sql_query, (value, user_id))
-        conn.commit()
-        
-        success = c.rowcount > 0
-        c.close()
-        return success
-
-    except Exception as e:
-        print(f"ERRO CRÍTICO AO ATUALIZAR DB ({field_name}): {e}")
-        if conn:
-            conn.rollback()
-        return False
-        
-    finally:
-        if conn:
-            conn.close()
+        enviar_email_ativacao_sendgrid(email, nome)
 
 
-def generate_activation_token(user_id):
-    """Gera um token JWT para ativação de conta. Use esta função no seu Streamlit."""
-    if not JWT_SECRET_KEY:
-        print("ERRO: JWT_SECRET_KEY não configurada.")
-        return None
-        
-    try:
-        # Define o payload do token
-        payload = {
-            'user_id': user_id,
-            # Usa a variável convertida para int
-            'exp': datetime.now(timezone.utc) + timedelta(days=ACTIVATION_EXPIRATION_DAYS),
-            'iat': datetime.now(timezone.utc)
-        }
-        
-        # Codifica o token
-        token = jwt.encode(payload, JWT_SECRET_KEY, algorithm='HS256')
-        return token
-    except Exception as e:
-        print(f"Erro ao gerar JWT: {e}")
-        return None
+        # Gera token JWT
+        token = jwt.encode(
+            {
+                "email": email,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+            },
+            SECRET_KEY,
+            algorithm="HS256"
+        )
 
-@app.route("/ativar_conta", methods=["GET"])
-def ativar_conta():
-    """
-    Recebe o token de ativação do e-mail, valida, atualiza o DB (ativo=1)
-    e redireciona o usuário para o Streamlit.
-    """
-    token = request.args.get('token')
-    
-    # 1. Checa se o token existe
-    if not token:
-        return "Erro: Token de ativação ausente.", 400
+        return jsonify({
+            "message": "Cadastro realizado com sucesso",
+            "token": token,
+            "email": email,
+            "nome": nome
+        }), 201
 
-    user_id = None
-    try:
-        # 2. Decodifica e valida o token
-        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=['HS256'])
-        user_id = payload.get('user_id')
-        
-        if not user_id:
-            return "Erro: Token inválido (ID de usuário ausente).", 400
+    # O resto da função de LOGIN está OK, pois o login não usa o campo 'cpf'
+    elif action == "LOGIN":
+        # ... (código do LOGIN continua aqui) ...
+        email = data.get("email")
+        senha = data.get("senha")
 
-    except jwt.ExpiredSignatureError:
-        print(f"Erro: Token expirado para user_id: {user_id}")
-        return "Erro: O link de ativação expirou. Por favor, registre-se novamente.", 401
-    except jwt.InvalidTokenError as e:
-        print(f"Erro: Token inválido: {e}")
-        return "Erro: Token de ativação inválido.", 401
-    except Exception as e:
-        print(f"Erro inesperado na decodificação do JWT: {e}")
-        return "Erro interno do servidor.", 500
+        if not email or not senha:
+            return jsonify({"message": "E-mail e senha são obrigatórios"}), 400
 
-    # 3. Atualiza o status de ativação no DB (ativo = 1)
-    if update_user_status(user_id, 'ativo', 1):
-        print(f"SUCESSO: Usuário ID {user_id} ativado via e-mail.")
-        
-        # 4. Redireciona para a tela de login do Streamlit (USANDO ENV VAR)
-        if STREAMLIT_LOGIN_URL:
-            # Redireciona para o Streamlit com o parâmetro 'activated'
-            return redirect(f"{STREAMLIT_LOGIN_URL}?message=activated&user={user_id}", code=302)
-        else:
-            return "SUCESSO: Conta ativada. Por favor, acesse o seu aplicativo Streamlit e faça login.", 200
+        # Busca usuário no Supabase
+        user = supabase.table("usuarios").select("*").eq("email", email).execute()
+        if not user.data:
+            return jsonify({"message": "Usuário não encontrado"}), 404
+
+        user_data = user.data[0]
+
+        # Verifica se está ativo
+        if user_data["ativo"] != 1:
+            return jsonify({"message": "Conta inativa. Entre em contato com o suporte."}), 403
+
+        # Confere a senha
+        senha_hash = user_data["senha_hash"].encode("utf-8")
+        if not bcrypt.checkpw(senha.encode("utf-8"), senha_hash):
+            return jsonify({"message": "Senha incorreta"}), 401
+
+        # Cria token JWT
+        token = jwt.encode(
+            {
+                "email": email,
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+            },
+            SECRET_KEY,
+            algorithm="HS256"
+        )
+
+        return jsonify({
+            "message": "Login realizado com sucesso",
+            "token": token,
+            "email": user_data["email"],
+            "nome": user_data["nome"],
+            "assinante": user_data["assinante"]
+        }), 200
+
     else:
-        # Se a atualização falhar (usuário não encontrado ou erro de DB)
-        return "Erro: Falha ao ativar a conta no banco de dados.", 500
+        return jsonify({"message": "Ação inválida"}), 400
 
 
-@app.route("/mercadopago_webhook", methods=["POST"])
-def mercadopago_webhook():
-    """Endpoint para receber as notificações (Webhooks) do Mercado Pago."""
-    
-    
-    data = request.json
-    
-    if data is None:
-        return jsonify({"message": "Nenhum dado recebido."}), 400
 
-    topic = data.get("topic") or data.get("type")
-    
-    # Processa apenas notificações de pagamento
-    if topic != "payment":
-        return jsonify({"message": f"Tópico ignorado: {topic}"}), 200
 
-    # Obtém o ID do pagamento da notificação
-    payment_id = data.get("id") or data.get("data", {}).get("id")
+# ------------------------------------------------------
+# 🔒 ROTA TESTE - EXIGE TOKEN (opcional)
+# ------------------------------------------------------
+@app.route("/perfil", methods=["GET"])
+def perfil():
+    token = request.headers.get("Authorization")
 
-    if not payment_id:
-        return jsonify({"message": "ID do pagamento ausente."}), 400
-    
-    print(f"Webhook recebido para Pagamento ID: {payment_id}")
+    if not token:
+        return jsonify({"message": "Token não fornecido"}), 401
 
     try:
-        # 1. Busca os detalhes completos do pagamento na API do MP
-        # Garante que o SDK foi inicializado
-        if sdk is None:
-             print("ERRO: SDK do Mercado Pago não inicializado.")
-             return jsonify({"message": "Serviço MP indisponível"}), 503
-             
-        payment_response = sdk.payment().get(payment_id)
-        payment = payment_response["response"]
+        dados = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        email = dados["email"]
+        user = supabase.table("usuarios").select("id,nome,email,assinante").eq("email", email).execute()
 
-        status = payment.get("status")
-        external_reference = payment.get("external_reference")
+        if not user.data:
+            return jsonify({"message": "Usuário não encontrado"}), 404
 
-        print(f"Status: {status} | Ref: {external_reference}")
+        return jsonify({"perfil": user.data[0]})
+    except jwt.ExpiredSignatureError:
+        return jsonify({"message": "Token expirado"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"message": "Token inválido"}), 401
 
-        # 2. Verifica aprovação
-        if status == "approved":
-            
-            # Formato esperado da referência: REF-{user_id}-{uuid}
-            if not external_reference or len(external_reference.split("-")) < 2:
-                print("ERRO: External reference inválida.")
-                return jsonify({"message": "External reference inválida."}), 400
-
-            try:
-                # Extrai o ID do usuário
-                user_id_str = external_reference.split("-")[1]
-                user_id = int(user_id_str)
-            except ValueError:
-                print("ERRO: ID do usuário na referência não é numérico.")
-                return jsonify({"message": "ID do usuário inválido na referência."}), 400
-
-            # 3. Atualiza o status do usuário no DB
-            if update_user_status(user_id, 'assinante', 1):
-                print(f"SUCESSO: Usuário ID {user_id} atualizado para assinante.")
-                return jsonify({"message": "Status de assinante atualizado."}), 200
-            else:
-                return jsonify({"message": "Erro ao atualizar DB."}), 500
-        
-        else:
-            # Pagamento não aprovado, apenas registra e retorna 200 para o MP
-            print(f"Pagamento não aprovado: {status}")
-            return jsonify({"message": f"Pagamento com status: {status}"}), 200
-
-    except Exception as e:
-        print(f"Erro ao processar pagamento: {e}")
-        # Retorna 500 para o Mercado Pago tentar re-enviar
-        return jsonify({"message": f"Erro interno no processamento do webhook: {e}"}), 500
-
-
-
-def enviar_email_ativacao_sendgrid(destinatario, nome_usuario, link_ativacao):
+def send_welcome_email_sendgrid(recipient_email, recipient_name):
     """
-    Função auxiliar para envio de e-mail. 
-    Chame esta função no Streamlit após o registro.
+    Envia um email HTML de boas-vindas usando o SDK do SendGrid.
     """
-    if not CHAVE_API_SENDGRID:
-        print("ERRO: CHAVE_API_SENDGRID não configurada para envio.")
+    if not CHAVE_API_SENDGRID or not EMAIL_REMETENTE:
+        print("Erro: A chave de API ou o e-mail remetente do SendGrid estão ausentes.")
         return False
-
-    try:
-        conta_sendgrid = SendGridAPIClient(CHAVE_API_SENDGRID)
         
+    try:
+        # Conteúdo HTML da mensagem
         html_content = f"""
         <html>
-          <body>
-            <p>Olá, <strong>{nome_usuario}</strong>,</p>
-            <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
-            
-            <p style="text-align: center;">
-                <a href="{link_ativacao}" 
-                    style="background-color: #4CAF50; 
-                           color: white; 
-                           padding: 10px 20px; 
-                           text-decoration: none; 
-                           border-radius: 5px; 
-                           display: inline-block;">
-                    ATIVAR MINHA CONTA
-                </a>
-            </p>
-            
-            <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
-            <p><small>{link_ativacao}</small></p>
-            
-            <p>Atenciosamente,<br>Equipe do Curso.</p>
-          </body>
+            <body>
+                <h2 style="color: #007bff;">🎉 Olá, {recipient_name}!</h2>
+                <p>Obrigado por se juntar à nossa comunidade.</p>
+                <p>Seu cadastro foi concluído com sucesso. Você já pode acessar:</p>
+                <ul>
+                    <li><strong>Email:</strong> {recipient_email}</li>
+                    <li><strong>Link para login:</strong> <a href="https://seu-app-streamlit.com/Home">Clique aqui para começar!</a></li>
+                </ul>
+                <p>Em caso de dúvidas, não hesite em nos contatar.</p>
+                <p>Atenciosamente,<br>A Equipe do Curso</p>
+            </body>
         </html>
         """
-
-        email = Mail(from_email='matheusandrade906@gmail.com', # TROQUE PELO SEU REMETENTE VERIFICADO!
-                     to_emails=destinatario,
-                     subject='Ativação de Conta - Seu Curso de CNH',
-                     html_content=html_content)
-
-        resposta = conta_sendgrid.send(email)
-        print(f"E-mail enviado. Status Code: {resposta.status_code}")
-        return resposta.status_code in [200, 202]
         
+        # Cria o objeto Mail
+        message = Mail(
+            from_email=EMAIL_REMETENTE,
+            to_emails=recipient_email,
+            subject='🎉 Bem-vindo(a) à Plataforma do Curso!',
+            html_content=html_content
+        )
+        
+        # Inicializa o cliente SendGrid e envia o email
+        sg = sendgrid.SendGridAPIClient(CHAVE_API_SENDGRID)
+        response = sg.client.mail.send.post(request_body=message.get())
+        
+        # Verifica se a API do SendGrid aceitou o envio (status 200 ou 202)
+        if response.status_code in [200, 202]:
+            print(f"E-mail de boas-vindas enviado com sucesso para {recipient_email}.")
+            # Se você quiser mais debug: print(response.body, response.headers)
+            return True
+        else:
+            print(f"Falha na API do SendGrid (Status {response.status_code}): {response.body}")
+            return False
+
     except Exception as e:
-        print(f"ERRO ao enviar e-mail com SendGrid: {e}")
+        print(f"Erro inesperado durante o envio com SendGrid: {e}")
         return False
+
+def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str) -> int:
+    """
+    Envia um e-mail de ativação usando o SendGrid e retorna o status code.
+    """
+    
+    # 1. Definição do Email (Como estava, presumindo que URL_CURSO está resolvida)
+    email = Mail(
+        from_email=EMAIL_REMETENTE,
+        to_emails=destinatario,
+        subject='Ativação de Conta - Seu Curso de CNH',
+        html_content=f"""
+        <html>
+            <body>
+                <p>Olá, <strong>{nome_usuario}</strong>,</p>
+                <p>Obrigado por se registrar! Para ativar sua conta e liberar o acesso, basta clicar no botão abaixo:</p>
+                
+                <p style="text-align: center;">
+                    <a href="{URL_CURSO}" 
+                       style="background-color: #4CAF50; 
+                              color: white; 
+                              padding: 10px 20px; 
+                              text-decoration: none; 
+                              border-radius: 5px; 
+                              display: inline-block;">
+                        ATIVAR MINHA CONTA
+                    </a>
+                </p>
+                
+                <p>Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
+                <p><small>{URL_CURSO}</small></p>
+                
+                <p>Atenciosamente,<br>Equipe do Curso.</p>
+            </body>
+        </html>
+        """
+    )
+    print(f"DEBUG 1: Destinatário: {destinatario}")
+    print(f"DEBUG 1: Remetente: {EMAIL_REMETENTE}")
+    
+    try:
+        print("DEBUG 2: Objeto Email criado com sucesso.")
+        # 2. Inicializa o cliente SendGrid e envia o email
+        conta_sendgrid = sendgrid.SendGridAPIClient(CHAVE_API_SENDGRID)
+        print("DEBUG 3: Cliente SendGrid inicializado. Tentando enviar...")
+        response = conta_sendgrid.send(email)
+        # 3. Imprime o status de sucesso para o log
+        print(f"E-mail enviado com sucesso. Status: {response.status_code}")
+        print(f"DEBUG 4: Resposta da API recebida. Status: {response.status_code}")
+        # Retorna o status code
+        return response.status_code
+
+    except BadRequestsError as e:
+        # 4. TRATAMENTO DO ERRO 4XX (BadRequestsError)
+        print("--- ERRO FATAL DO SENDGRID (BadRequestsError) ---")
+        
+        # O status code está diretamente no objeto e
+        print(f"Status Code: {e.status_code}")
+        
+        # Acesso correto ao corpo da resposta de erro da API
+        try:
+            # e.response é o objeto de resposta completo
+            error_details = e.response.text 
+            print(f"Detalhes do Erro da API: {error_details}")
+        except Exception as body_e:
+            print(f"Erro ao obter o corpo da resposta: {body_e}")
+            
+        print("--------------------------------------------------")
+        
+        # Retorna o status code do erro (geralmente 400, 401, 403)
+        return e.status_code
 
 
 if __name__ == "__main__":
-    # Roda o servidor Flask na porta 5000
-    app.run(port=5000, debug=True)
+    app.run(debug=True)
