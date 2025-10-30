@@ -112,7 +112,7 @@ def tela_curso():
         # VÍDEO 1.1 (GRÁTIS)
         with st.expander("▶️ Aula 1.1: Configurando o Ambiente"):
             # Nota: Este link parece ser de uma playlist. Streamlit pode não tocar a playlist.
-            st.video('https://www.youtube.com/watch?v=ZZ4B0QUHuNc') 
+            st.video('https://www.youtube.com/watch?v=LIbALvdxXqM') 
             st.write("Descrição: Introdução ao tema e instalação das ferramentas necessárias.")
         
         # VÍDEO 1.2 (GRÁTIS)
@@ -132,7 +132,7 @@ def tela_curso():
             
             # VÍDEO 2.1 (PAGO)
             with st.expander("🔒 Aula 2.1: Hashing e Segurança (BCrypt na Prática)"):
-                st.video('https://www.youtube.com/watch?v=8M20LyCZDOY') 
+                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Detalhamento sobre hasheamento de senhas e proteção contra ameaças.")
 
             # VÍDEO 2.2 (PAGO)
