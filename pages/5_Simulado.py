@@ -3,12 +3,7 @@ import os
 from dotenv import load_dotenv
 import pandas as pd 
 import numpy as np
-cwd = os.getcwd()
-print("O CÓDIGO ESTÁ EXECUTANDO A PARTIR DE:", cwd)
 
-# 2. Constrói o caminho completo que o programa está TENTANDO USAR (com a correção anterior)
-caminho_tentado = os.path.join(cwd, '../todos_simulados.csv')
-print("O PROGRAMA ESTÁ TENTANDO ACESSAR:", caminho_tentado)
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
 
