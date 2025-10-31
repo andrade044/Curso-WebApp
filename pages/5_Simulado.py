@@ -86,7 +86,7 @@ def proxima_pergunta():
         st.session_state['quiz_finished'] = True
 
 @st.cache_data
-def load_all_simulados_data(file_path="todos_simulados.csv"):
+def load_all_simulados_data(file_path="testeWebApp/todos_simulados.csv"):
     """
     Carrega o arquivo CSV, transforma os dados e os agrupa por 'simulado_id'.
     """
