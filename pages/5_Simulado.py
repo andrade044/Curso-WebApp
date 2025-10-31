@@ -100,7 +100,7 @@ def load_all_simulados_data():
         caminho_csv = os.path.join(dir_atual_script, '..', 'todos_simulados.csv')
         
         # Tenta ler o arquivo
-        df = pd.read_csv(caminho_csv, sep=',')
+        df = pd.read_csv(caminho_csv, sep=';')
 
         df = df.fillna('')
         
