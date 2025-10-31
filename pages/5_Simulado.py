@@ -109,7 +109,16 @@ def load_all_simulados_data(file_mtime):
                          on_bad_lines='skip')
 
         # Assegura que o DataFrame tem a estrutura correta (após a correção de CSV)
-        colunas_esperadas = ['simulado_id', 'id', 'pergunta', 'opcoes_A', 'opcoes_B', 'opcoes_C', 'opcoes_D', 'resposta_correta', 'pontuacao', 'imagens_locais']
+        colunas_esperadas = ['simulado_id', 
+                             'id', 
+                             'pergunta', 
+                             'opcoes_A', 
+                             'opcoes_B', 
+                             'opcoes_C', 
+                             'opcoes_D', 
+                             'resposta_correta', 
+                             'pontuacao', 
+                             'imagens_locais']
         
         if df.shape[1] > len(colunas_esperadas):
             df = df.iloc[:, :len(colunas_esperadas)]
