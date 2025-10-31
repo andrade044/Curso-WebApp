@@ -86,51 +86,57 @@ def proxima_pergunta():
         st.session_state['quiz_finished'] = True
 
 
+# --- Lógica para o caminho do arquivo (necessária fora da função cacheada) ---
+dir_atual_script = os.path.dirname(os.path.abspath(__file__))
+CAMINHO_CSV = os.path.join(dir_atual_script, '..', 'todos_simulados.csv')
+
+
 @st.cache_data
-def load_all_simulados_data():
+def load_all_simulados_data(file_mtime):
     """
     Carrega o arquivo CSV, transforma os dados e os agrupa por 'simulado_id'.
-    Usa caminho absoluto dinâmico e força o uso de vírgula (,) como separador,
-    ignorando linhas mal formatadas (como a linha 27).
+    O argumento `file_mtime` força o recarregamento do cache se o arquivo mudar.
     """
     try:
-        # Define o diretório do script atual (pages/)
-        dir_atual_script = os.path.dirname(os.path.abspath(__file__))
-        
-        # Sobe um nível e aponta para o CSV na raiz do projeto (TESTEWEBAPP/todos_simulados.csv)
-        caminho_csv = os.path.join(dir_atual_script, '..', 'todos_simulados.csv')
-        
+        if not os.path.exists(CAMINHO_CSV):
+             st.error(f"Arquivo CSV não encontrado no caminho: {CAMINHO_CSV}")
+             return {}
+             
         # Tenta ler o arquivo.
-        # Estratégia Final: sep=',' para forçar a vírgula (que é o delimitador correto).
-        # on_bad_lines='skip' para ignorar a linha 27 (ou qualquer outra inconsistente)
-        df = pd.read_csv(caminho_csv, 
+        df = pd.read_csv(CAMINHO_CSV, 
                          sep=',', 
-                         engine='python', # Usamos o engine python para maior flexibilidade no parsing
+                         engine='python', 
                          on_bad_lines='skip')
 
-        # Se houver mais de 10 colunas (o número correto), o pandas pode ter lido a primeira linha incorretamente
-        # Devido a inconsistências no seu CSV, vamos garantir que só pegamos as 10 colunas essenciais
+        # Assegura que o DataFrame tem a estrutura correta (após a correção de CSV)
         colunas_esperadas = ['simulado_id', 'id', 'pergunta', 'opcoes_A', 'opcoes_B', 'opcoes_C', 'opcoes_D', 'resposta_correta', 'pontuacao', 'imagens_locais']
         
-        # Remove colunas extras que podem ter sido criadas por parsing incorreto
-        df = df.iloc[:, :len(colunas_esperadas)]
+        if df.shape[1] > len(colunas_esperadas):
+            df = df.iloc[:, :len(colunas_esperadas)]
         
-        # Renomeia o que for necessário, caso o cabeçalho tenha sido corrompido
-        if len(df.columns) == len(colunas_esperadas):
+        if df.shape[1] == len(colunas_esperadas):
             df.columns = colunas_esperadas
+        else:
+            st.error(f"O carregamento resultou em {df.shape[1]} colunas, o que é insuficiente. Esperado: {len(colunas_esperadas)}. Verifique o cabeçalho do CSV.")
+            return {}
         
+        # Alerta se poucas questões forem carregadas (agora que o CSV foi corrigido)
+        if df.empty or df.shape[0] < 5: 
+            st.warning(
+                f"Atenção: Apenas {df.shape[0]} linhas foram carregadas. Embora o formato CSV pareça correto, "
+                f"o número de questões ainda está baixo. Verifique se o seu arquivo 'todos_simulados.csv' "
+                f"possui realmente todas as 60 linhas."
+            )
+
         df = df.fillna('')
         
         # 🟢 PASSO CRÍTICO: Agrupar por Simulados
         simulados_agrupados = {}
         
-        # Obtém a lista única de simulados
         lista_de_simulados = df['simulado_id'].unique()
 
         for simulado_nome in lista_de_simulados:
-            # Filtra o DataFrame para obter apenas as perguntas deste simulado
             df_simulado = df[df['simulado_id'] == simulado_nome]
-            
             simulado_data_list = []
             
             for index, row in df_simulado.iterrows():
@@ -144,7 +150,6 @@ def load_all_simulados_data():
                 
                 imagens = row.get('imagens_locais', '')
                 if isinstance(imagens, str) and imagens:
-                    # O seu campo de imagens usa ponto e vírgula, então mantemos essa separação
                     imagens_list = [img.strip() for img in imagens.split(';') if img.strip()]
                 else:
                     imagens_list = []
@@ -165,22 +170,25 @@ def load_all_simulados_data():
         return simulados_agrupados
 
     except Exception as e:
-        # Adiciona o caminho completo que causou o erro na mensagem
-        st.error(f"Erro ao carregar os dados. Caminho tentado: {caminho_csv}. Detalhe: {e}")
+        st.error(f"Erro fatal ao carregar os dados do simulado. Detalhe: {e}")
         return {}
 
-# Carrega todos os simulados. O caminho agora está embutido na função load_all_simulados_data()
-SIMULADOS_DATA_AGRUPADOS = load_all_simulados_data()
+# --- LÓGICA DE CARREGAMENTO PARA FORÇAR O CACHE ---
+file_mtime = None
+if os.path.exists(CAMINHO_CSV):
+    file_mtime = os.path.getmtime(CAMINHO_CSV)
+
+SIMULADOS_DATA_AGRUPADOS = load_all_simulados_data(file_mtime)
+# --- FIM DA LÓGICA DE CARREGAMENTO ---
+
 
 def tela_simulados():
-    """Interface principal para a tela de Simulado."""
     """Interface principal para a tela de Simulado com acesso restrito a assinantes."""
     
 
     
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
     st.title("Página de Simulados")
-    # st.write("📘 Conteúdo gratuito do curso.")
 
     # A linha que estava dando erro, agora segura:
     st.title("🧠 Simulado de Conhecimento")
@@ -224,6 +232,11 @@ def tela_simulados():
     if not SIMULADO_DATA:
         st.warning("Simulado selecionado não possui questões.")
         return
+
+    # Verifica o tamanho do simulado
+    total_questoes = len(SIMULADO_DATA)
+    if total_questoes < 5:
+        st.warning(f"Simulado '{simulado_escolhido}' carregou apenas {total_questoes} questão(ões). Certifique-se de que o CSV está salvo corretamente.")
 
     # O restante do código de inicialização e lógica do quiz (reiniciar_simulado, proxima_pergunta, etc.)
     # deve ser adaptado para usar a variável global SIMULADO_DATA.
