@@ -23,7 +23,7 @@ VALOR_ASSINATURA = get_secret('VALOR_ASSINATURA')
 TITULO_ASSINATURA = "Assinatura Premium do Curso de Python"
 
 CHAVE_API_SENDGRID = get_secret('CHAVE_API_SENDGRID')
-EMAIL_REMETENTE =  get_secret('EMAIL_REMETENTE')
+EMAIL_REMETENTE = get_secret('EMAIL_REMETENTE')
 TOKEN_LENGTH_BYTES= get_secret('TOKEN_LENGTH_BYTES')
 TOKEN_EXPIRATION_HOURS= get_secret('TOKEN_EXPIRATION_HOURS')
 
@@ -86,16 +86,21 @@ def proxima_pergunta():
         st.session_state['quiz_finished'] = True
 
 
-
-
-
 @st.cache_data
-def load_all_simulados_data(file_path="todos_simulados"):
+def load_all_simulados_data():
     """
     Carrega o arquivo CSV, transforma os dados e os agrupa por 'simulado_id'.
+    Usa caminho absoluto dinâmico para garantir que funcione em qualquer ambiente.
     """
     try:
-        df = pd.read_csv(file_path, sep=',')
+        # Define o diretório do script atual (pages/)
+        dir_atual_script = os.path.dirname(os.path.abspath(__file__))
+        
+        # Sobe um nível e aponta para o CSV na raiz do projeto (TESTEWEBAPP/todos_simulados.csv)
+        caminho_csv = os.path.join(dir_atual_script, '..', 'todos_simulados.csv')
+        
+        # Tenta ler o arquivo
+        df = pd.read_csv(caminho_csv, sep=',')
 
         df = df.fillna('')
         
@@ -142,11 +147,12 @@ def load_all_simulados_data(file_path="todos_simulados"):
         return simulados_agrupados
 
     except Exception as e:
-        st.error(f"Erro ao carregar os dados: {e}")
+        # Adiciona o caminho completo que causou o erro na mensagem
+        st.error(f"Erro ao carregar os dados. Caminho tentado: {caminho_csv}. Detalhe: {e}")
         return {}
 
-# Carrega todos os simulados
-SIMULADOS_DATA_AGRUPADOS = load_all_simulados_data("todos_simulados.csv")
+# Carrega todos os simulados. O caminho agora está embutido na função load_all_simulados_data()
+SIMULADOS_DATA_AGRUPADOS = load_all_simulados_data()
 
 def tela_simulados():
     """Interface principal para a tela de Simulado."""
@@ -170,7 +176,7 @@ def tela_simulados():
     
     # --------------------------------------------------------------------------
     if not SIMULADOS_DATA_AGRUPADOS:
-        st.error("Nenhum simulado carregado. Verifique o arquivo CSV.")
+        st.error("Nenhum simulado carregado. Verifique o arquivo CSV e o erro acima.")
         return
 
     # 1. PERMITE O USUÁRIO ESCOLHER O SIMULADO
@@ -204,7 +210,6 @@ def tela_simulados():
     # O restante do código de inicialização e lógica do quiz (reiniciar_simulado, proxima_pergunta, etc.)
     # deve ser adaptado para usar a variável global SIMULADO_DATA.
 
-    # ... (Restante da sua lógica de quiz, que agora usa SIMULADO_DATA)
     if 'current_question' not in st.session_state or st.session_state.get('current_simulado_name') != simulado_escolhido:
         reiniciar_simulado()
 
@@ -260,7 +265,7 @@ def tela_simulados():
         )
         
         st.markdown("---")
-        st.caption(f"Score atual: {st.session_state['score']}")    
+        st.caption(f"Score atual: {st.session_state['score']}")     
     
     if st.button("Sair"):
         logout()
