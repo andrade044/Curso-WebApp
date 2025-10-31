@@ -1,5 +1,5 @@
 # --- Dados do Simulado (Quiz) ---
-[
+SIMULADO_DATA = [
   {
     "id": 1,
     "pergunta": "Quando o trânsito estiver congestionado, o condutor deve:",
