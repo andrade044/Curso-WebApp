@@ -92,12 +92,10 @@ def proxima_pergunta():
 
 
 
-dir_atual = os.path.dirname(os.path.abspath(__file__))
-caminho_raiz = os.path.join(dir_atual, '..')
-caminho_csv = os.path.join(caminho_raiz, 'todos_simulados.csv')
+
 
 @st.cache_data
-def load_all_simulados_data(file_path=caminho_csv):
+def load_all_simulados_data(file_path="todos_simulados"):
     """
     Carrega o arquivo CSV, transforma os dados e os agrupa por 'simulado_id'.
     """
