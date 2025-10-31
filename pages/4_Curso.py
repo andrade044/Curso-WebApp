@@ -110,13 +110,13 @@ def tela_curso():
         st.info("Este conteúdo está liberado para todos os usuários.")
 
         # VÍDEO 1.1 (GRÁTIS)
-        with st.expander("▶️ Aula 1.1: Configurando o Ambiente"):
+        with st.expander("▶️ Aula 1.1: Boas Vindas"):
             # Nota: Este link parece ser de uma playlist. Streamlit pode não tocar a playlist.
             st.video('https://www.youtube.com/watch?v=LIbALvdxXqM') 
             st.write("Descrição: Introdução ao tema e instalação das ferramentas necessárias.")
         
         # VÍDEO 1.2 (GRÁTIS)
-        with st.expander("▶️ Aula 1.2: Visão Geral e Estrutura Básica"):
+        with st.expander("▶️ Aula 1.2: Explicando como funciona"):
             # Substitua 'VIDEO_GRATUITO_2' pela URL real do vídeo
             st.video('https://www.youtube.com/watch?v=VIDEO_GRATUITO_2_URL_AQUI') 
             st.write("Descrição: Conceitos fundamentais e a primeira linha de código.")
@@ -127,11 +127,11 @@ def tela_curso():
     # 4. MÓDULO 2: CONTEÚDO PAGO (Acesso Condicional)
     if verifica_assinante():
         # CONTEÚDO LIBERADO
-        with st.expander("👑 Módulo 2: Conteúdo Avançado e Práticas Profissionais (Assinantes)", expanded=True):
+        with st.expander("👑 Módulo 2: Direção Defensiva", expanded=False):
             st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
             # VÍDEO 2.1 (PAGO)
-            with st.expander("🔒 Aula 2.1: Hashing e Segurança (BCrypt na Prática)"):
+            with st.expander("🔒 Aula 2.1: Introdução a direção defensiva"):
                 st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Detalhamento sobre hasheamento de senhas e proteção contra ameaças.")
 
@@ -149,10 +149,121 @@ def tela_curso():
                 
             st.markdown("---")
             st.write("Material complementar e exercícios práticos do Módulo 2.")
+
+
+        with st.expander("👑 Módulo 3: Legislação de trânsito ", expanded=False):
+            st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
+            with st.expander("🔒 Aula 3.1: Introdução a direção defensiva"):
+                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
+                st.write("Descrição: Tudo sobre Legislação de Transito.")
+
+            # VÍDEO 2.2 (PAGO)
+            with st.expander("🔒 Aula 3.2: Legislação Generico!"):
+                # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
+                # e que arquivos grandes podem ser lentos em deploys como o Render.
+                try:
+                    video_file = open('video.mp4', 'rb')
+                    video_byts = video_file.read()
+                    st.video(video_byts) 
+                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
+                except FileNotFoundError:
+                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
+                
+            st.markdown("---")
+            st.write("Material complementar e exercícios práticos do Módulo 3.")
+
+
+        with st.expander("👑 Módulo 4: Primeiros socorros ", expanded=False):
+            st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
+            
+            with st.expander("🔒 Aula 4.1: Introdução a Primeiros socorros!"):
+                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
+                st.write("Descrição: Tudo sobre Legislação de Transito.")
+
+            # VÍDEO 2.2 (PAGO)
+            with st.expander("🔒 Aula 4.2: Legislação Generico!"):
+                # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
+                # e que arquivos grandes podem ser lentos em deploys como o Render.
+                try:
+                    video_file = open('video.mp4', 'rb')
+                    video_byts = video_file.read()
+                    st.video(video_byts) 
+                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
+                except FileNotFoundError:
+                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
+                
+            st.markdown("---")
+            st.write("Material complementar e exercícios práticos do Módulo 4.")
+
+
+        with st.expander("👑 Módulo 5: Mecânica ", expanded=False):
+            st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
+            
+            with st.expander("🔒 Aula 5.1: Introdução a Mecânica Básica !"):
+                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
+                st.write("Descrição: Tudo sobre Legislação de Transito.")
+
+            # VÍDEO 2.2 (PAGO)
+            with st.expander("🔒 Aula 5.2: Mecânica Generica !"):
+                # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
+                # e que arquivos grandes podem ser lentos em deploys como o Render.
+                try:
+                    video_file = open('video.mp4', 'rb')
+                    video_byts = video_file.read()
+                    st.video(video_byts) 
+                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
+                except FileNotFoundError:
+                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
+                
+            st.markdown("---")
+            st.write("Material complementar e exercícios práticos do Módulo 5.")
+
+
+        with st.expander("👑 Módulo 6: Meio ambiente e cidadania ", expanded=False):
+            st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
+            
+            with st.expander("🔒 Aula 6.1: Introdução a Meio ambiente !"):
+                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
+                st.write("Descrição: Tudo sobre Legislação de Transito.")
+
+            # VÍDEO 2.2 (PAGO)
+            with st.expander("🔒 Aula 6.2: Meio Ambiente Generica !"):
+                # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
+                # e que arquivos grandes podem ser lentos em deploys como o Render.
+                try:
+                    video_file = open('video.mp4', 'rb')
+                    video_byts = video_file.read()
+                    st.video(video_byts) 
+                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
+                except FileNotFoundError:
+                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
+                
+            st.markdown("---")
+            st.write("Material complementar e exercícios práticos do Módulo 6.")
+         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     else:
         # CONTEÚDO BLOQUEADO
-        with st.expander("🔒 Módulo 2: Conteúdo Avançado e Práticas Profissionais (Bloqueado)"):
+        with st.expander("🔒 Módulo 2, 3, 4, 5, 6: Conteúdo Avançado e Práticas Profissionais (Bloqueado)"):
             st.warning("🔒 **CONTEÚDO EXCLUSIVO PARA ASSINANTES.**")
             st.write("Adquira sua assinatura para liberar este e outros módulos avançados.")
 
