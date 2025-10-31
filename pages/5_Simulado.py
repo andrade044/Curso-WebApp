@@ -90,14 +90,20 @@ def proxima_pergunta():
     if st.session_state['current_question'] >= len(SIMULADO_DATA):
         st.session_state['quiz_finished'] = True
 
+
+
+dir_atual = os.path.dirname(os.path.abspath(__file__))
+caminho_raiz = os.path.join(dir_atual, '..')
+caminho_csv = os.path.join(caminho_raiz, 'todos_simulados.csv')
+
 @st.cache_data
-def load_all_simulados_data(file_path="../todos_simulados.csv"):
+def load_all_simulados_data(file_path=caminho_csv):
     """
     Carrega o arquivo CSV, transforma os dados e os agrupa por 'simulado_id'.
     """
     try:
         df = pd.read_csv(file_path, sep=',')
-        df = pd.read_csv("../todos_simulados.csv")
+
         df = df.fillna('')
         
         # 🟢 PASSO CRÍTICO: Agrupar por Simulados
