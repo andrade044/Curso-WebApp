@@ -90,7 +90,8 @@ def proxima_pergunta():
 def load_all_simulados_data():
     """
     Carrega o arquivo CSV, transforma os dados e os agrupa por 'simulado_id'.
-    Usa caminho absoluto dinâmico para garantir que funcione em qualquer ambiente.
+    Usa caminho absoluto dinâmico e força o uso de vírgula (,) como separador,
+    ignorando linhas mal formatadas (como a linha 27).
     """
     try:
         # Define o diretório do script atual (pages/)
@@ -99,9 +100,25 @@ def load_all_simulados_data():
         # Sobe um nível e aponta para o CSV na raiz do projeto (TESTEWEBAPP/todos_simulados.csv)
         caminho_csv = os.path.join(dir_atual_script, '..', 'todos_simulados.csv')
         
-        # Tenta ler o arquivo
-        df = pd.read_csv(caminho_csv, sep=';')
+        # Tenta ler o arquivo.
+        # Estratégia Final: sep=',' para forçar a vírgula (que é o delimitador correto).
+        # on_bad_lines='skip' para ignorar a linha 27 (ou qualquer outra inconsistente)
+        df = pd.read_csv(caminho_csv, 
+                         sep=',', 
+                         engine='python', # Usamos o engine python para maior flexibilidade no parsing
+                         on_bad_lines='skip')
 
+        # Se houver mais de 10 colunas (o número correto), o pandas pode ter lido a primeira linha incorretamente
+        # Devido a inconsistências no seu CSV, vamos garantir que só pegamos as 10 colunas essenciais
+        colunas_esperadas = ['simulado_id', 'id', 'pergunta', 'opcoes_A', 'opcoes_B', 'opcoes_C', 'opcoes_D', 'resposta_correta', 'pontuacao', 'imagens_locais']
+        
+        # Remove colunas extras que podem ter sido criadas por parsing incorreto
+        df = df.iloc[:, :len(colunas_esperadas)]
+        
+        # Renomeia o que for necessário, caso o cabeçalho tenha sido corrompido
+        if len(df.columns) == len(colunas_esperadas):
+            df.columns = colunas_esperadas
+        
         df = df.fillna('')
         
         # 🟢 PASSO CRÍTICO: Agrupar por Simulados
@@ -127,6 +144,7 @@ def load_all_simulados_data():
                 
                 imagens = row.get('imagens_locais', '')
                 if isinstance(imagens, str) and imagens:
+                    # O seu campo de imagens usa ponto e vírgula, então mantemos essa separação
                     imagens_list = [img.strip() for img in imagens.split(';') if img.strip()]
                 else:
                     imagens_list = []
