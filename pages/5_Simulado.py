@@ -92,6 +92,7 @@ def load_all_simulados_data(file_path="../todos_simulados.csv"):
     """
     try:
         df = pd.read_csv(file_path, sep=',')
+        df = pd.read_csv("../todos_simulados.csv")
         df = df.fillna('')
         
         # 🟢 PASSO CRÍTICO: Agrupar por Simulados
