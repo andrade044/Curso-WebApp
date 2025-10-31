@@ -49,14 +49,6 @@ if 'user_email' not in st.session_state:
 # --- Configuração do Banco de Dados SQLite ---
 DB_NAME = 'usuarios.db'
 
-def reiniciar_simulado():
-    """Reseta todas as variáveis do quiz."""
-    st.session_state['current_question'] = 0
-    st.session_state['score'] = 0
-    st.session_state['quiz_finished'] = False
-    st.session_state['user_answer'] = None
-    st.rerun()
-
 if 'current_question' not in st.session_state:
     st.session_state['current_question'] = 0
 if 'score' not in st.session_state:
@@ -65,6 +57,14 @@ if 'quiz_finished' not in st.session_state:
     st.session_state['quiz_finished'] = False
 if 'user_answer' not in st.session_state:
     st.session_state['user_answer'] = None
+def reiniciar_simulado():
+    """Reseta todas as variáveis do quiz."""
+    st.session_state['current_question'] = 0
+    st.session_state['score'] = 0
+    st.session_state['quiz_finished'] = False
+    st.session_state['user_answer'] = None
+    st.rerun()
+
 
 def proxima_pergunta():
     """Lógica para avançar para a próxima pergunta e verificar a resposta."""
