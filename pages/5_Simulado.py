@@ -40,14 +40,7 @@ if 'user_email' not in st.session_state:
 # --- Configuração do Banco de Dados SQLite ---
 DB_NAME = 'usuarios.db'
 
-if 'current_question' not in st.session_state:
-    st.session_state['current_question'] = 0
-if 'score' not in st.session_state:
-    st.session_state['score'] = 0
-if 'quiz_finished' not in st.session_state:
-    st.session_state['quiz_finished'] = False
-if 'user_answer' not in st.session_state:
-    st.session_state['user_answer'] = None
+
 def reiniciar_simulado():
     """Reseta todas as variáveis do quiz."""
     st.session_state['current_question'] = 0
@@ -56,14 +49,23 @@ def reiniciar_simulado():
     st.session_state['user_answer'] = None
     st.rerun()
 
+if 'current_question' not in st.session_state:
+    st.session_state['current_question'] = 0
+if 'score' not in st.session_state:
+    st.session_state['score'] = 0
+if 'quiz_finished' not in st.session_state:
+    st.session_state['quiz_finished'] = False
+if 'user_answer' not in st.session_state:
+    st.session_state['user_answer'] = None
 
 def proxima_pergunta():
     """Lógica para avançar para a próxima pergunta e verificar a resposta."""
-    
-    
-    
-    # Se o usuário respondeu, verifica
-    if st.session_state['user_answer'] is not None:
+    global SIMULADO_DATA # Garante que a variável SIMULADO_DATA está no escopo
+
+    # 1. Se o usuário respondeu, verifica e atualiza o score
+    if st.session_state.get('user_answer') is not None:
+        
+        # Pega a pergunta atual antes de avançar o índice
         pergunta_atual = SIMULADO_DATA[st.session_state['current_question']]
         
         # Verifica se a resposta está correta
@@ -73,9 +75,13 @@ def proxima_pergunta():
         else:
             st.toast(f"❌ Resposta Incorreta. A correta era: {pergunta_atual['resposta_correta']}", icon='👎')
     
-    # Avança para o próximo índice
+    # 2. Avança para o próximo índice
     st.session_state['current_question'] += 1
-    st.session_state['user_answer'] = None # Limpa a resposta para a próxima pergunta
+    st.session_state['user_answer'] = None # Limpa a resposta do usuário para a próxima pergunta
+
+    # 3. Verifica se o simulado terminou
+    if st.session_state['current_question'] >= len(SIMULADO_DATA):
+        st.session_state['quiz_finished'] = True
 
 def tela_simulados():
     """Interface principal para a tela de Simulado."""
