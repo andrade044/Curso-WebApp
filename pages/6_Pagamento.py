@@ -1,20 +1,14 @@
 
 import streamlit as st
-import sqlite3
-import re
-import bcrypt
+
 import os 
-from dotenv import load_dotenv
-import random
+
+
 import mercadopago
 import uuid
-import secrets
-import time
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+
 # from api_mercadopago import api_pagamento
-from data import SIMULADO_DATA
-import requests
+
 from auth import verifica_login, verifica_assinante, logout
 
 
