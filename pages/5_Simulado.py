@@ -91,26 +91,9 @@ def tela_simulados():
     
     # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
     st.title("Página de Simulados")
-    st.write("📘 Conteúdo gratuito do curso.")
-
-# Conteúdo premium
-    # if verifica_assinante():
-    #     st.success("🎉 Conteúdo premium desbloqueado!")
-    #     st.write("💎 Aqui está o conteúdo exclusivo para assinantes...")
-    # else:
-    #     st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
-
-
+    # st.write("📘 Conteúdo gratuito do curso.")
 
     # A linha que estava dando erro, agora segura:
-    if not verifica_assinante():
-        # Lógica para usuário Free
-        st.warning("Recurso de Simulado Ilimitado apenas para Assinantes.")
-        # ...
-    else:
-        # Lógica para usuário Assinante
-        st.success("Acesso ilimitado liberado!")
-    
     st.title("🧠 Simulado de Conhecimento")
 
     # ------------------ VERIFICAÇÃO DE ACESSO (NOVA LÓGICA) ------------------
@@ -120,66 +103,6 @@ def tela_simulados():
         st.info("Acesse a aba 'Pagamento' para liberar este conteúdo.")
         return # Interrompe a função aqui, não exibindo o quiz.
     # --------------------------------------------------------------------------
-    
-    # Se for assinante, o código continua:
-    total_perguntas = len(SIMULADO_DATA)
-    
-    # ------------------ SE O QUIZ TERMINOU ------------------
-    if verifica_assinante():
-        if st.session_state['current_question'] >= total_perguntas:
-            st.session_state['quiz_finished'] = True
-            
-            st.balloons()
-            st.subheader("Simulado Finalizado!")
-            
-            porcentagem = (st.session_state['score'] / total_perguntas) * 100
-            
-            if porcentagem >= 70:
-                st.success(f"Parabéns, você passou! 🎉 Sua pontuação final é: **{st.session_state['score']}/{total_perguntas}** ({porcentagem:.1f}%)")
-            else:
-                st.warning(f"Você pode melhorar. Sua pontuação final é: **{st.session_state['score']}/{total_perguntas}** ({porcentagem:.1f}%)")
-                
-            # Botão para recomeçar
-            st.button("Tentar Novamente", on_click=reiniciar_simulado)
-            
-        # ------------------ SE O QUIZ ESTÁ EM ANDAMENTO ------------------
-        else:
-            pergunta_idx = st.session_state['current_question']
-            pergunta_data = SIMULADO_DATA[pergunta_idx]
-            
-            # Exibe o progresso
-            st.markdown(f"**Questão {pergunta_idx + 1} de {total_perguntas}**")
-            st.progress((pergunta_idx) / total_perguntas)
-
-            # Exibe a pergunta
-            st.subheader(pergunta_data["pergunta"])
-
-            # Formulário para o Radio Button
-            with st.form(key=f"quiz_form_{pergunta_idx}"):
-                
-                # Opções (Radio Button)
-                escolha = st.radio(
-                    "Escolha a opção correta:",
-                    pergunta_data["opcoes"],
-                    index=None, 
-                    key=f"radio_{pergunta_idx}"
-                )
-                
-                # Submissão
-                submit_button = st.form_submit_button(label="Próxima Questão")
-                
-                if submit_button:
-                    if escolha is None:
-                        st.error("Por favor, selecione uma resposta antes de continuar.")
-                    else:
-                        st.session_state['user_answer'] = escolha
-                        proxima_pergunta()
-                        st.rerun()
-    
-    if st.button("Sair"):
-        logout()
-
-
 
     if 'current_question' not in st.session_state:
         reiniciar_simulado()
@@ -207,7 +130,7 @@ def tela_simulados():
         q = SIMULADO_DATA[indice_atual]
         
         # Título da Questão
-        st.subheader(f"Questão {indice_atual + 1}/{len(SIMULADO_DATA)} - (ID: {q['id']})")
+        st.subheader(f"Questão {indice_atual + 1}/{len(SIMULADO_DATA)} ")
         st.markdown(f"**{q['pergunta']}**")
         
         # Exibe as opções (Radio Button)
@@ -234,5 +157,8 @@ def tela_simulados():
         
         st.markdown("---")
         st.caption(f"Score atual: {st.session_state['score']}")    
+    
+    if st.button("Sair"):
+        logout()
         
 tela_simulados()
