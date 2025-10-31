@@ -94,11 +94,11 @@ def tela_simulados():
     st.write("📘 Conteúdo gratuito do curso.")
 
 # Conteúdo premium
-    if verifica_assinante():
-        st.success("🎉 Conteúdo premium desbloqueado!")
-        st.write("💎 Aqui está o conteúdo exclusivo para assinantes...")
-    else:
-        st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
+    # if verifica_assinante():
+    #     st.success("🎉 Conteúdo premium desbloqueado!")
+    #     st.write("💎 Aqui está o conteúdo exclusivo para assinantes...")
+    # else:
+    #     st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
 
 
 
@@ -178,7 +178,61 @@ def tela_simulados():
     
     if st.button("Sair"):
         logout()
-        st.success("Você saiu da conta.")
-        st.experimental_rerun()
 
+
+
+    if 'current_question' not in st.session_state:
+        reiniciar_simulado()
+        
+    # 3.2 Lógica de Finalização
+    if st.session_state['quiz_finished']:
+        total_questoes = len(SIMULADO_DATA)
+        score_final = st.session_state['score']
+        aprovado = score_final >= 21 # Critério de aprovação (70% de 30 questões)
+        
+        if aprovado:
+            st.balloons()
+            st.success(f"🎉 **APROVADO!** Você acertou {score_final} de {total_questoes}.")
+        else:
+            st.error(f"😔 **REPROVADO.** Você acertou {score_final} de {total_questoes}.")
+        
+        st.info("Para ser aprovado, você precisa de 70% de acertos (21/30).")
+        
+        if st.button("Fazer Novo Simulado"):
+            reiniciar_simulado()
+
+    # 3.3 Lógica de Exibição da Pergunta
+    else:
+        indice_atual = st.session_state['current_question']
+        q = SIMULADO_DATA[indice_atual]
+        
+        # Título da Questão
+        st.subheader(f"Questão {indice_atual + 1}/{len(SIMULADO_DATA)} - (ID: {q['id']})")
+        st.markdown(f"**{q['pergunta']}**")
+        
+        # Exibe as opções (Radio Button)
+        # O valor do radio button é a chave (A, B, C, D)
+        resposta_selecionada = st.radio(
+            "Sua Resposta:",
+            options=q['opcoes'].keys(), 
+            format_func=lambda key: f"{key} - {q['opcoes'][key]}", 
+            key=f"radio_{q['id']}" # Garante uma chave única para o widget
+        )
+        
+        # Armazena a resposta selecionada no state para uso na função de avanço
+        st.session_state['user_answer'] = resposta_selecionada 
+
+        # Botão para Avançar
+        proxima_texto = "Finalizar Simulado" if indice_atual == len(SIMULADO_DATA) - 1 else "Próxima Questão"
+        
+        st.button(
+            proxima_texto, 
+            on_click=proxima_pergunta, 
+            use_container_width=True,
+            type="primary"
+        )
+        
+        st.markdown("---")
+        st.caption(f"Score atual: {st.session_state['score']}")    
+        
 tela_simulados()
