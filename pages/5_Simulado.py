@@ -150,6 +150,7 @@ def load_all_simulados_data(file_mtime):
                 
                 imagens = row.get('imagens_locais', '')
                 if isinstance(imagens, str) and imagens:
+                    # Se houver mais de uma imagem separada por ';', cria uma lista
                     imagens_list = [img.strip() for img in imagens.split(';') if img.strip()]
                 else:
                     imagens_list = []
@@ -185,12 +186,11 @@ SIMULADOS_DATA_AGRUPADOS = load_all_simulados_data(file_mtime)
 def tela_simulados():
     """Interface principal para a tela de Simulado com acesso restrito a assinantes."""
     
-
+    # Define o diretório raiz do projeto (necessário para encontrar a pasta de imagens)
+    dir_projeto = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
     
-    # --- 2. CONTEÚDO DA PÁGINA (Apenas executa se a guarda passar) ---
     st.title("Página de Simulados")
 
-    # A linha que estava dando erro, agora segura:
     st.title("🧠 Simulado de Conhecimento")
 
     # ------------------ VERIFICAÇÃO DE ACESSO (NOVA LÓGICA) ------------------
@@ -233,20 +233,6 @@ def tela_simulados():
         st.warning("Simulado selecionado não possui questões.")
         return
 
-    # Verifica o tamanho do simulado
-    total_questoes = len(SIMULADO_DATA)
-    if total_questoes < 5:
-        st.warning(f"Simulado '{simulado_escolhido}' carregou apenas {total_questoes} questão(ões). Certifique-se de que o CSV está salvo corretamente.")
-
-    # O restante do código de inicialização e lógica do quiz (reiniciar_simulado, proxima_pergunta, etc.)
-    # deve ser adaptado para usar a variável global SIMULADO_DATA.
-
-    if 'current_question' not in st.session_state or st.session_state.get('current_simulado_name') != simulado_escolhido:
-        reiniciar_simulado()
-
-    if 'current_question' not in st.session_state:
-        reiniciar_simulado()
-        
     # 3.2 Lógica de Finalização
     if st.session_state['quiz_finished']:
         total_questoes = len(SIMULADO_DATA)
@@ -272,6 +258,24 @@ def tela_simulados():
         # Título da Questão
         st.subheader(f"Questão {indice_atual + 1}/{len(SIMULADO_DATA)} ")
         st.markdown(f"**{q['pergunta']}**")
+        
+        # --- NOVO BLOCO PARA EXIBIR IMAGENS ---
+        if q['imagens_locais']:
+            # Cria um container para centralizar as imagens
+            with st.container():
+                cols = st.columns(len(q['imagens_locais']))
+                
+                for i, img_filename in enumerate(q['imagens_locais']):
+                    # Constrói o caminho completo: [Raiz do Projeto]/imagens/[Nome do Arquivo]
+                    img_path = os.path.join(dir_projeto, 'imagens', img_filename)
+                    
+                    if os.path.exists(img_path):
+                        with cols[i]:
+                            # Exibe a imagem com uma largura fixa para melhor visualização
+                            st.image(img_path, caption=img_filename, width=150)
+                    else:
+                        st.warning(f"Imagem não encontrada: {img_filename}")
+        # --- FIM DO NOVO BLOCO ---
         
         # Exibe as opções (Radio Button)
         # O valor do radio button é a chave (A, B, C, D)
