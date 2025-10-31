@@ -1,6 +1,8 @@
 import streamlit as st
 import os 
 from dotenv import load_dotenv
+import pandas as pd 
+import numpy as np
 
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
@@ -83,6 +85,64 @@ def proxima_pergunta():
     if st.session_state['current_question'] >= len(SIMULADO_DATA):
         st.session_state['quiz_finished'] = True
 
+@st.cache_data
+def load_all_simulados_data(file_path="todos_simulados.csv"):
+    """
+    Carrega o arquivo CSV, transforma os dados e os agrupa por 'simulado_id'.
+    """
+    try:
+        df = pd.read_csv(file_path, sep=',')
+        df = df.fillna('')
+        
+        # 🟢 PASSO CRÍTICO: Agrupar por Simulados
+        simulados_agrupados = {}
+        
+        # Obtém a lista única de simulados
+        lista_de_simulados = df['simulado_id'].unique()
+
+        for simulado_nome in lista_de_simulados:
+            # Filtra o DataFrame para obter apenas as perguntas deste simulado
+            df_simulado = df[df['simulado_id'] == simulado_nome]
+            
+            simulado_data_list = []
+            
+            for index, row in df_simulado.iterrows():
+                
+                opcoes_dict = {
+                    'A': row['opcoes_A'],
+                    'B': row['opcoes_B'],
+                    'C': row['opcoes_C'],
+                    'D': row['opcoes_D']
+                }
+                
+                imagens = row.get('imagens_locais', '')
+                if isinstance(imagens, str) and imagens:
+                    imagens_list = [img.strip() for img in imagens.split(';') if img.strip()]
+                else:
+                    imagens_list = []
+                
+                question_dict = {
+                    'id': row['id'],
+                    'pergunta': row['pergunta'],
+                    'opcoes': opcoes_dict,
+                    'resposta_correta': row['resposta_correta'],
+                    'pontuacao': row.get('pontuacao', 1),
+                    'imagens_locais': imagens_list
+                }
+                
+                simulado_data_list.append(question_dict)
+            
+            simulados_agrupados[simulado_nome] = simulado_data_list
+            
+        return simulados_agrupados
+
+    except Exception as e:
+        st.error(f"Erro ao carregar os dados: {e}")
+        return {}
+
+# Carrega todos os simulados
+SIMULADOS_DATA_AGRUPADOS = load_all_simulados_data("todos_simulados.csv")
+
 def tela_simulados():
     """Interface principal para a tela de Simulado."""
     """Interface principal para a tela de Simulado com acesso restrito a assinantes."""
@@ -102,7 +162,46 @@ def tela_simulados():
         st.subheader("Para realizar os simulados, você precisa ser um Assinante Premium.")
         st.info("Acesse a aba 'Pagamento' para liberar este conteúdo.")
         return # Interrompe a função aqui, não exibindo o quiz.
+    
     # --------------------------------------------------------------------------
+    if not SIMULADOS_DATA_AGRUPADOS:
+        st.error("Nenhum simulado carregado. Verifique o arquivo CSV.")
+        return
+
+    # 1. PERMITE O USUÁRIO ESCOLHER O SIMULADO
+    nomes_dos_simulados = list(SIMULADOS_DATA_AGRUPADOS.keys())
+    
+    # Inicializa o nome do simulado selecionado no estado da sessão
+    if 'selected_simulado' not in st.session_state:
+        st.session_state['selected_simulado'] = nomes_dos_simulados[0]
+        
+    simulado_escolhido = st.selectbox(
+        "Selecione o Simulado:",
+        options=nomes_dos_simulados,
+        key='simulado_selector'
+    )
+    
+    # 2. SE O SIMULADO MUDOU, REINICIA O ESTADO DO QUIZ
+    if simulado_escolhido != st.session_state.get('current_simulado_name'):
+        # Força o reinício se o simulado mudou
+        st.session_state['current_simulado_name'] = simulado_escolhido
+        reiniciar_simulado()
+        st.stop() # Interrompe e recarrega para aplicar a mudança
+
+    # 3. DEFINE OS DADOS DO SIMULADO ATUAL
+    global SIMULADO_DATA
+    SIMULADO_DATA = SIMULADOS_DATA_AGRUPADOS.get(simulado_escolhido, [])
+    
+    if not SIMULADO_DATA:
+        st.warning("Simulado selecionado não possui questões.")
+        return
+
+    # O restante do código de inicialização e lógica do quiz (reiniciar_simulado, proxima_pergunta, etc.)
+    # deve ser adaptado para usar a variável global SIMULADO_DATA.
+
+    # ... (Restante da sua lógica de quiz, que agora usa SIMULADO_DATA)
+    if 'current_question' not in st.session_state or st.session_state.get('current_simulado_name') != simulado_escolhido:
+        reiniciar_simulado()
 
     if 'current_question' not in st.session_state:
         reiniciar_simulado()
