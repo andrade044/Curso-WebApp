@@ -244,23 +244,6 @@ def tela_curso():
          
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     else:
         # CONTEÚDO BLOQUEADO
         with st.expander("🔒 Módulo 2, 3, 4, 5, 6: Conteúdo Avançado e Práticas Profissionais (Bloqueado)"):
