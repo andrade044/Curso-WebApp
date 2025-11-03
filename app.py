@@ -280,7 +280,7 @@ def send_reset_email(destinatario: str, nome_usuario: str, token: str) -> int:
     from python_http_client.exceptions import HTTPError 
 
     try:
-        conta_sendgrid = SendGridAPIClient(api_key)
+        conta_sendgrid = SendGridAPIClient(CHAVE_API_SENDGRID)
         resposta = conta_sendgrid.send(email)
         # Se for 202, significa que o SendGrid aceitou.
         print(f"DEBUG: Email de reset enviado. Status Code: {resposta.status_code}") # Log de sucesso
@@ -292,25 +292,6 @@ def send_reset_email(destinatario: str, nome_usuario: str, token: str) -> int:
         return e.status_code
     except Exception as e:
         print(f"🚨 ERRO INESPERADO NO ENVIO: {e}") # Imprime o erro no terminal
-        st.error(f"Erro inesperado no envio de email: {e}")
-        return 500
-
-    
-    email = Mail(
-        from_email=remetente,
-        to_emails=destinatario,
-        subject='[Seu Curso] Redefinição de Senha Solicitada',
-        html_content=email_html
-    )
-
-    try:
-        conta_sendgrid = SendGridAPIClient(api_key)
-        resposta = conta_sendgrid.send(email)
-        return resposta.status_code
-    except HTTPError as e:
-        st.error(f"Erro ao enviar email (Status {e.status_code}): {e.body}")
-        return e.status_code
-    except Exception as e:
         st.error(f"Erro inesperado no envio de email: {e}")
         return 500
 
