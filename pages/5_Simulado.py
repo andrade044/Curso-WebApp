@@ -43,7 +43,7 @@ if 'user_email' not in st.session_state:
 DB_NAME = 'usuarios.db'
 
 st.set_page_config(
-    page_title="Auto Escola",
+    page_title="Simulado",
     page_icon="🚗",
     layout="wide",
     initial_sidebar_state="collapsed"

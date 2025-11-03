@@ -42,7 +42,7 @@ if 'user_email' not in st.session_state:
 
 
 st.set_page_config(
-    page_title="Auto Escola",
+    page_title="Cadastro",
     page_icon="🚗",
     layout="wide",
     initial_sidebar_state="collapsed"

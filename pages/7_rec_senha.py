@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import os
 from dotenv import load_dotenv
+import time
 
 # --- Configuração e Variáveis de Ambiente ---
 def get_secret(key, default=None):
@@ -14,9 +15,14 @@ def get_secret(key, default=None):
 
 load_dotenv()
 URL_API_AUTH = get_secret("URL_API_AUTH") 
-# A URL base da API (ex: https://suaapi.com/auth). Usaremos a base para os outros endpoints.
+
+if 'is_logged_in' not in st.session_state or not st.session_state['is_logged_in']:
+    st.error("Acesso negado. Por favor, faça login.")
+    time.sleep(1)
+    st.switch_page("Home.py")
+
 st.set_page_config(
-    page_title="Auto Escola",
+    page_title="Recuperação de senha",
     page_icon="🚗",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -31,6 +37,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 # --- Funções de UI ---
+
 
 def tela_redefinir_senha():
     """

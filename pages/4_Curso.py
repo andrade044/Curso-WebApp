@@ -35,7 +35,7 @@ if 'user_email' not in st.session_state:
     st.session_state['user_email'] = None
 
 st.set_page_config(
-    page_title="Auto Escola",
+    page_title="Curso",
     page_icon="🚗",
     layout="wide",
     initial_sidebar_state="collapsed"
