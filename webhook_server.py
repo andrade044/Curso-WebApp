@@ -161,7 +161,7 @@ def verify_reset_token(token: str) -> Optional[str]:
         # Converte a string ISO para objeto datetime (UTC)
         exp_time = datetime.datetime.fromisoformat(exp_iso_str.replace('Z', '+00:00'))
         
-        if exp_time < datetime.datetime.now(timezone.utc):
+        if exp_time < datetime.datetime.now(datetime.timezone.utc):
             # Token expirado
             print(f"AVISO: Token expirado para o usuário {user['email']}")
             return None
