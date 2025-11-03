@@ -1,96 +1,125 @@
 import streamlit as st
-import os
-from supabase_client import create_client, Client # Importe o SDK
-
-# Para este arquivo, usaremos a variável do ambiente que define a URL base
-# Lembre-se de definir esta variável (URL_BASE_ATIVACAO) nas suas secrets.
-def get_secret(key, default=None):
-    
-    # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
-    if 'secrets' in st.session_state and key in st.secrets:
-        return st.secrets[key]
-    # 2. Tenta ler de os.environ (para Codespace/Local com .env)
-    return os.getenv(key, default)
+# Importa todas as funções de BD, hash e token do seu arquivo principal
+# NOTA: Certifique-se que o seu app.py está na raiz e chame-o de 'main_app'
 try:
-    # Tente importar o cliente anon de onde ele foi definido (melhor prática)
-    from supabase_client import supabase_anon 
+    # Se seu arquivo principal é 'app.py', use 'import app as main_app'
+    # Se seu arquivo principal é 'Home.py' (como na sua tela de login), mantenha 'from Home...'
+    from Home import (
+        buscar_usuario, 
+        get_reset_token, 
+        send_reset_email, 
+        verify_reset_token, 
+        hash_senha, # Para hash BCrypt
+        update_user_password_hash # Onde você inserirá a lógica Supabase
+    )
 except ImportError:
-    # Fallback ou aviso se o cliente não for encontrado
-    st.error("Erro: Não foi possível importar 'supabase_anon'. Verifique seu arquivo 'supabase_client.py'.")
+    st.error("Erro: Não foi possível importar as funções do arquivo principal. Verifique o nome do arquivo.")
     st.stop()
     
-URL_BASE_ATIVACAO = get_secret("URL_BASE_ATIVACAO") 
+# Importação para ler parâmetros da URL
+from urllib.parse import urlparse, parse_qs 
 
-def handle_password_recovery(email: str):
-    """
-    Chama a função de recuperação de senha do Supabase Auth.
-    O Supabase enviará um link de "Redefinir Senha" para o email fornecido.
-    """
-    if not email:
-        st.error("Por favor, insira seu endereço de e-mail.")
-        return
+st.set_page_config(page_title="Recuperação de Senha")
 
-    try:
-        # A URL 'redirectTo' garante que o usuário volte para sua página Streamlit 
-        # (Home.py) após clicar no link de redefinição no e-mail.
-        redirect_url = f"{URL_BASE_ATIVACAO}/Home.py"
-        
-        response = supabase_anon.auth.reset_password_for_email(
-            email=email,
-            # Redireciona o usuário de volta para o seu app após a confirmação do link
-            redirectTo=redirect_url 
-        )
-        
-        # A API pode retornar um erro no objeto de resposta
-        if response.error:
-             st.error(f"Erro ao solicitar recuperação: {response.error.message}. Tente novamente.")
-        else:
-            # Mensagem de sucesso, independentemente de o email existir, por segurança.
-            st.success("Se o e-mail estiver registrado, você receberá um link de recuperação em breve. Verifique sua caixa de spam e as configurações de e-mail do seu projeto Supabase.")
+
+# -----------------------------------------------------------------
+# Função 1: Exibe o formulário inicial para solicitar o e-mail
+# -----------------------------------------------------------------
+
+def display_forgot_form():
+    """Exibe o formulário 'Esqueci a Senha?' e envia o e-mail de redefinição."""
+    st.title("Esqueceu sua Senha? 🧐")
+    st.markdown("Insira seu e-mail para receber um link de redefinição.")
+
+    with st.form(key='forgot_form'):
+        email = st.text_input("Seu E-mail", key="forgot_email")
+        submitted = st.form_submit_button("Receber Link de Redefinição")
+
+        if submitted:
+            if not email:
+                st.warning("Por favor, preencha o campo de e-mail.")
+                return
             
-    except Exception as e:
-        # Erro de conexão ou inesperado
-        st.error(f"Ocorreu um erro inesperado na comunicação: {e}")
+            user_data = buscar_usuario(email)
+            
+            # Por segurança, sempre retorne a mesma mensagem (evita informar se o e-mail existe)
+            if user_data:
+                # user_id, nome, senha_hash_salva, assinante, ativo, token_ativacao = user_data
+                user_nome = user_data[1] # Nome está na posição 1 do retorno de buscar_usuario
+                
+                # 1. Gera o token
+                token = get_reset_token(email)
+                
+                # 2. Envia o e-mail
+                status_envio = send_reset_email(email, user_nome, token)
+                
+                if status_envio == 202:
+                    st.success("✅ Solicitação Enviada! Se o e-mail estiver cadastrado, verifique sua caixa de entrada (e spam!).")
+                else:
+                    st.error("❌ Falha no envio do e-mail. Tente novamente ou entre em contato.")
+
+            else:
+                st.success("Se o e-mail estiver cadastrado, um link de redefinição será enviado.")
+                
+
+# -----------------------------------------------------------------
+# Função 2: Exibe o formulário para inserir a nova senha
+# -----------------------------------------------------------------
+
+def display_reset_form(token, user_email):
+    """Exibe o formulário para o usuário digitar a nova senha."""
+    st.title("🔐 Redefinir Sua Senha")
+    st.info(f"Redefinindo senha para: **{user_email}**")
+
+    with st.form(key='reset_form'):
+        new_password = st.text_input("Nova Senha", type="password")
+        confirm_password = st.text_input("Confirme a Nova Senha", type="password")
+        reset_submitted = st.form_submit_button("Atualizar Senha")
+
+        if reset_submitted:
+            if new_password != confirm_password:
+                st.error("As senhas não coincidem.")
+            elif len(new_password) < 6:
+                st.error("A senha deve ter pelo menos 6 caracteres.")
+            else:
+                # 1. Hash da nova senha
+                new_hash = hash_senha(new_password)
+                
+                # 2. Atualiza no banco de dados
+                if update_user_password_hash(user_email, new_hash):
+                    st.success("✅ Senha atualizada com sucesso! Você já pode fazer login.")
+                    st.balloons()
+                    # Redireciona para o login
+                    st.page_link("Home.py", label="Ir para a página de Login", icon="🚪")
+                    # st.stop()
+                else:
+                    st.error("❌ Erro interno ao salvar a nova senha.")
 
 
-def password_recovery_page():
-    """Renderiza a página de recuperação de senha no Streamlit."""
-    
-    st.set_page_config(page_title="Recuperação de Senha", layout="centered")
-    
-    st.markdown(
-        """
-        <style>
-        .stButton>button {
-            background-color: #009ee3; 
-            color: white;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-        .stTextInput>div>div>input {
-            border-radius: 8px;
-        }
-        </style>
-        """, unsafe_allow_html=True
-    )
-    
-    st.title("🔒 Recuperação de Senha")
-    st.markdown("Insira seu e-mail para que possamos enviar um link **seguro** para você redefinir sua senha.")
+# -----------------------------------------------------------------
+# Lógica Principal da Página
+# -----------------------------------------------------------------
 
-    with st.form(key='recovery_form'):
-        email = st.text_input(
-            "Seu E-mail", 
-            placeholder="exemplo@dominio.com", 
-            key="recovery_email_input"
-        )
-        submit_button = st.form_submit_button("Enviar Link de Redefinição")
+def main_rec_senha():
+    # Pega o token da URL, se existir (ex: http://localhost:8501/7_rec_senha?token=xyz...)
+    query_params = st.query_params
+    token = query_params.get('token')
 
-        if submit_button:
-            handle_password_recovery(email)
+    if token:
+        # Tenta verificar o token usando a função importada do app.py
+        user_email = verify_reset_token(token)
+        
+        if user_email:
+            # Token válido
+            display_reset_form(token, user_email)
+        else:
+            # Token inválido ou expirado
+            st.error("🚨 Link de redefinição inválido ou expirado. Por favor, solicite um novo.")
+            st.markdown("---")
+            display_forgot_form() 
+    else:
+        # Se não houver token, mostra o formulário inicial de esqueci a senha
+        display_forgot_form()
 
-    st.markdown("---")
-    
-    # Adiciona um link para voltar à página de login
-    st.page_link("Home.py", label="Voltar ao Login", icon="🔙")
-
+if __name__ == "__main__":
+    main_rec_senha()

@@ -11,7 +11,7 @@ import secrets
 import time
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
-# from api_mercadopago import api_pagamento
+from itsdangerous import URLSafeTimedSerializer as Serializer
 from data import SIMULADO_DATA
 
 load_dotenv()
@@ -27,8 +27,8 @@ CHAVE_API_SENDGRID = os.getenv('CHAVE_API_SENDGRID')
 EMAIL_REMETENTE =  os.getenv('EMAIL_REMETENTE')
 TOKEN_LENGTH_BYTES= os.getenv('TOKEN_LENGTH_BYTES')
 TOKEN_EXPIRATION_HOURS= os.getenv('TOKEN_EXPIRATION_HOURS')
-
-
+SECRET_KEY_RECOVERY = os.getenv('SECRET_KEY_RECOVERY')
+URL_BASE_REDEFINICAO = os.getenv('URL_BASE_REDEFINICAO')
 
 # --- Configuração de Sessão e Título ---
 st.set_page_config(
@@ -186,8 +186,120 @@ def gerar_token_ativacao():
     expiracao = int(time.time()) + (24 * 3600)
     return token, expiracao
 
+def update_user_password_hash(email, new_hash):
+    """
+    Atualiza a senha hash (BCrypt) do usuário no Supabase.
+    
+    Args:
+        email (str): Email do usuário para identificar o registro.
+        new_hash (bytes): O novo hash da senha gerado pelo bcrypt.
+        
+    Returns:
+        bool: True se a atualização for bem-sucedida, False caso contrário.
+    """
+    try:
+        # A senha hash do bcrypt é tipicamente um objeto 'bytes'. 
+        # Supabase/Postgres pode exigir que ela seja convertida para string (utf-8)
+        # antes de ser salva no campo de TEXTO/VARCHAR.
+        if isinstance(new_hash, bytes):
+            hash_str = new_hash.decode('utf-8')
+        else:
+            hash_str = new_hash # Assume que já está como string
+
+        response = supabase.table('usuarios').update({
+            'senha_hash': hash_str # Nome da coluna que armazena o hash
+        }).eq('email', email).execute()
+
+        # Verifica se a atualização foi bem-sucedida
+        # Geralmente, Supabase retorna dados na propriedade 'data' se for OK
+        if response.data:
+            # Verifica se pelo menos um registro foi alterado
+            if len(response.data) > 0:
+                print(f"DEBUG: Senha para {email} atualizada no Supabase.")
+                return True
+        
+        # Se a resposta do Supabase não contiver dados de sucesso
+        return False
+
+    except Exception as e:
+        # Você pode usar st.error(f"Erro no Supabase: {e}") se estiver no Streamlit
+        print(f"ERRO Supabase ao atualizar senha: {e}")
+        return False
 
 
+def get_reset_token(email, expires_sec=1800): 
+    """Gera o token de redefinição (válido por 30 minutos)."""
+    s = Serializer(SECRET_KEY_RECOVERY, expires_sec)
+    return s.dumps({'user_email': email}).decode('utf-8')
+
+def verify_reset_token(token):
+    """Verifica o token. Retorna o email se válido, None caso contrário."""
+    s = Serializer(SECRET_KEY_RECOVERY)
+    try:
+        # Tenta desserializar o token
+        data = s.loads(token)
+    except:
+        return None # Token inválido ou expirado
+    
+    return data['user_email'] # Retorna o email
+
+def send_reset_email(destinatario: str, nome_usuario: str, token: str) -> int:
+    """Envia o e-mail com o link de redefinição de senha."""
+    
+    # Monta o link que o usuário deve clicar
+    link_redefinicao = f"{URL_BASE_REDEFINICAO}?token={token}"
+    
+    api_key = CHAVE_API_SENDGRID
+    remetente = EMAIL_REMETENTE
+
+    if not api_key:
+        print("ERRO: CHAVE_API_SENDGRID não definida para envio de reset.")
+        return 500
+
+    from python_http_client.exceptions import HTTPError 
+
+    email_html = f"""
+    <html>
+      <body>
+        <p>Olá, <strong>{nome_usuario}</strong>,</p>
+        <p>Você solicitou a redefinição de sua senha. Clique no botão abaixo para continuar:</p>
+        
+        <p style="text-align: center;">
+            <a href="{link_redefinicao}" 
+                style="background-color: #d9534f; 
+                       color: white; 
+                       padding: 10px 20px; 
+                       text-decoration: none; 
+                       border-radius: 5px; 
+                       display: inline-block;">
+                REDEFINIR MINHA SENHA
+            </a>
+        </p>
+        
+        <p>O link expira em 30 minutos. Se você não solicitou isso, ignore este e-mail.</p>
+        
+        <p>Atenciosamente,<br>Equipe do Curso.</p>
+      </body>
+    </html>
+    """
+    
+    email = Mail(
+        from_email=remetente,
+        to_emails=destinatario,
+        subject='[Seu Curso] Redefinição de Senha Solicitada',
+        html_content=email_html
+    )
+
+    try:
+        conta_sendgrid = SendGridAPIClient(api_key)
+        resposta = conta_sendgrid.send(email)
+        return resposta.status_code
+    except HTTPError as e:
+        st.error(f"Erro ao enviar email (Status {e.status_code}): {e.body}")
+        return e.status_code
+    except Exception as e:
+        st.error(f"Erro inesperado no envio de email: {e}")
+        return 500
 
 
 def enviar_email_ativacao_sendgrid(destinatario: str, nome_usuario: str, link_ativacao: str) -> int:

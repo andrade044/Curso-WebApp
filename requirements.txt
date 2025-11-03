@@ -9,3 +9,4 @@ streamlit
 bcrypt
 flask-cors
 supabase
+itsdangerous
