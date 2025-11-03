@@ -45,6 +45,7 @@ def tela_redefinir_senha():
 
     if st.session_state.get('logged_in'):
             st.info(f"Você já esta logado!, {st.session_state.get('user_nome', 'Usuário')}!")
+            time.sleep(1)
             st.switch_page("pages/4_Curso.py")
             st.stop()
     # 1. Tenta extrair o token da URL
