@@ -244,19 +244,7 @@ def verify_reset_token(token):
     return data['user_email'] # Retorna o email
 
 def send_reset_email(destinatario: str, nome_usuario: str, token: str) -> int:
-    """Envia o e-mail com o link de redefinição de senha."""
-    
-    # Monta o link que o usuário deve clicar
-    link_redefinicao = f"{URL_BASE_REDEFINICAO}?token={token}"
-    
-    api_key = CHAVE_API_SENDGRID
-    remetente = EMAIL_REMETENTE
-
-    if not api_key:
-        print("ERRO: CHAVE_API_SENDGRID não definida para envio de reset.")
-        return 500
-
-    from python_http_client.exceptions import HTTPError 
+    # ... (código que define api_key, remetente, link_redefinicao, email_html) ...
 
     email_html = f"""
     <html>
@@ -282,6 +270,31 @@ def send_reset_email(destinatario: str, nome_usuario: str, token: str) -> int:
       </body>
     </html>
     """
+    email = Mail(
+        from_email=EMAIL_REMETENTE,
+        to_emails=destinatario, # Verifique se esta variável 'destinatario' está correta!
+        subject='[Seu Curso] Redefinição de Senha Solicitada',
+        html_content=email_html
+    )
+
+    from python_http_client.exceptions import HTTPError 
+
+    try:
+        conta_sendgrid = SendGridAPIClient(api_key)
+        resposta = conta_sendgrid.send(email)
+        # Se for 202, significa que o SendGrid aceitou.
+        print(f"DEBUG: Email de reset enviado. Status Code: {resposta.status_code}") # Log de sucesso
+        return resposta.status_code
+    except HTTPError as e:
+        # 🚨 ESTE É O BLOCO MAIS IMPORTANTE
+        print(f"🚨 ERRO DE SENDGRID HTTP ({e.status_code}): {e.body}") # Imprime o erro no terminal
+        st.error(f"Falha no envio do e-mail de redefinição (Status: {e.status_code}).")
+        return e.status_code
+    except Exception as e:
+        print(f"🚨 ERRO INESPERADO NO ENVIO: {e}") # Imprime o erro no terminal
+        st.error(f"Erro inesperado no envio de email: {e}")
+        return 500
+
     
     email = Mail(
         from_email=remetente,
