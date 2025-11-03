@@ -4,7 +4,7 @@ from flask_cors import CORS
 from supabase_client import supabase
 from dotenv import load_dotenv
 import os, bcrypt, jwt, datetime
-from datetime import datetime, timedelta,timezone
+
 import streamlit as st
 import sqlite3
 import re
@@ -116,7 +116,7 @@ def get_reset_token(email: str) -> str:
     token = secrets.token_urlsafe(TOKEN_LENGTH_BYTES)
     
     # Calcula a expiração como timestamp UTC
-    exp_time = datetime.now(timezone.utc) + datetime.timedelta(hours=TOKEN_EXPIRATION_HOURS)
+    exp_time = datetime.datetime.now(timezone.utc) + datetime.timedelta(hours=TOKEN_EXPIRATION_HOURS)
     # Formato ISO string para o Supabase
     exp_iso = exp_time.isoformat().replace('+00:00', 'Z')
     
@@ -430,7 +430,7 @@ def login():
         token = jwt.encode(
             {
                 "email": email,
-                "exp": datetime.utcnow() + timedelta(hours=2)
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=2)
             },
             SECRET_KEY,
             algorithm="HS256"
