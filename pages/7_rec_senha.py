@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 
 # --- Configuração e Variáveis de Ambiente ---
-# Replicar a função get_secret de app.py para garantir que a página funcione isoladamente
 def get_secret(key, default=None):
     """Lê segredos de st.secrets ou de os.environ."""
     # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
@@ -14,7 +13,8 @@ def get_secret(key, default=None):
     return os.getenv(key, default)
 
 load_dotenv()
-URL_API_AUTH = get_secret("URL_API_AUTH") # A rota /forgot_password é gerenciada pelo mesmo servidor
+URL_API_AUTH = get_secret("URL_API_AUTH") 
+# A URL base da API (ex: https://suaapi.com/auth). Usaremos a base para os outros endpoints.
 
 # --- Funções de UI ---
 
@@ -27,11 +27,15 @@ def tela_redefinir_senha():
     st.markdown("---")
 
     # 1. Tenta extrair o token da URL
+    # st.query_params retorna um dict-like com os parâmetros da URL
     query_params = st.query_params
-    reset_token = query_params.get("token")
+    
+    # 🚨 PONTO CRÍTICO: Garantir que a chave usada aqui ("token") é a mesma 
+    # que a sua API Flask coloca no link de e-mail.
+    reset_token = query_params.get("token") 
 
     if reset_token:
-        # Se houver um token na URL, mostra o formulário para a nova senha
+        # Se houver um token, mostra o formulário para a nova senha
         show_reset_form(reset_token)
     else:
         # Se não houver token, mostra o formulário para solicitação do link
@@ -40,12 +44,9 @@ def tela_redefinir_senha():
 # --- Formulário de Solicitação de Link (/forgot_password) ---
 
 def show_forgot_form():
-    """
-    Pede o e-mail para enviar o link de redefinição.
-    Chama a rota /forgot_password.
-    """
+    """Pede o e-mail para enviar o link de redefinição."""
     st.subheader("Passo 1: Enviar Link de Redefinição")
-    st.info("Insira seu e-mail abaixo. Se encontrarmos sua conta, enviaremos um link para criar uma nova senha.")
+    st.info("Insira seu e-mail abaixo. Enviaremos um link para criar uma nova senha.")
 
     with st.form(key='forgot_form'):
         email = st.text_input("Seu Email", key="forgot_email")
@@ -56,19 +57,15 @@ def show_forgot_form():
         status_message.info("Processando solicitação...")
 
         try:
-            # Chama o endpoint /forgot_password da API Flask
-            payload = {"email": email}
-            # OBS: Usamos a mesma URL base da API de autenticação
-            response = requests.post(f"{URL_API_AUTH.replace('/auth', '')}/forgot_password", json=payload)
+            # Remove a parte "/auth" da URL para acessar /forgot_password
+            base_api_url = URL_API_AUTH.removesuffix('/auth') 
+            response = requests.post(f"{base_api_url}/forgot_password", json={"email": email})
             
-            # Como a rota /forgot_password sempre retorna 200 (ou 500 em caso de erro fatal),
-            # usamos a resposta de sucesso genérica para segurança.
             if response.status_code == 200:
                 status_message.success("Solicitação enviada! Verifique sua caixa de entrada e spam. O link é válido por 1 hora.")
             else:
-                # Se for um erro interno (500), informamos o usuário
-                status_message.error("Erro interno do servidor ao processar a solicitação.")
-                print(f"Erro na API /forgot_password: {response.status_code}, {response.text}")
+                error_msg = response.json().get('detail', f"Erro no servidor: Código {response.status_code}")
+                status_message.error(error_msg)
 
         except requests.exceptions.RequestException:
             status_message.error("Erro de conexão. Verifique se a API está online.")
@@ -76,11 +73,9 @@ def show_forgot_form():
 # --- Formulário de Redefinição de Senha (/reset_password) ---
 
 def show_reset_form(token):
-    """
-    Pede a nova senha, usa o token e chama a rota /reset_password.
-    """
+    """Pede a nova senha, usa o token e chama a rota /reset_password."""
     st.subheader("Passo 2: Criar Nova Senha")
-    st.warning("Você está usando o link de redefinição de senha. O token expira em breve.")
+    st.warning("Você está usando o link de redefinição de senha. O token será enviado na requisição.")
 
     with st.form(key='reset_form'):
         new_password = st.text_input("Nova Senha", type="password", key="new_pass")
@@ -100,22 +95,21 @@ def show_reset_form(token):
             return
             
         try:
-            # Chama o endpoint /reset_password da API Flask
             payload = {
                 "token": token,
                 "new_password": new_password
             }
-            # OBS: Usamos a mesma URL base da API de autenticação
-            response = requests.post(f"{URL_API_AUTH.replace('/auth', '')}/reset_password", json=payload)
+            
+            # Remove a parte "/auth" da URL para acessar /reset_password
+            base_api_url = URL_API_AUTH.removesuffix('/auth') 
+            response = requests.post(f"{base_api_url}/reset_password", json=payload)
 
             if response.status_code == 200:
-                status_message.success("🥳 Senha redefinida com sucesso! Você pode fazer login agora.")
-                # Redireciona para a tela de login
                 st.balloons()
+                status_message.success("🥳 Senha redefinida com sucesso! Você pode fazer login agora.")
                 st.page_link("app.py", label="Ir para a tela de Login", icon="🚪")
                 st.stop()
             else:
-                # O token pode estar inválido (400) ou expirado (400)
                 error_msg = response.json().get('message', "Erro ao redefinir a senha.")
                 status_message.error(error_msg)
                 
