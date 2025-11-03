@@ -16,11 +16,7 @@ def get_secret(key, default=None):
 load_dotenv()
 URL_API_AUTH = get_secret("URL_API_AUTH") 
 
-if 'is_logged_in' not in st.session_state or not st.session_state['is_logged_in']:
-    st.error("Acesso negado. Por favor, faça login.")
-    time.sleep(1)
-    st.switch_page("Home.py")
-
+      
 st.set_page_config(
     page_title="Recuperação de senha",
     page_icon="🚗",
@@ -47,6 +43,10 @@ def tela_redefinir_senha():
     st.title("🔒 Redefinir Senha")
     st.markdown("---")
 
+    if st.session_state.get('logged_in'):
+            st.info(f"Você já esta logado!, {st.session_state.get('user_nome', 'Usuário')}!")
+            st.switch_page("pages/4_Curso.py")
+            st.stop()
     # 1. Tenta extrair o token da URL
     # st.query_params retorna um dict-like com os parâmetros da URL
     query_params = st.query_params
