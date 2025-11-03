@@ -116,7 +116,7 @@ def get_reset_token(email: str) -> str:
     token = secrets.token_urlsafe(TOKEN_LENGTH_BYTES)
     
     # Calcula a expiração como timestamp UTC
-    exp_time = datetime.datetime.now(timezone.utc) + datetime.timedelta(hours=TOKEN_EXPIRATION_HOURS)
+    exp_time = datetime.datetime.now(datetime.timezone.utc) + datetime.timedelta(hours=int(TOKEN_EXPIRATION_HOURS))
     # Formato ISO string para o Supabase
     exp_iso = exp_time.isoformat().replace('+00:00', 'Z')
     
