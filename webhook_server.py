@@ -4,7 +4,7 @@ from flask_cors import CORS
 from supabase_client import supabase
 from dotenv import load_dotenv
 import os, bcrypt, jwt, datetime
-
+from datetime import datetime, timedelta,timezone
 import streamlit as st
 import sqlite3
 import re
@@ -72,13 +72,12 @@ def hash_senha(senha: str) -> str:
 
 def buscar_usuario(email: str) -> Optional[Tuple[int, str, str, int, int, Optional[str]]]:
     """
-    Busca o usuário pelo email no Supabase.
+    Busca o usuário pelo email no Supabase (cliente normal).
 
     Retorna uma tupla no formato esperado pelo Streamlit:
     (id, nome, senha_hash, assinante, ativo, token_ativacao)
     """
     try:
-        # Usa o cliente Supabase padrão (não o de serviço)
         response = supabase.table('usuarios').select(
             'id, nome, senha_hash, assinante, ativo, token_ativacao'
         ).eq('email', email).limit(1).execute()
@@ -87,14 +86,14 @@ def buscar_usuario(email: str) -> Optional[Tuple[int, str, str, int, int, Option
         
         if data:
             user_dict = data[0]
-            # Mapeia o dicionário para a tupla
+            # Mapeia o dicionário para a tupla (corrigido para o formato esperado)
             user_data_tuple = (
                 user_dict['id'],
                 user_dict['nome'],
                 user_dict['senha_hash'],
                 user_dict['assinante'],
                 user_dict['ativo'],
-                user_dict['token_ativacao']
+                user_dict.get('token_ativacao') # Usar .get para segurança
             )
             return user_data_tuple
         else:
@@ -103,6 +102,7 @@ def buscar_usuario(email: str) -> Optional[Tuple[int, str, str, int, int, Option
     except Exception as e:
         print(f"ERRO SUPABASE em buscar_usuario: {e}") 
         return None
+
 
 # ------------------------------------------------------
 # 📌 ROTA /auth → cadastro e login no mesmo endpoint
@@ -217,12 +217,12 @@ def send_reset_email(destinatario: str, nome_usuario: str, token: str) -> int:
         <p style="text-align: center;">
             <a href="{link_redefinicao}" 
                 style="background-color: #ffc107; 
-                       color: #333; 
-                       padding: 12px 25px; 
-                       text-decoration: none; 
-                       border-radius: 5px; 
-                       display: inline-block;
-                       font-weight: bold;">
+                        color: #333; 
+                        padding: 12px 25px; 
+                        text-decoration: none; 
+                        border-radius: 5px; 
+                        display: inline-block;
+                        font-weight: bold;">
                 REDEFINIR MINHA SENHA AGORA
             </a>
         </p>
@@ -274,6 +274,70 @@ def send_reset_email(destinatario: str, nome_usuario: str, token: str) -> int:
         print(f"🚨 ERRO INESPERADO NO ENVIO: {e}")
         st.error(f"Erro inesperado no envio de email: {e}")
         return 500
+
+@app.route("/forgot_password", methods=["POST"])
+def forgot_password():
+    data = request.get_json()
+    email = data.get("email")
+
+    if not email:
+        return jsonify({"message": "O e-mail é obrigatório."}), 400
+
+    # Busca o usuário usando o cliente normal (não precisa de Service Role Key para lookup)
+    user_response = supabase.table("usuarios").select("nome").eq("email", email).execute()
+    
+    # Resposta genérica para evitar enumeração de e-mail (Segurança!)
+    # Sempre retorna 200, mesmo se o e-mail não existir no DB.
+    response_success = jsonify({"message": "Se o e-mail estiver em nosso sistema, enviaremos um link de redefinição."}), 200
+    
+    if not user_response.data:
+        print(f"AVISO: Tentativa de redefinição de senha para e-mail não encontrado: {email}")
+        return response_success # Retorna sucesso genérico
+
+    nome_usuario = user_response.data[0]["nome"]
+    
+    # 1. Gera o token e armazena no DB (usa o cliente de serviço)
+    reset_token = get_reset_token(email)
+    
+    if not reset_token:
+        print(f"ERRO: Falha ao gerar e salvar o token de reset para {email}.")
+        return jsonify({"message": "Erro interno ao gerar token."}), 500
+        
+    # 2. Envia o e-mail
+    send_status = send_reset_email(email, nome_usuario, reset_token)
+    
+    if send_status >= 400:
+        print(f"ERRO: Falha ao enviar e-mail de reset para {email}. Status: {send_status}")
+        # Se falhar, é melhor retornar sucesso genérico para não vazar info,
+        # mas logamos o erro internamente.
+        return response_success
+
+    return response_success
+
+@app.route("/reset_password", methods=["POST"])
+def reset_password():
+    data = request.get_json()
+    token = data.get("token")
+    new_password = data.get("new_password")
+
+    if not token or not new_password:
+        return jsonify({"message": "O token e a nova senha são obrigatórios."}), 400
+
+    # 1. Verifica a validade do token
+    email_do_usuario = verify_reset_token(token)
+    
+    if not email_do_usuario:
+        return jsonify({"message": "Token inválido ou expirado."}), 400
+        
+    # 2. Gera o novo hash da senha
+    new_hash = hash_senha(new_password)
+    
+    # 3. Atualiza o hash e limpa o token (usa o cliente de serviço)
+    if update_user_password_hash(email_do_usuario, new_hash):
+        return jsonify({"message": "Senha atualizada com sucesso!"}), 200
+    else:
+        return jsonify({"message": "Erro ao atualizar a senha no banco de dados."}), 500
+
 
 @app.route("/auth", methods=["POST"])
 def login():
