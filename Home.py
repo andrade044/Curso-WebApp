@@ -96,13 +96,92 @@ if 'user_answer' not in st.session_state:
 # --- Funções do Simulado ---
 
 
+def handle_reset_password(new_password: str):
+    """
+    Tenta redefinir a senha do usuário com o token injetado na sessão pelo Supabase.
+    Isso só funciona porque o Supabase já autenticou o usuário temporariamente
+    através do token na URL.
+    """
+    if len(new_password) < 6:
+        st.error("A nova senha deve ter pelo menos 6 caracteres.")
+        return
 
+    try:
+        # A função update_user_by_id precisa apenas da nova senha
+        # se o token foi processado corretamente pelo Streamlit
+        response = supabase_anon.auth.update_user(
+            {"password": new_password}
+        )
+        
+        if response.error:
+            st.error(f"Erro ao redefinir a senha: {response.error.message}")
+        else:
+            st.success("Senha redefinida com sucesso! Você já pode fazer login com sua nova senha.")
+            # Limpa o modo de recuperação e força o login
+            st.session_state['recovery_mode'] = False
+            st.session_state['logged_in'] = True
+            st.session_state['user_email'] = response.user.email # O Supabase retorna o novo user logado
+            st.rerun()
+
+    except Exception as e:
+        st.error(f"Erro inesperado: {e}")
+
+def handle_url_recovery():
+    """
+    Verifica a URL do navegador em busca de um token de redefinição de senha.
+    O Streamlit não expõe o hash da URL (#), mas o SDK do Supabase tenta
+    capturar o token e fazer o login temporário de 'recovery'
+    no momento que a página carrega.
+    """
+    try:
+        # Tenta obter o usuário logado. Se for um token de recuperação, 
+        # o usuário estará logado TEMPORARIAMENTE.
+        user = supabase_anon.auth.get_user()
+        
+        # O Supabase injeta o token na sessão, o que autentica o usuário temporariamente.
+        # Se um usuário está logado E não está no modo normal (pois foi redirecionado
+        # do link de e-mail), ativamos o modo de recuperação.
+        
+        # NOTE: O Supabase v2 espera que você chame auth.getSession() em um useEffect (React) ou similar.
+        # No Streamlit, a forma mais simples de checar é tentar obter a sessão.
+        session = supabase_anon.auth.get_session()
+        
+        if session and session.session.user.identities[0].identity_data['recovery_token_sent_at']:
+            # Se a sessão for válida e tiver a flag de recuperação, ativamos o modo.
+            st.session_state['recovery_mode'] = True
+            st.session_state['logged_in'] = False # Força o modo de redefinição sobre o login normal
+            return True
+            
+        return False
+    
+    except Exception:
+        # Ignora erros se não houver sessão válida
+        return False
 
 
 
 def tela_login():
     """Mostra o formulário de login e autentica o usuário via API."""
     
+    if handle_url_recovery():
+        # Se for modo de recuperação, exibe o formulário de redefinição
+        st.title("🔑 Definir Nova Senha")
+        st.warning("Seu link de redefinição foi validado. Por favor, insira sua nova senha.")
+
+
+    with st.form(key='reset_password_form'):
+            new_password = st.text_input("Nova Senha", type="password", key="new_password")
+            confirm_password = st.text_input("Confirmar Nova Senha", type="password", key="confirm_new_password")
+            reset_submitted = st.form_submit_button("Redefinir Senha")
+            
+            if reset_submitted:
+                if new_password == confirm_password:
+                    handle_reset_password(new_password)
+                else:
+                    st.error("As senhas não coincidem.")
+    return
+
+
     # Adicionando verificação para redirecionar se o usuário já estiver logado
     if st.session_state.get('logged_in'):
         st.info(f"Bem-vindo de volta, {st.session_state.get('user_nome', 'Usuário')}!")
@@ -121,6 +200,8 @@ def tela_login():
         email = st.text_input("Email", key="login_email")
         senha = st.text_input("Senha", type="password", key="login_senha")
         submitted = st.form_submit_button("Entrar")
+        
+        st.page_link("recuperacao_senha.py", label="Esqueceu a senha?")
         st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? Cadastre-se aqui")
 
 
