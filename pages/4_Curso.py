@@ -34,9 +34,25 @@ if 'logged_in' not in st.session_state:
 if 'user_email' not in st.session_state:
     st.session_state['user_email'] = None
 
+st.set_page_config(
+    page_title="Auto Escola",
+    page_icon="🚗",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Adiciona um CSS para esconder os botões de menu e footer, se necessário
+st.markdown("""
+<style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
+
 
 # --- Configuração do Banco de Dados SQLite ---
-DB_NAME = 'usuarios.db'
+
 
 if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
     st.warning("Você precisa estar logado para acessar esta página.")

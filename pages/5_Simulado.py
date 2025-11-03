@@ -42,6 +42,21 @@ if 'user_email' not in st.session_state:
 # --- Configuração do Banco de Dados SQLite ---
 DB_NAME = 'usuarios.db'
 
+st.set_page_config(
+    page_title="Auto Escola",
+    page_icon="🚗",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Adiciona um CSS para esconder os botões de menu e footer, se necessário
+st.markdown("""
+<style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
 
 def reiniciar_simulado():
     """Reseta todas as variáveis do quiz."""

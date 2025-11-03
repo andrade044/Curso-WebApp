@@ -15,7 +15,21 @@ def get_secret(key, default=None):
 load_dotenv()
 URL_API_AUTH = get_secret("URL_API_AUTH") 
 # A URL base da API (ex: https://suaapi.com/auth). Usaremos a base para os outros endpoints.
+st.set_page_config(
+    page_title="Auto Escola",
+    page_icon="🚗",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
+# Adiciona um CSS para esconder os botões de menu e footer, se necessário
+st.markdown("""
+<style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
 # --- Funções de UI ---
 
 def tela_redefinir_senha():

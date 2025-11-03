@@ -40,11 +40,29 @@ URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
 URL_API_AUTH = get_secret("URL_API_AUTH")
 URL_CURSO = get_secret("URL_CURSO")
 
+
+
+
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
 if 'user_email' not in st.session_state:
     st.session_state['user_email'] = None
 
+st.set_page_config(
+    page_title="Auto Escola",
+    page_icon="🚗",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Adiciona um CSS para esconder os botões de menu e footer, se necessário
+st.markdown("""
+<style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
 
 # --- Configuração do Banco de Dados SQLite ---
 

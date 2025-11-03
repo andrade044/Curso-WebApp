@@ -47,10 +47,20 @@ URL_API_AUTH = get_secret("URL_API_AUTH")
 
 # --- Configuração de Sessão e Título ---
 st.set_page_config(
-    page_title="Sistema de Cursos",
+    page_title="Auto Escola",
+    page_icon="🚗",
     layout="wide",
-    
+    initial_sidebar_state="collapsed"
 )
+
+# Adiciona um CSS para esconder os botões de menu e footer, se necessário
+st.markdown("""
+<style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
 
 # Inicializa o session_state para controlar o estado do login
 if 'logged_in' not in st.session_state:
