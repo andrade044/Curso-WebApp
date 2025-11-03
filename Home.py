@@ -118,8 +118,14 @@ def tela_login():
         senha = st.text_input("Senha", type="password", key="login_senha")
         submitted = st.form_submit_button("Entrar")
         
-        st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? [Cadastre-se aqui]")
-        st.page_link("pages/7_rec_senha.py", label="Esqueceu a senha?")
+        col1, col2,col3 = st.columns(3)
+
+
+        with col1:
+            st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? [Cadastre-se aqui]")
+        
+        with col3:
+            st.page_link("pages/7_rec_senha.py", label="Esqueceu a senha?")
 
 
     if submitted:
@@ -144,7 +150,7 @@ def tela_login():
                 user_data = data.get('user', {})
                 token = data.get('token') # Captura o token
 
-                # 3. DEFINE AS CHAVES DE SESSÃO (CRÍTICO)
+                # 3. DEFINE AS CHAVE1S DE SESSÃO (CRÍTICO)
                 st.session_state['logged_in'] = True
                 st.session_state['user_nome'] = data.get('nome', 'Usuário')
                 st.session_state['user_assinante'] = data.get('assinante', False)

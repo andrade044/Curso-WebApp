@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from supabase import create_client, Client # Importe o SDK
+from supabase_client import create_client, Client # Importe o SDK
 
 # Para este arquivo, usaremos a variável do ambiente que define a URL base
 # Lembre-se de definir esta variável (URL_BASE_ATIVACAO) nas suas secrets.
