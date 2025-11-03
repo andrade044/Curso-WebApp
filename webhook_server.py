@@ -62,7 +62,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 # Carrega variáveis de ambiente
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
-
+DB_TABLE_NAME = 'usuarios' 
 app = Flask(__name__)
 CORS(app)
 
