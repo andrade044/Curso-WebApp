@@ -184,7 +184,7 @@ def tela_login():
         senha = st.text_input("Senha", type="password", key="login_senha")
         submitted = st.form_submit_button("Entrar")
         
-        st.page_link("rec_senha.py", label="Esqueceu a senha?")
+        st.page_link("/pages/rec_senha.py", label="Esqueceu a senha?")
         st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? Cadastre-se aqui")
 
 
