@@ -163,23 +163,6 @@ def handle_url_recovery():
 def tela_login():
     """Mostra o formulário de login e autentica o usuário via API."""
     
-    if handle_url_recovery():
-        # Se for modo de recuperação, exibe o formulário de redefinição
-        st.title("🔑 Definir Nova Senha")
-        st.warning("Seu link de redefinição foi validado. Por favor, insira sua nova senha.")
-
-
-    with st.form(key='reset_password_form'):
-            new_password = st.text_input("Nova Senha", type="password", key="new_password")
-            confirm_password = st.text_input("Confirmar Nova Senha", type="password", key="confirm_new_password")
-            reset_submitted = st.form_submit_button("Redefinir Senha")
-            
-            if reset_submitted:
-                if new_password == confirm_password:
-                    handle_reset_password(new_password)
-                else:
-                    st.error("As senhas não coincidem.")
-    return
 
 
     # Adicionando verificação para redirecionar se o usuário já estiver logado
@@ -252,6 +235,23 @@ def tela_login():
         except requests.exceptions.RequestException:
             status_message.error("Erro de conexão com o servidor. Verifique se a API está online.")
 
+    if handle_url_recovery():
+        # Se for modo de recuperação, exibe o formulário de redefinição
+        st.title("🔑 Definir Nova Senha")
+        st.warning("Seu link de redefinição foi validado. Por favor, insira sua nova senha.")
+
+
+    with st.form(key='reset_password_form'):
+            new_password = st.text_input("Nova Senha", type="password", key="new_password")
+            confirm_password = st.text_input("Confirmar Nova Senha", type="password", key="confirm_new_password")
+            reset_submitted = st.form_submit_button("Redefinir Senha")
+            
+            if reset_submitted:
+                if new_password == confirm_password:
+                    handle_reset_password(new_password)
+                else:
+                    st.error("As senhas não coincidem.")
+    return
 # ----------------------------------------------------------------------
 # FUNÇÃO PRINCIPAL DA PÁGINA (CONTROLADOR DE TELAS)
 # ----------------------------------------------------------------------
