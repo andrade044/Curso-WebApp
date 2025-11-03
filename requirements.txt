@@ -10,3 +10,4 @@ bcrypt
 flask-cors
 supabase
 itsdangerous
+datetime
