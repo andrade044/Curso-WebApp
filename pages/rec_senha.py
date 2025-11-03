@@ -94,6 +94,3 @@ def password_recovery_page():
     # Adiciona um link para voltar à página de login
     st.page_link("Home.py", label="Voltar ao Login", icon="🔙")
 
-# Execute a função da página
-if __name__ == "__main__":
-    password_recovery_page()
