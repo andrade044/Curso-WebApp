@@ -4,7 +4,7 @@ import streamlit as st
 try:
     # Se seu arquivo principal é 'app.py', use 'import app as main_app'
     # Se seu arquivo principal é 'Home.py' (como na sua tela de login), mantenha 'from Home...'
-    from Home import (
+    from app import (
         buscar_usuario, 
         get_reset_token, 
         send_reset_email, 
