@@ -114,14 +114,36 @@ def cadastrar_usuario(cpf, email, nome, senha, assinante, ativo=0, token=None, t
         return False
 
 def buscar_usuario(email):
-    """Busca o usuário pelo email e retorna os dados."""
-    conn = sqlite3.connect(DB_NAME)
-    c = conn.cursor()
-    # Adicionando 'ativo', 'token_ativacao' e 'token_expiracao'
-    c.execute('SELECT id, nome, senha_hash, assinante, ativo, token_ativacao FROM usuarios WHERE email = ?', (email,)) 
-    user_data = c.fetchone()
-    conn.close()    
-    return user_data
+    """Busca o usuário pelo email no Supabase e retorna os dados."""
+    
+    try:
+        # 1. Lógica de Busca no Supabase
+        response = supabase.table(DB_TABLE_NAME).select(
+            'id, nome, senha_hash, assinante, ativo, token_ativacao'
+        ).eq('email', email).limit(1).execute()
+        
+        data = response.data
+        
+        if data:
+            # Garante que os dados do Supabase retornem no formato tuple esperado:
+            # (id, nome, senha_hash, assinante, ativo, token_ativacao)
+            user_dict = data[0]
+            user_data_tuple = (
+                user_dict['id'],
+                user_dict['nome'],
+                user_dict['senha_hash'],
+                user_dict['assinante'],
+                user_dict['ativo'],
+                user_dict['token_ativacao']
+            )
+            return user_data_tuple
+        else:
+            return None # Usuário não encontrado
+            
+    except Exception as e:
+        # Erro de conexão ou consulta (Debug)
+        print(f"ERRO SUPABASE em buscar_usuario: {e}") 
+        return None
 # --- Funções de Validação de Input (Reutilizadas) ---
 
 def set_user_active(user_id):
