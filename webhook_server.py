@@ -24,6 +24,8 @@ import requests
 import sendgrid
 from auth import verifica_login, verifica_assinante, logout
 from python_http_client.exceptions import BadRequestsError
+from typing import Optional, Tuple, Dict, Any
+
 
 
 
@@ -64,9 +66,215 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 app = Flask(__name__)
 CORS(app)
 
+def hash_senha(senha: str) -> str:
+    """Gera o hash da senha usando bcrypt."""
+    return bcrypt.hashpw(senha.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+def buscar_usuario(email: str) -> Optional[Tuple[int, str, str, int, int, Optional[str]]]:
+    """
+    Busca o usuário pelo email no Supabase.
+
+    Retorna uma tupla no formato esperado pelo Streamlit:
+    (id, nome, senha_hash, assinante, ativo, token_ativacao)
+    """
+    try:
+        # Usa o cliente Supabase padrão (não o de serviço)
+        response = supabase.table('usuarios').select(
+            'id, nome, senha_hash, assinante, ativo, token_ativacao'
+        ).eq('email', email).limit(1).execute()
+        
+        data = response.data
+        
+        if data:
+            user_dict = data[0]
+            # Mapeia o dicionário para a tupla
+            user_data_tuple = (
+                user_dict['id'],
+                user_dict['nome'],
+                user_dict['senha_hash'],
+                user_dict['assinante'],
+                user_dict['ativo'],
+                user_dict['token_ativacao']
+            )
+            return user_data_tuple
+        else:
+            return None
+            
+    except Exception as e:
+        print(f"ERRO SUPABASE em buscar_usuario: {e}") 
+        return None
+
 # ------------------------------------------------------
 # 📌 ROTA /auth → cadastro e login no mesmo endpoint
 # ------------------------------------------------------
+
+def get_reset_token(email: str) -> str:
+    """
+    Gera um token de redefinição único, armazena no Supabase e retorna.
+    O Supabase deve ter os campos 'token_reset' e 'token_expiracao'.
+    """
+    token = secrets.token_urlsafe(TOKEN_LENGTH_BYTES)
+    
+    # Calcula a expiração como timestamp UTC
+    exp_time = datetime.datetime.now(timezone.utc) + datetime.timedelta(hours=TOKEN_EXPIRATION_HOURS)
+    # Formato ISO string para o Supabase
+    exp_iso = exp_time.isoformat().replace('+00:00', 'Z')
+    
+    try:
+        # 1. Atualiza o usuário no Supabase
+        response = supabase_service.table(DB_TABLE_NAME) \
+            .update({'token_reset': token, 'token_expiracao': exp_iso}) \
+            .eq('email', email) \
+            .execute()
+            
+        if response.data:
+            print(f"Token de reset gerado e salvo para: {email}")
+            return token
+        
+    except Exception as e:
+        print(f"ERRO SUPABASE ao salvar token de reset: {e}")
+    
+    return ""
+
+def verify_reset_token(token: str) -> Optional[str]:
+    """
+    Verifica se o token é válido e retorna o email do usuário.
+    O token deve ser o token_reset salvo no Supabase e não deve estar expirado.
+    """
+    try:
+        response = supabase.table(DB_TABLE_NAME).select(
+            'email, token_expiracao'
+        ).eq('token_reset', token).limit(1).execute()
+        
+        user_data = response.data
+        
+        if not user_data:
+            return None # Token não encontrado
+        
+        user = user_data[0]
+        
+        # 1. Verifica a expiração
+        exp_iso_str = user['token_expiracao']
+        if not exp_iso_str:
+            return None # Token sem expiração (inválido)
+            
+        # Converte a string ISO para objeto datetime (UTC)
+        exp_time = datetime.datetime.fromisoformat(exp_iso_str.replace('Z', '+00:00'))
+        
+        if exp_time < datetime.datetime.now(timezone.utc):
+            # Token expirado
+            print(f"AVISO: Token expirado para o usuário {user['email']}")
+            return None
+            
+        # 2. Token válido
+        return user['email']
+        
+    except Exception as e:
+        print(f"ERRO SUPABASE ao verificar token: {e}")
+        return None
+    
+def update_user_password_hash(email: str, new_hash: str) -> bool:
+    """
+    Atualiza o hash da senha e limpa o token de reset no Supabase.
+    """
+    try:
+        # Usa o cliente de serviço para garantir que a atualização funcione
+        response = supabase_service.table(DB_TABLE_NAME) \
+            .update({'senha_hash': new_hash, 'token_reset': None, 'token_expiracao': None}) \
+            .eq('email', email) \
+            .execute()
+        
+        if response.data:
+            print(f"Senha de {email} atualizada com sucesso.")
+            return True
+        return False
+        
+    except Exception as e:
+        print(f"ERRO SUPABASE ao atualizar senha: {e}")
+        return False
+    
+def send_reset_email(destinatario: str, nome_usuario: str, token: str) -> int:
+    """
+    Envia o e-mail de redefinição de senha com o link e o token.
+    """
+    # 1. Cria o link de redefinição (usa a URL_BASE + o caminho para a página Streamlit)
+    link_redefinicao = f"{URL_BASE_ATIVACAO}/7_rec_senha?token={token}"
+    
+    email_html = f"""
+    <html>
+    <body>
+        <h1 style="color: #ffc107; text-align: center;">🔒 Redefinição de Senha</h1>
+
+        <p>Olá, <strong>{nome_usuario}</strong>,</p>
+
+        <p>
+            Recebemos uma solicitação para redefinir a senha da sua conta.
+            Se você não solicitou essa alteração, pode ignorar este e-mail com segurança.
+        </p>
+        
+        <p>Para criar uma nova senha, clique no botão abaixo. Este link é válido por {TOKEN_EXPIRATION_HOURS} horas:</p>
+        
+        <p style="text-align: center;">
+            <a href="{link_redefinicao}" 
+                style="background-color: #ffc107; 
+                       color: #333; 
+                       padding: 12px 25px; 
+                       text-decoration: none; 
+                       border-radius: 5px; 
+                       display: inline-block;
+                       font-weight: bold;">
+                REDEFINIR MINHA SENHA AGORA
+            </a>
+        </p>
+        
+        <p style="margin-top: 20px;">Se o botão não funcionar, copie e cole o seguinte link no seu navegador:</p>
+        <p><small><a href="{link_redefinicao}">{link_redefinicao}</a></small></p>
+        
+        <p>
+            Em caso de dúvidas, entre em contato com o suporte.
+        </p>
+        
+        <p>Atenciosamente,<br>A Equipe do Curso.</p>
+    </body>
+    </html> 
+    """
+    
+    email = Mail(
+        from_email=EMAIL_REMETENTE,
+        to_emails=destinatario,
+        subject='[Seu Curso] Link para Redefinir sua Senha',
+        html_content=email_html
+    )
+
+    try:
+        conta_sendgrid = SendGridAPIClient(CHAVE_API_SENDGRID)
+        response = conta_sendgrid.send(email)
+        
+        print(f"DEBUG: Email de reset enviado. Status Code: {response.status_code}")
+        # Se for 202, significa que o SendGrid aceitou.
+        return response.status_code
+
+    except BadRequestsError as e:
+        # Tratamento de erro específico do SendGrid (geralmente 400 ou 403)
+        print("--- ERRO FATAL DO SENDGRID (BadRequestsError) ---")
+        print(f"Status Code: {e.status_code}")
+        try:
+            # Imprime os detalhes exatos do erro da API
+            error_details = e.response.text 
+            print(f"Detalhes do Erro da API: {error_details}")
+            st.error(f"Falha no envio do e-mail de redefinição. Status: {e.status_code}. Detalhes no console.")
+        except Exception as body_e:
+            print(f"Erro ao obter o corpo da resposta: {body_e}")
+            st.error(f"Falha no envio do e-mail de redefinição. Status: {e.status_code}.")
+            
+        print("--------------------------------------------------")
+        return e.status_code
+        
+    except Exception as e:
+        print(f"🚨 ERRO INESPERADO NO ENVIO: {e}")
+        st.error(f"Erro inesperado no envio de email: {e}")
+        return 500
+
 @app.route("/auth", methods=["POST"])
 def login():
     data = request.get_json()
