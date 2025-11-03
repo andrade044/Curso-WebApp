@@ -198,7 +198,7 @@ def send_reset_email(destinatario: str, nome_usuario: str, token: str) -> int:
     Envia o e-mail de redefinição de senha com o link e o token.
     """
     # 1. Cria o link de redefinição (usa a URL_BASE + o caminho para a página Streamlit)
-    link_redefinicao = f"{URL_BASE_ATIVACAO}/7_rec_senha?token={token}"
+    link_redefinicao = f"{URL_BASE_ATIVACAO}/rec_senha?token={token}"
     
     email_html = f"""
     <html>
