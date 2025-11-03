@@ -107,7 +107,7 @@ def show_reset_form(token):
             if response.status_code == 200:
                 st.balloons()
                 status_message.success("🥳 Senha redefinida com sucesso! Você pode fazer login agora.")
-                st.page_link("app.py", label="Ir para a tela de Login", icon="🚪")
+                st.page_link("Home.py", label="Ir para a tela de Login", icon="🚪")
                 st.stop()
             else:
                 error_msg = response.json().get('message', "Erro ao redefinir a senha.")
