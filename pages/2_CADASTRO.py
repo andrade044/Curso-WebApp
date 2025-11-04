@@ -95,11 +95,12 @@ def tela_cadastro():
             submit_button = st.form_submit_button(label='Cadastrar')    
         
         with col4:
-            login_button = st.form_submit_button(label='Fazer login') 
-                
-            if login_button:
-                switch_page = st.page_link("Home.py", label="Fazer login") 
-                switch_page == True
+            st.markdown(
+                '<div style="text-align: right;">'
+                '   <a href="/" target="_self">Já tem conta? Fazer Login</a>'
+                '</div>', 
+                unsafe_allow_html=True
+            )
             
             
     if submit_button:
