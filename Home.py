@@ -128,13 +128,13 @@ def tela_login():
         senha = st.text_input("Senha", type="password", key="login_senha")
         submitted = st.form_submit_button("Entrar")
         
-        col1, col2,col3, col4 = st.columns(4)
+        col1,col2 = st.columns(2[0.9, 0.1])
 
 
         with col1:
             st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? [Cadastre-se aqui]")
         
-        with col4:
+        with col2:
             st.page_link("pages/7_rec_senha.py", label="Esqueceu a senha?")
 
 
