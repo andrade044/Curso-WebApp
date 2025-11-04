@@ -128,7 +128,7 @@ def tela_login():
         senha = st.text_input("Senha", type="password", key="login_senha")
         submitted = st.form_submit_button("Entrar")
         
-        col1, col2,col3, col4 = st.columns([1, 6, 1, 1])
+        col1, col2,col3, col4 = st.columns([1, 3, 3, 1])
 
 
         with col1:
