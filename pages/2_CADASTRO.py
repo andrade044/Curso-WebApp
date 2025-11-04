@@ -95,7 +95,7 @@ def tela_cadastro():
             submit_button = st.form_submit_button(label='Cadastrar')    
         
         with col4:
-            login_button = st.form_submit_button(label='Fazerlogin') 
+            login_button = st.form_submit_button(label='Fazer login') 
                 
             if login_button:
                 switch_page = st.page_link("Home.py", label="Fazer login") 
