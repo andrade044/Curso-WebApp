@@ -91,22 +91,13 @@ def tela_cadastro():
         
         col1, col3 ,col4 = st.columns([2, 5, 1])
 
-
         with col1:
-            
             submit_button = st.form_submit_button(label='Cadastrar')    
         
         with col4:
-            login_button = st.form_submit_button(label='Fazer login') 
+            st.page_link("Home.py", label="Fazer login") 
             
             
-    if login_button:
-        st.swicth_page("Home.py")
-
-
-
-
-
     if submit_button:
         erros = False
         
