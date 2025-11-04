@@ -89,7 +89,19 @@ def tela_cadastro():
         senha_input = st.text_input(label="Senha", type="password")
         confirma_senha_input = st.text_input(label="Confirma senha", type="password")
         
-        submit_button = st.form_submit_button(label='Cadastrar')
+        col1, col3 ,col4 = st.columns([2, 5, 1])
+
+
+        with col1:
+            
+            submit_button = st.form_submit_button(label='Cadastrar')    
+        
+        with col4:
+            st.page_link("Home.py", label="Fazer login")
+
+
+
+
 
     if submit_button:
         erros = False
