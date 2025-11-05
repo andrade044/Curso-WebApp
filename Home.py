@@ -135,7 +135,7 @@ def tela_login():
             st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? [Cadastre-se aqui]")
         
         with col4:
-            st.page_link("pages/7_rec_senha.py", label="Esqueceu a senha?")
+            st.page_link("pages/_7_rec_senha.py", label="Esqueceu a senha?")
 
 
     if submitted:
