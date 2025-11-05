@@ -60,7 +60,7 @@ st.markdown("""
 st.markdown("""
 <style>
     /* Esconde o link da página de Cadastro (Supondo que o href contenha 'cadastro') */
-    [data-testid="stSidebarNav"] a[href*="cadastro"] {
+    [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
         display: none !important;
     }
 

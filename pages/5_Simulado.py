@@ -42,7 +42,7 @@ if 'user_email' not in st.session_state:
 st.markdown("""
 <style>
     /* Esconde o link da página de Cadastro (Supondo que o href contenha 'cadastro') */
-    [data-testid="stSidebarNav"] a[href*="cadastro"] {
+    [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
         display: none !important;
     }
 
@@ -51,9 +51,10 @@ st.markdown("""
         display: none !important;
     }
 
-    /* Esconde o link da página Home (Supondo que o href contenha 'home') */
-    [data-testid="stSidebarNav"] a[href*="Home"] {
-        display: none !important;
+    
+    [data-testid="stSidebarNav"] li:first-child a { 
+        display: none !important; 
+    }
     }
 
     /* Esconde o link da página de Pagamento (Supondo que o href contenha 'pagamento') */
