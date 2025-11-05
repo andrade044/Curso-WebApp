@@ -50,19 +50,7 @@ st.set_page_config(
 # </style>
 # """, unsafe_allow_html=True)
 
-st.markdown("""
-<style>
-    /* Esconde o link da página de Cadastro (Página 2) */
-    [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
-        display: none !important;
-    }
 
-    /* Esconde o link da página de Recuperação de Senha (Página 7) */
-    [data-testid="stSidebarNav"] a[href*="rec_senha"] {
-        display: none !important;
-    }
-</style>
-""", unsafe_allow_html=True)
     
 # --- Configuração do Banco de Dados SQLite ---
 
