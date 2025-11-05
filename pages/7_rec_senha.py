@@ -52,8 +52,8 @@ st.markdown("""
     }
 
     /* Esconde o link da página Home (Supondo que o href contenha 'home') */
-    [data-testid="stSidebarNav"] a[href*="Home"] {
-        display: none !important;
+    [data-testid="stSidebarNav"] li:first-child a { 
+    * display: none !important;
     }
 
 </style>
