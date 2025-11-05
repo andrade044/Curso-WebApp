@@ -67,13 +67,23 @@ st.markdown("""
 
 st.markdown("""
 <style>
-    /* Esconde o link da página de Cadastro (Página 2) */
-    [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
+    /* Esconde o link da página de Cadastro (Supondo que o href contenha 'cadastro') */
+    [data-testid="stSidebarNav"] a[href*="cadastro"] {
         display: none !important;
     }
 
-    /* Esconde o link da página de Recuperação de Senha (Página 7) */
+    /* Esconde o link da página de Recuperação de Senha (Supondo que o href contenha 'rec_senha') */
     [data-testid="stSidebarNav"] a[href*="rec_senha"] {
+        display: none !important;
+    }
+
+    /* Esconde o link da página Home (Supondo que o href contenha 'home') */
+    [data-testid="stSidebarNav"] a[href*="Home"] {
+        display: none !important;
+    }
+
+    /* Esconde o link da página de Pagamento (Supondo que o href contenha 'pagamento') */
+    [data-testid="stSidebarNav"] a[href*="Pagamento"] {
         display: none !important;
     }
 </style>

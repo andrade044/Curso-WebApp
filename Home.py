@@ -62,6 +62,31 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+    /* Esconde o link da página de Cadastro (Supondo que o href contenha 'cadastro') */
+    [data-testid="stSidebarNav"] a[href*="cadastro"] {
+        display: none !important;
+    }
+
+    /* Esconde o link da página de Recuperação de Senha (Supondo que o href contenha 'rec_senha') */
+    [data-testid="stSidebarNav"] a[href*="rec_senha"] {
+        display: none !important;
+    }
+
+    /* Esconde o link da página Home (Supondo que o href contenha 'home') */
+    [data-testid="stSidebarNav"] a[href*="Home"] {
+        display: none !important;
+    }
+
+    /* Esconde o link da página de Pagamento (Supondo que o href contenha 'pagamento') */
+    [data-testid="stSidebarNav"] a[href*="Pagamento"] {
+        display: none !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+    
+
 # Inicializa o session_state para controlar o estado do login
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
