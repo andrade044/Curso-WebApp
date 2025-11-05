@@ -69,9 +69,10 @@ st.markdown("""
         display: none !important;
     }
 
-    /* Esconde o link da página Home (Supondo que o href contenha 'home') */
-    [data-testid="stSidebarNav"] a[href*="Home"] {
+    
+    [data-testid="stSidebarNav"] a[href*="home"] {
         display: none !important;
+    }
     }
 
     /* Esconde o link da página de Pagamento (Supondo que o href contenha 'pagamento') */
