@@ -205,6 +205,30 @@ def tela_pagamento():
         st.write("Libere o Módulo 2 e todos os Simulados com pagamento único.")
         
         # --- Botão para iniciar o Checkout ---
+        with st.spinner("Gerando link de pagamento seguro..."):
+                link_pagamento = criar_preferencia_pagamento()
+            
+        if link_pagamento:
+                # 2. Redireciona o usuário (Usando HTML para abertura segura)
+                st.session_state['payment_link'] = link_pagamento
+                
+                # Usando um componente Streamlit para ser mais limpo, se possível, 
+                # ou mantendo o HTML para o link de checkout:
+                st.markdown(f"""
+                    <a href="{link_pagamento}" target="_blank" style="text-decoration: none;">
+                        <button style="background-color:#009ee3; color:white; padding: 10px 20px; border:none; border-radius:5px; font-size: 16px; cursor: pointer;">
+                            Ir para o Checkout de Pagamento Seguro 🔒
+                        </button>
+                    </a>
+                """, unsafe_allow_html=True)
+                
+                st.info("Você será redirecionado para o ambiente seguro do Mercado Pago para concluir a transação.")
+        else:
+                st.error("Não foi possível iniciar o processo de pagamento. Tente novamente mais tarde.")
+
+        st.markdown("---")
+        
+        
         if st.button("Pagar com Mercado Pago", key="mp_checkout_button"):
             
             # 1. Cria a Preferência e Obtém o Link

@@ -130,6 +130,8 @@ def tela_curso():
         st.success("🎉 Conteúdo premium desbloqueado!")
     else:
         st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
+        if st.button("💰 Desbloquear Conteúdo Premium Agora", use_container_width=True):
+            st.switch_page("pages/6_Pagamento.py")
     # 2.2. Botão de Logout (Consolidado)
 
     st.markdown("---")
