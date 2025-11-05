@@ -53,7 +53,7 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* Esconde o link da página de Cadastro (Página 2) */
-    [data-testid="stSidebarNav"] a[href*="2_CADASTRO"] {
+    [data-testid="stSidebarNav"] a[href*="pages/2_CADASTRO"] {
         display: none !important;
     }
 
