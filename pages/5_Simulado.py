@@ -235,7 +235,7 @@ def tela_simulados():
         st.subheader("Para realizar os simulados, você precisa ser um Assinante Premium.")
         st.info("Acesse a aba 'Pagamento' para liberar este conteúdo.")
         if st.button("💰 Desbloquear Conteúdo Premium Agora", use_container_width=True):
-            st.switch_page("pages/5_Pagamento.py")
+            st.switch_page("pages/6_Pagamento.py")
         return # Interrompe a função aqui, não exibindo o quiz.
     
     # --------------------------------------------------------------------------
