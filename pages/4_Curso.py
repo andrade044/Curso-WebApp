@@ -66,9 +66,9 @@ st.markdown("""
     * A regra a[href*="home"] só funciona se o arquivo raiz for nomeado 'home.py' ou similar.
     * * SE O ARQUIVO PRINCIPAL NÃO ESTIVER ESCONDENDO, use a regra abaixo, 
     * que mira o primeiro item da lista de navegação:
-    * * [data-testid="stSidebarNav"] li:first-child a { 
-    * display: none !important; 
-    * }
+     * [data-testid="stSidebarNav"] li:first-child a { 
+        display: none !important; 
+    }
     */
     [data-testid="stSidebarNav"] a[href*="Home"] {
         display: none !important;
