@@ -108,6 +108,7 @@ def verifica_assinante():
     """
     if not st.session_state['logged_in'] or not st.session_state['token']:
         st.warning("Você precisa estar logado para acessar esta página.")
+        st.page_link("Home.py", label="Voltar para tela de login")
         st.stop()
 
     headers = {"Authorization": st.session_state['token']}
