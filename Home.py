@@ -102,6 +102,19 @@ if 'quiz_finished' not in st.session_state:
 if 'user_answer' not in st.session_state:
     st.session_state['user_answer'] = None
 
+st.markdown("""
+<style>
+    /* Esconde o link da página de Cadastro (Página 2) */
+    [data-testid="stSidebarNav"] a[href*="2_CADASTRO"] {
+        display: none !important;
+    }
+
+    /* Esconde o link da página de Recuperação de Senha (Página 7) */
+    [data-testid="stSidebarNav"] a[href*="7_rec_senha"] {
+        display: none !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 
 def tela_login():
@@ -132,10 +145,10 @@ def tela_login():
 
 
         with col1:
-            st.page_link("pages/_cadastro.py", label="Novo por aqui? [Cadastre-se aqui]")
+            st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? [Cadastre-se aqui]")
         
         with col4:
-            st.page_link("pages/_rec_senha.py", label="Esqueceu a senha?")
+            st.page_link("pages/7_rec_senha.py", label="Esqueceu a senha?")
 
 
     if submitted:
