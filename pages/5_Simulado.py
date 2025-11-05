@@ -39,6 +39,24 @@ if 'user_email' not in st.session_state:
     st.session_state['user_email'] = None
 
 
+    
+
+st.set_page_config(
+    page_title="Simulado",
+    page_icon="🚗",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
+
+# Adiciona um CSS para esconder os botões de menu e footer, se necessário
+st.markdown("""
+<style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+</style>
+""", unsafe_allow_html=True)
+
 st.markdown("""
 <style>
     /* Esconde o link da página de Cadastro (Supondo que o href contenha 'cadastro') */
@@ -61,23 +79,6 @@ st.markdown("""
     [data-testid="stSidebarNav"] a[href*="Pagamento"] {
         display: none !important;
     }
-</style>
-""", unsafe_allow_html=True)
-    
-
-st.set_page_config(
-    page_title="Simulado",
-    page_icon="🚗",
-    layout="wide",
-    initial_sidebar_state="collapsed"
-)
-
-# Adiciona um CSS para esconder os botões de menu e footer, se necessário
-st.markdown("""
-<style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
