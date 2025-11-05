@@ -50,7 +50,19 @@ st.set_page_config(
 # </style>
 # """, unsafe_allow_html=True)
 
+st.markdown("""
+<style>
+    /* Esconde o link da página de Cadastro (Página 2) */
+    [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
+        display: none !important;
+    }
 
+    /* Esconde o link da página de Recuperação de Senha (Página 7) */
+    [data-testid="stSidebarNav"] a[href*="rec_senha"] {
+        display: none !important;
+    }
+</style>
+""", unsafe_allow_html=True)
     
 # --- Configuração do Banco de Dados SQLite ---
 
@@ -78,20 +90,7 @@ except Exception as e:
 nome_usuario = st.session_state['user_nome']
 
 def tela_curso():
-    st.markdown("""
-<style>
-    /* Esconde o link da página de Cadastro (Página 2) */
-    [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
-        display: none !important;
-    }
-
-    /* Esconde o link da página de Recuperação de Senha (Página 7) */
-    [data-testid="stSidebarNav"] a[href*="rec_senha"] {
-        display: none !important;
-    }
-</style>
-""", unsafe_allow_html=True)
-    
+  
     """Conteúdo do Curso (Acesso Condicional e Protegido)."""
 
     # 1. GUARDA DE LOGIN (CRÍTICO)
