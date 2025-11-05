@@ -45,17 +45,17 @@ st.markdown("""
     [data-testid="stSidebarNav"] a[href*="rec_senha"] {
         display: none !important;
     }
-
     
-    [data-testid="stSidebarNav"] li:first-child a { 
-        display: none !important; 
-    }
-    }
-
     /* Esconde o link da página de Pagamento (Supondo que o href contenha 'pagamento') */
     [data-testid="stSidebarNav"] a[href*="Pagamento"] {
         display: none !important;
     }
+
+    /* Esconde o link da página Home (Supondo que o href contenha 'home') */
+    [data-testid="stSidebarNav"] a[href*="Home"] {
+        display: none !important;
+    }
+
 </style>
 """, unsafe_allow_html=True)
     
