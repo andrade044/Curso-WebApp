@@ -70,8 +70,8 @@ st.markdown("""
     }
 
     
-    [data-testid="stSidebarNav"] a[href*="Home"] {
-        display: none !important;
+    [data-testid="stSidebarNav"] li:first-child a { 
+        display: none !important; 
     }
     }
 
