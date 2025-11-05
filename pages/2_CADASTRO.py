@@ -70,7 +70,7 @@ st.markdown("""
     }
 
     
-    [data-testid="stSidebarNav"] a[href*="home"] {
+    [data-testid="stSidebarNav"] a[href*="Home"] {
         display: none !important;
     }
     }
