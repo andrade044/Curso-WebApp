@@ -52,7 +52,7 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* Esconde o link da página de Cadastro (Supondo que o href contenha 'cadastro') */
+    /* Esconde o link da página de Cadastro (Usando a capitalização 'CADASTRO') */
     [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
         display: none !important;
     }
@@ -62,25 +62,20 @@ st.markdown("""
         display: none !important;
     }
 
-    /* * Esconde o link da página Home (Raiz)
-    * A regra a[href*="home"] só funciona se o arquivo raiz for nomeado 'home.py' ou similar.
-    * * SE O ARQUIVO PRINCIPAL NÃO ESTIVER ESCONDENDO, use a regra abaixo, 
-    * que mira o primeiro item da lista de navegação:
+    /* FIX DEFINITIVO: Esconde a página Home (Arquivo principal/raiz). 
+       Este seletor mira o PRIMEIRO item da lista de navegação (li:first-child), 
+       o que é garantido para funcionar na Home. */
     [data-testid="stSidebarNav"] li:first-child a { 
         display: none !important; 
     }
-    */
-    [data-testid="stSidebarNav"] a[href*="Home"] {
-        display: none !important;
-    }
 
-    /* Esconde o link da página de Pagamento (Supondo que o href contenha 'pagamento') */
+    /* Esconde o link da página de Pagamento (Usando a capitalização 'Pagamento') */
     [data-testid="stSidebarNav"] a[href*="Pagamento"] {
         display: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
-    
+
 # --- Configuração do Banco de Dados SQLite ---
 
 
