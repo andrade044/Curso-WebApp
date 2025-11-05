@@ -61,17 +61,23 @@ st.markdown("""
     [data-testid="stSidebarNav"] a[href*="rec_senha"] {
         display: none !important;
     }
-    
+
+    /* * Esconde o link da página Home (Raiz)
+    * A regra a[href*="home"] só funciona se o arquivo raiz for nomeado 'home.py' ou similar.
+    * * SE O ARQUIVO PRINCIPAL NÃO ESTIVER ESCONDENDO, use a regra abaixo, 
+    * que mira o primeiro item da lista de navegação:
+    * * [data-testid="stSidebarNav"] li:first-child a { 
+    * display: none !important; 
+    * }
+    */
+    [data-testid="stSidebarNav"] a[href*="Home"] {
+        display: none !important;
+    }
+
     /* Esconde o link da página de Pagamento (Supondo que o href contenha 'pagamento') */
     [data-testid="stSidebarNav"] a[href*="Pagamento"] {
         display: none !important;
     }
-
-    /* Esconde o link da página Home (Supondo que o href contenha 'home') */
-    [data-testid="stSidebarNav"] li:first-child a { 
-    * display: none !important;
-    }
-
 </style>
 """, unsafe_allow_html=True)
     
@@ -80,6 +86,7 @@ st.markdown("""
 
 if 'logged_in' not in st.session_state or not st.session_state['logged_in']:
     st.warning("Você precisa estar logado para acessar esta página.")
+    st.page_link("Home.py", label="Voltar para tela de login")
     st.stop()
 
 # Se quiser, podemos validar o token direto na API
