@@ -69,11 +69,6 @@ if 'user_email' not in st.session_state:
     st.session_state['user_email'] = None
 
 
-# --- Configuração do Banco de Dados SQLite ---
-DB_NAME = 'usuarios.db'
-
-
-
 
 def validar_cpf(cpf):
     cpf = re.sub(r'[^0-9]', '', cpf)

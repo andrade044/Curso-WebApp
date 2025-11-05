@@ -32,8 +32,22 @@ st.markdown("""
     header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
-# --- Funções de UI ---
 
+
+st.markdown("""
+<style>
+    /* Esconde o link da página de Cadastro (Página 2) */
+    [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
+        display: none !important;
+    }
+
+    /* Esconde o link da página de Recuperação de Senha (Página 7) */
+    [data-testid="stSidebarNav"] a[href*="rec_senha"] {
+        display: none !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+    
 
 def tela_redefinir_senha():
     """

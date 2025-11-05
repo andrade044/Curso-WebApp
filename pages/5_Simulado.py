@@ -39,8 +39,20 @@ if 'user_email' not in st.session_state:
     st.session_state['user_email'] = None
 
 
-# --- Configuração do Banco de Dados SQLite ---
-DB_NAME = 'usuarios.db'
+st.markdown("""
+<style>
+    /* Esconde o link da página de Cadastro (Página 2) */
+    [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
+        display: none !important;
+    }
+
+    /* Esconde o link da página de Recuperação de Senha (Página 7) */
+    [data-testid="stSidebarNav"] a[href*="rec_senha"] {
+        display: none !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+    
 
 st.set_page_config(
     page_title="Simulado",
@@ -222,6 +234,8 @@ def tela_simulados():
         st.warning("🔒 **ACESSO RESTRITO.**")
         st.subheader("Para realizar os simulados, você precisa ser um Assinante Premium.")
         st.info("Acesse a aba 'Pagamento' para liberar este conteúdo.")
+        if st.button("💰 Desbloquear Conteúdo Premium Agora", use_container_width=True):
+            st.switch_page("pages/5_Pagamento.py")
         return # Interrompe a função aqui, não exibindo o quiz.
     
     # --------------------------------------------------------------------------

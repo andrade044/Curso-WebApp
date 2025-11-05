@@ -117,7 +117,6 @@ def tela_curso():
         st.success("🎉 Conteúdo premium desbloqueado!")
     else:
         st.warning("🔒 Conteúdo premium bloqueado. Faça upgrade para acessar.")
-    
     # 2.2. Botão de Logout (Consolidado)
 
     st.markdown("---")
