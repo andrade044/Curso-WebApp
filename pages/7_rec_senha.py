@@ -36,7 +36,7 @@ st.markdown("""
 
 st.markdown("""
 <style>
-    /* Esconde o link da página de Cadastro (Supondo que o href contenha 'cadastro') */
+    /* Esconde o link da página de Cadastro (Usando a capitalização 'CADASTRO') */
     [data-testid="stSidebarNav"] a[href*="CADASTRO"] {
         display: none !important;
     }
@@ -45,17 +45,18 @@ st.markdown("""
     [data-testid="stSidebarNav"] a[href*="rec_senha"] {
         display: none !important;
     }
-    
-    /* Esconde o link da página de Pagamento (Supondo que o href contenha 'pagamento') */
+
+    /* FIX DEFINITIVO: Esconde a página Home (Arquivo principal/raiz). 
+       Este seletor mira o PRIMEIRO item da lista de navegação (li:first-child), 
+       o que é garantido para funcionar na Home. */
+    [data-testid="stSidebarNav"] li:first-child a { 
+        display: none !important; 
+    }
+
+    /* Esconde o link da página de Pagamento (Usando a capitalização 'Pagamento') */
     [data-testid="stSidebarNav"] a[href*="Pagamento"] {
         display: none !important;
     }
-
-    /* Esconde o link da página Home (Supondo que o href contenha 'home') */
-    [data-testid="stSidebarNav"] li:first-child a { 
-    * display: none !important;
-    }
-
 </style>
 """, unsafe_allow_html=True)
     
