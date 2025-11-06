@@ -281,7 +281,8 @@ def tela_curso():
             st.warning("🔒 **CONTEÚDO EXCLUSIVO PARA ASSINANTES.**")
             st.write("Adquira sua assinatura para liberar este e outros módulos avançados.")
 
-    if st.button("Sair da Conta"):
+    if st.button("Sair da Conta",
+                 type="primary"):
         logout()
         st.success("Você saiu da conta. Redirecionando...")
         # Usa switch_page para redirecionar para o login/home
