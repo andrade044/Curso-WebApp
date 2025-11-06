@@ -353,6 +353,10 @@ def tela_simulados():
         st.markdown("---")
         st.caption(f"Score atual: {st.session_state['score']}")     
     
+    if st.button("Voltar ao Curso"):
+        st.switch_page("pages/4_Curso.py")
+
+
     if st.button("Sair"):
         logout()
         
