@@ -357,7 +357,7 @@ def tela_simulados():
         st.switch_page("pages/4_Curso.py")
 
 
-    if st.button("Sair"):
+    if st.button("Sair",type="primary"):
         logout()
         
 tela_simulados()
