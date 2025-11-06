@@ -218,7 +218,7 @@ def tela_login():
                 status_message.error(error_msg)
 
         except requests.exceptions.RequestException:
-            status_message.error("Erro de conexão com o servidor. Verifique se a API está online.")
+            status_message.error("Erro de conexão com o servidor. Verifique se o servidor está online.")
 
     
     return

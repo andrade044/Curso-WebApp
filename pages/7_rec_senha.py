@@ -116,7 +116,7 @@ def show_forgot_form():
                 status_message.error(error_msg)
 
         except requests.exceptions.RequestException:
-            status_message.error("Erro de conexão. Verifique se a API está online.")
+            status_message.error("Erro de conexão. Verifique se o servidor está online.")
 
 # --- Formulário de Redefinição de Senha (/reset_password) ---
 
@@ -162,7 +162,7 @@ def show_reset_form(token):
                 status_message.error(error_msg)
                 
         except requests.exceptions.RequestException:
-            status_message.error("Erro de conexão. Verifique se a API está online.")
+            status_message.error("Erro de conexão. Verifique se o servidor está online.")
 
 
 # --- Execução ---
