@@ -162,12 +162,12 @@ def tela_curso():
             st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
             # VÍDEO 2.1 (PAGO)
-            with st.expander("🔒 Aula 2.1: Introdução a direção defensiva"):
+            with st.expander("▶️ Aula 2.1: Introdução a direção defensiva"):
                 st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Detalhamento sobre hasheamento de senhas e proteção contra ameaças.")
 
             # VÍDEO 2.2 (PAGO)
-            with st.expander("🔒 Aula 2.2: Integração com Bancos NoSQL e Desempenho"):
+            with st.expander("▶️ Aula 2.2: Integração com Bancos NoSQL e Desempenho"):
                 # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
                 # e que arquivos grandes podem ser lentos em deploys como o Render.
                 try:
@@ -182,15 +182,15 @@ def tela_curso():
             st.write("Material complementar e exercícios práticos do Módulo 2.")
 
 
-        with st.expander("👑 Módulo 3: Legislação de trânsito ", expanded=False):
-            st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
+        with st.expander("▶️ Módulo 3: Legislação de trânsito ", expanded=False):
+            # st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
-            with st.expander("🔒 Aula 3.1: Introdução a direção defensiva"):
+            with st.expander("▶️ Aula 3.1: Introdução a direção defensiva"):
                 st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Tudo sobre Legislação de Transito.")
 
             # VÍDEO 2.2 (PAGO)
-            with st.expander("🔒 Aula 3.2: Legislação Generico!"):
+            with st.expander("▶️ Aula 3.2: Legislação Generico!"):
                 # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
                 # e que arquivos grandes podem ser lentos em deploys como o Render.
                 try:
@@ -206,14 +206,14 @@ def tela_curso():
 
 
         with st.expander("👑 Módulo 4: Primeiros socorros ", expanded=False):
-            st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
+            # st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
-            with st.expander("🔒 Aula 4.1: Introdução a Primeiros socorros!"):
+            with st.expander("▶️ Aula 4.1: Introdução a Primeiros socorros!"):
                 st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Tudo sobre Legislação de Transito.")
 
             # VÍDEO 2.2 (PAGO)
-            with st.expander("🔒 Aula 4.2: Legislação Generico!"):
+            with st.expander("▶️ Aula 4.2: Legislação Generico!"):
                 # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
                 # e que arquivos grandes podem ser lentos em deploys como o Render.
                 try:
@@ -229,14 +229,14 @@ def tela_curso():
 
 
         with st.expander("👑 Módulo 5: Mecânica ", expanded=False):
-            st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
+            # st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
-            with st.expander("🔒 Aula 5.1: Introdução a Mecânica Básica !"):
+            with st.expander("▶️ Aula 5.1: Introdução a Mecânica Básica !"):
                 st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Tudo sobre Legislação de Transito.")
 
             # VÍDEO 2.2 (PAGO)
-            with st.expander("🔒 Aula 5.2: Mecânica Generica !"):
+            with st.expander("▶️ Aula 5.2: Mecânica Generica !"):
                 # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
                 # e que arquivos grandes podem ser lentos em deploys como o Render.
                 try:
@@ -252,14 +252,14 @@ def tela_curso():
 
 
         with st.expander("👑 Módulo 6: Meio ambiente e cidadania ", expanded=False):
-            st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
+            # st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
-            with st.expander("🔒 Aula 6.1: Introdução a Meio ambiente !"):
+            with st.expander("▶️ Aula 6.1: Introdução a Meio ambiente !"):
                 st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Tudo sobre Legislação de Transito.")
 
             # VÍDEO 2.2 (PAGO)
-            with st.expander("🔒 Aula 6.2: Meio Ambiente Generica !"):
+            with st.expander("▶️ Aula 6.2: Meio Ambiente Generica !"):
                 # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
                 # e que arquivos grandes podem ser lentos em deploys como o Render.
                 try:
