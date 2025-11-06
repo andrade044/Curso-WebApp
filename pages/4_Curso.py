@@ -158,7 +158,7 @@ def tela_curso():
     # 4. MÓDULO 2: CONTEÚDO PAGO (Acesso Condicional)
     if verifica_assinante():
         # CONTEÚDO LIBERADO
-        with st.expander("👑 Módulo 2: Direção Defensiva", expanded=False):
+        with st.expander("📝 Módulo 2: Direção Defensiva", expanded=False):
             st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
             # VÍDEO 2.1 (PAGO)
@@ -190,7 +190,7 @@ def tela_curso():
                 st.write("Descrição: Tudo sobre Legislação de Transito.")
 
             # VÍDEO 2.2 (PAGO)
-            with st.expander("▶ Aula 3.2: Legislação Generico!"):
+            with st.expander("▶️ Aula 3.2: Legislação Generico!"):
                 # Aviso: Lembre-se que 'video.mp4' deve estar no mesmo diretório ou caminho correto 
                 # e que arquivos grandes podem ser lentos em deploys como o Render.
                 try:
@@ -205,10 +205,10 @@ def tela_curso():
             st.write("Material complementar e exercícios práticos do Módulo 3.")
 
 
-        with st.expander("👑 Módulo 4: Primeiros socorros ", expanded=False):
+        with st.expander("📝 Módulo 4: Primeiros socorros ", expanded=False):
             # st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
-            with st.expander(" Aula 4.1: Introdução a Primeiros socorros!"):
+            with st.expander("▶️ Aula 4.1: Introdução a Primeiros socorros!"):
                 st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Tudo sobre Legislação de Transito.")
 
@@ -228,7 +228,7 @@ def tela_curso():
             st.write("Material complementar e exercícios práticos do Módulo 4.")
 
 
-        with st.expander("👑 Módulo 5: Mecânica ", expanded=False):
+        with st.expander("📝 Módulo 5: Mecânica ", expanded=False):
             # st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
             with st.expander("▶️ Aula 5.1: Introdução a Mecânica Básica !"):
@@ -251,7 +251,7 @@ def tela_curso():
             st.write("Material complementar e exercícios práticos do Módulo 5.")
 
 
-        with st.expander("👑 Módulo 6: Meio ambiente e cidadania ", expanded=False):
+        with st.expander("📝 Módulo 6: Meio ambiente e cidadania ", expanded=False):
             # st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
             with st.expander("▶️ Aula 6.1: Introdução a Meio ambiente !"):
