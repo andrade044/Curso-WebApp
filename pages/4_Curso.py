@@ -182,7 +182,7 @@ def tela_curso():
             st.write("Material complementar e exercícios práticos do Módulo 2.")
 
 
-        with st.expander("▶️ Módulo 3: Legislação de trânsito ", expanded=False):
+        with st.expander("📝 Módulo 3: Legislação de trânsito ", expanded=False):
             # st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
             
             with st.expander("▶️ Aula 3.1: Introdução a direção defensiva"):
