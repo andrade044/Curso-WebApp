@@ -123,6 +123,7 @@ def verifica_assinante():
         else:
             st.warning("Sessão inválida ou expirada. Faça login novamente.")
             st.session_state['logged_in'] = False
+            st.switch_page("Home.py") 
             st.stop()
     except Exception as e:
         st.error(f"Erro ao verificar assinatura: {e}")
