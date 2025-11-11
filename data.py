@@ -1,0 +1,1 @@
+SIMULADO_DATA = {}

@@ -1,7 +1,8 @@
 import streamlit as st
 import os 
+from dotenv import load_dotenv
 import pandas as pd 
-
+import numpy as np
 
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA

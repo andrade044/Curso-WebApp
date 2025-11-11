@@ -18,9 +18,9 @@ import secrets
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 # from api_mercadopago import api_pagamento
-from data import SIMULADO_DATA
+
 import sendgrid
-from auth import verifica_login, verifica_assinante, logout
+
 from python_http_client.exceptions import BadRequestsError
 from typing import Optional, Tuple, Dict, Any
 
