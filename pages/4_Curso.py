@@ -1,7 +1,7 @@
 import streamlit as st
 import os 
 import requests
-from auth import verifica_login, logout, verifica_assinante
+from auth import logout, verifica_assinante
 
 def get_secret(key, default=None):
     

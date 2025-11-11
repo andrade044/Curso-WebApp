@@ -1,13 +1,12 @@
 import streamlit as st
 import os 
-from dotenv import load_dotenv
 import pandas as pd 
-import numpy as np
+
 
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
 
-from auth import verifica_login, verifica_assinante, logout
+from auth import verifica_assinante, logout
 def get_secret(key, default=None):
     
     # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
