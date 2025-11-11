@@ -229,7 +229,7 @@ def tela_pagamento():
         # st.markdown("---")
         
         
-        if st.button("Pagar com Mercado Pago",):
+        if st.button("Pagar com Mercado Pago"):
             
             # 1. Cria a Preferência e Obtém o Link
             with st.spinner("Gerando link de pagamento seguro..."):
