@@ -323,7 +323,7 @@ def tela_simulados():
                     if os.path.exists(img_path):
                         with cols[i]:
                             # Exibe a imagem com uma largura fixa para melhor visualização
-                            st.image(img_path, caption=img_filename, width=500)
+                            st.image(img_path, caption=img_filename, width=400)
                     else:
                         st.warning(f"Imagem não encontrada: {img_filename}")
         # --- FIM DO NOVO BLOCO ---
