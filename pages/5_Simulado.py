@@ -125,6 +125,16 @@ def proxima_pergunta():
     if st.session_state['current_question'] >= len(SIMULADO_DATA):
         st.session_state['quiz_finished'] = True
 
+def questao_anterior():
+    """Volta para a questão anterior, se não for a primeira."""
+    # Garante que não volta para um índice negativo (mínimo é 0)
+    if st.session_state['current_question'] > 0:
+        st.session_state['current_question'] -= 1
+        st.session_state['user_answer'] = None # Limpa a resposta, forçando a seleção novamente
+        st.rerun() # Recarrega a página para exibir a nova questão
+    else:
+        # Opcional: Avisar o usuário se ele já está na primeira questão
+        st.toast("Você já está na primeira questão!", icon='⚠️')
 
 # --- Lógica para o caminho do arquivo (necessária fora da função cacheada) ---
 dir_atual_script = os.path.dirname(os.path.abspath(__file__))
@@ -341,7 +351,28 @@ def tela_simulados():
         st.session_state['user_answer'] = resposta_selecionada 
 
         # Botão para Avançar
-        proxima_texto = "Finalizar Simulado" if indice_atual == len(SIMULADO_DATA) - 1 else "Próxima Questão"
+        col_ant, col_prox = st.columns([1, 1])
+        
+        # Botão "Questão Anterior"
+        # Só aparece se não for a primeira questão (índice_atual > 0)
+        if indice_atual > 0:
+            with col_ant:
+                st.button(
+                    "⬅️ Questão Anterior", 
+                    on_click=questao_anterior, 
+                    use_container_width=True,
+                    type="secondary"
+                )
+        
+        # Botão "Próxima Questão" ou "Finalizar Simulado"
+        proxima_texto = "✅ Finalizar Simulado" if indice_atual == len(SIMULADO_DATA) - 1 else "➡️ Próxima Questão"
+        
+        with col_prox:
+            st.button(
+                proxima_texto, 
+                on_click=proxima_pergunta, 
+                use_container_width=True,
+                type="primary")
         
         st.button(
             proxima_texto, 
