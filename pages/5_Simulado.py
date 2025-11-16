@@ -374,13 +374,6 @@ def tela_simulados():
                 use_container_width=True,
                 type="primary")
         
-        st.button(
-            proxima_texto, 
-            on_click=proxima_pergunta, 
-            use_container_width=True,
-            type="primary"
-        )
-        
         st.markdown("---")
         st.caption(f"Score atual: {st.session_state['score']}")     
     
