@@ -343,20 +343,6 @@ def tela_simulados():
         
         # Exibe as opções (Radio Button)
         # O valor do radio button é a chave (A, B, C, D)
-        resposta_salva = st.session_state['answers_history'].get(indice_atual)
-        options_keys = list(q['opcoes'].keys())
-
-        # Define o índice de pré-seleção. Se não há resposta salva, é None (-1).
-        index_selecionado = options_keys.index(resposta_salva) if resposta_salva in options_keys else 0
-
-        resposta_selecionada = st.radio(
-            "Sua Resposta:",
-            options=options_keys, 
-            index=index_selecionado, # Usando index para pré-selecionar
-            format_func=lambda key: f"{key} - {q['opcoes'][key]}", 
-            key=f"radio_{q['id']}"
-        )     
-        
         
         resposta_selecionada = st.radio(
             "Sua Resposta:",
