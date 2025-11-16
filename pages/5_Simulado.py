@@ -131,7 +131,7 @@ def questao_anterior():
     if st.session_state['current_question'] > 0:
         st.session_state['current_question'] -= 1
         st.session_state['user_answer'] = None # Limpa a resposta, forçando a seleção novamente
-        st.rerun()
+        # st.rerun()
     else:
         st.toast("Você já está na primeira questão!", icon='⚠️')
 # --- Lógica para o caminho do arquivo (necessária fora da função cacheada) ---
