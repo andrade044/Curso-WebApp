@@ -127,15 +127,18 @@ def proxima_pergunta():
 
 def questao_anterior():
     """Volta para a questão anterior, se não for a primeira."""
-    # Garante que não volta para um índice negativo (mínimo é 0)
+    
     if st.session_state['current_question'] > 0:
         st.session_state['current_question'] -= 1
-        st.session_state['user_answer'] = None # Limpa a resposta, forçando a seleção novamente
-        st.rerun() # Recarrega a página para exibir a nova questão
+        # Pré-seleciona a resposta do histórico (se existir)
+        indice_anterior = st.session_state['current_question']
+        
+        # Define 'user_answer' com a resposta do histórico
+        st.session_state['user_answer'] = st.session_state['answers_history'].get(indice_anterior)
+        
+        st.rerun() 
     else:
-        # Opcional: Avisar o usuário se ele já está na primeira questão
         st.toast("Você já está na primeira questão!", icon='⚠️')
-
 # --- Lógica para o caminho do arquivo (necessária fora da função cacheada) ---
 dir_atual_script = os.path.dirname(os.path.abspath(__file__))
 CAMINHO_CSV = os.path.join(dir_atual_script, '..', 'todos_simulados.csv')
