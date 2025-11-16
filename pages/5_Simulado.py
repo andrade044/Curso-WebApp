@@ -347,13 +347,8 @@ def tela_simulados():
         options_keys = list(q['opcoes'].keys())
 
         # Define o índice de pré-seleção. Se não há resposta salva, é None (-1).
-        try:
-            index_selecionado = options_keys.index(resposta_salva)
-        except ValueError:
-            # Se resposta_salva for None ou não estiver nas chaves (o que não deve ocorrer), 
-            # assume-se que a primeira opção (índice 0) deve ser selecionada.
-            index_selecionado = 0
-        
+        index_selecionado = options_keys.index(resposta_salva) if resposta_salva in options_keys else 0
+
         resposta_selecionada = st.radio(
             "Sua Resposta:",
             options=options_keys, 
@@ -363,7 +358,13 @@ def tela_simulados():
         )     
         
         
-      
+        resposta_selecionada = st.radio(
+            "Sua Resposta:",
+            options=q['opcoes'].keys(), 
+            format_func=lambda key: f"{key} - {q['opcoes'][key]}", 
+            key=f"radio_{q['id']}" # Garante uma chave única para o widget
+        )
+        
         # Armazena a resposta selecionada no state para uso na função de avanço
         st.session_state['user_answer'] = resposta_selecionada 
 
