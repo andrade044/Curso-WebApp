@@ -49,13 +49,13 @@ st.set_page_config(
 )
 
 # Adiciona um CSS para esconder os botões de menu e footer, se necessário
-st.markdown("""
-<style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-</style>
-""", unsafe_allow_html=True)
+# st.markdown("""
+# <style>
+#     #MainMenu {visibility: hidden;}
+#     footer {visibility: hidden;}
+#     header {visibility: hidden;}
+# </style>
+# """, unsafe_allow_html=True)
 
 st.markdown("""
 <style>
