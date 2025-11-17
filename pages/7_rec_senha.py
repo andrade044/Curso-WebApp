@@ -109,7 +109,6 @@ def show_forgot_form():
             status_message.error("Erro de conexão. Verifique se o servidor está online.")
 
 # --- Formulário de Redefinição de Senha (/reset_password) ---
-
 def show_reset_form(token):
     """Pede a nova senha, usa o token e chama a rota /reset_password."""
     st.subheader("Passo 2: Criar Nova Senha")

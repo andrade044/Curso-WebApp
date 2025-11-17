@@ -28,15 +28,12 @@ CHAVE_API_SENDGRID = get_secret('CHAVE_API_SENDGRID')
 EMAIL_REMETENTE =  get_secret('EMAIL_REMETENTE')
 TOKEN_LENGTH_BYTES= get_secret('TOKEN_LENGTH_BYTES')
 TOKEN_EXPIRATION_HOURS= get_secret('TOKEN_EXPIRATION_HOURS')
-
 URL_BASE_ATIVACAO = get_secret("URL_BASE_ATIVACAO") 
 MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
 MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
 URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
 URL_API_AUTH = get_secret("URL_API_AUTH")
 URL_CURSO = get_secret("URL_CURSO")
-
-
 
 
 if 'logged_in' not in st.session_state:
@@ -59,7 +56,6 @@ st.markdown("""
     header {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
-
 
 st.markdown("""
 <style>
@@ -141,7 +137,8 @@ def tela_pagamento():
                 st.info("Você será redirecionado para o ambiente seguro do Mercado Pago para concluir a transação.")
             else:
                 st.error("Não foi possível iniciar o processo de pagamento. Tente novamente mais tarde.")
-
+        st.page_link("4_Curso.py", label="Ir para a página do Curso")
+   
     st.markdown("---")
 
     # 5. BOTÃO DE LOGOUT (Consolidado)
