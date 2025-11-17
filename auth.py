@@ -1,6 +1,8 @@
 import streamlit as st
 import requests
 import os
+import mercadopago
+import uuid
 
 # URL do backend Flask
 def get_secret(key, default=None):
@@ -11,6 +13,24 @@ def get_secret(key, default=None):
     # 2. Tenta ler de os.environ (para Codespace/Local com .env)
     return os.getenv(key, default)
 
+MERCADO_PAGO_ACCESS_TOKEN = get_secret('MERCADO_PAGO_ACCESS_TOKEN')
+REFERENCIA_ASSINATURA = get_secret('REFERENCIA_ASSINATURA')
+
+VALOR_ASSINATURA = get_secret('VALOR_ASSINATURA') 
+VALOR_ASSINATURA = float(VALOR_ASSINATURA)
+TITULO_ASSINATURA = "Assinatura Premium do Curso de Python"
+
+CHAVE_API_SENDGRID = get_secret('CHAVE_API_SENDGRID')
+EMAIL_REMETENTE =  get_secret('EMAIL_REMETENTE')
+TOKEN_LENGTH_BYTES= get_secret('TOKEN_LENGTH_BYTES')
+TOKEN_EXPIRATION_HOURS= get_secret('TOKEN_EXPIRATION_HOURS')
+
+URL_BASE_ATIVACAO = get_secret("URL_BASE_ATIVACAO") 
+MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
+MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
+URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
+URL_API_AUTH = get_secret("URL_API_AUTH")
+URL_CURSO = get_secret("URL_CURSO")
 URL_API_AUTH = get_secret("URL_API_AUTH")
 URL_PERFIL = get_secret("URL_PERFIL")
 
@@ -102,10 +122,7 @@ def logout():
     st.session_state['user_email'] = None
 
 def verifica_assinante():
-    """
-    Verifica se o usuário logado é assinante.
-    Retorna True se assinante, False caso contrário.
-    """
+
     if not st.session_state['logged_in'] or not st.session_state['token']:
         st.warning("Você precisa estar logado para acessar esta página.")
         st.page_link("Home.py", label="Voltar para tela de login")
@@ -128,3 +145,63 @@ def verifica_assinante():
     except Exception as e:
         st.error(f"Erro ao verificar assinatura: {e}")
         st.stop()
+
+def criar_preferencia_pagamento():
+
+    # 1. PEGA O EMAIL DE FORMA SEGURA 
+    id_para_mp = st.session_state.get('user_email') 
+
+    if not id_para_mp:
+
+        raise ValueError("Identificador de usuário ausente na sessão.")
+    
+    if not MP_ACCESS_TOKEN:
+        st.error("Falha na configuração do pagamento: Access Token ausente.")
+        return None
+
+    try:
+
+        user_id_ref = st.session_state.get('user_id', id_para_mp) 
+    
+        ref_id = f"REF-{user_id_ref}-{uuid.uuid4()}"
+        
+        # Inicializa o SDK
+        sdk = mercadopago.SDK(MP_ACCESS_TOKEN)
+        
+        preference_data = {
+            "items": [
+                {
+                    "title": TITULO_ASSINATURA,
+                    "quantity": 1,
+                    "unit_price": VALOR_ASSINATURA
+                }
+            ],
+            "payer": {
+                "email": id_para_mp,
+            },
+
+            "external_reference": ref_id,
+            "notification_url": MP_NOTIFICATION_URL,
+            
+
+            "back_urls": {
+
+                "success": URL_CURSO, 
+                "pending": URL_CURSO,
+                "failure": URL_CURSO 
+            },
+            "auto_return": "approved"
+        }
+
+        preference_response = sdk.preference().create(preference_data)
+        
+        if preference_response["status"] == 201:
+            return preference_response["response"]["init_point"]
+        else:
+            st.error(f"Erro ao criar preferência: {preference_response['response']['message']}")
+            st.code(preference_response)
+            return None
+
+    except Exception as e:
+        st.error(f"Erro inesperado no Mercado Pago: {e}")
+        return None

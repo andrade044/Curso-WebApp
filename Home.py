@@ -1,15 +1,8 @@
 import streamlit as st
-
 import re
-
 import os 
 from dotenv import load_dotenv
 import random
-
-
-
-# from api_mercadopago import api_pagamento
-
 import requests
 
 
@@ -103,12 +96,12 @@ def validar_email(email):
 
 # # ---------------------------------------------------
 
-def gerar_codigo_ativacao():
-    """Gera e salva um código único para o link de ativação."""
-    # Gera um código de 6 dígitos. UUIDs são mais seguros, mas um código simples é mais amigável.
-    code = str(random.randint(100000, 999999))
-    st.session_state['user_activation_code'] = code
-    return code
+# def gerar_codigo_ativacao():
+#     """Gera e salva um código único para o link de ativação."""
+#     # Gera um código de 6 dígitos. UUIDs são mais seguros, mas um código simples é mais amigável.
+#     code = str(random.randint(100000, 999999))
+#     st.session_state['user_activation_code'] = code
+#     return code
 
 
 if 'current_question' not in st.session_state:
@@ -136,10 +129,7 @@ st.markdown("""
 
 
 def tela_login():
-    """Mostra o formulário de login e autentica o usuário via API."""
     
-
-
     # Adicionando verificação para redirecionar se o usuário já estiver logado
     if st.session_state.get('logged_in'):
         st.info(f"Bem-vindo de volta, {st.session_state.get('user_nome', 'Usuário')}!")
@@ -149,23 +139,17 @@ def tela_login():
 
     st.title("🚪 Login")
 
-    # --- REMOVIDOS OS CAMPOS DUPLICADOS AQUI ---
-    # email = st.text_input("Email")
-    # senha = st.text_input("Senha", type="password")
-
-    # APENAS UM FORMULÁRIO DE LOGIN DEVE EXISTIR
     with st.form(key='login_form'):
         email = st.text_input("Email", key="login_email")
         senha = st.text_input("Senha", type="password", key="login_senha")
         submitted = st.form_submit_button("Entrar")
         
-        col1, col3 ,col4 = st.columns([2, 5, 1])
-
+        col1, col2 ,col3 = st.columns([2, 5, 1])
 
         with col1:
             st.page_link("pages/2_CADASTRO.py", label="Novo por aqui? [Cadastre-se aqui]")
         
-        with col4:
+        with col3:
             st.page_link("pages/7_rec_senha.py", label="Esqueceu a senha?")
 
 
@@ -202,7 +186,6 @@ def tela_login():
                 
                 # 🚨 4. REDIRECIONAMENTO CORRETO
                 st.switch_page("pages/4_Curso.py")
-                # st.stop() é opcional após switch_page, mas garante a parada imediata.
                 st.stop()
             
             elif response.status_code == 401:
@@ -218,8 +201,5 @@ def tela_login():
 
     
     return
-# ----------------------------------------------------------------------
-# FUNÇÃO PRINCIPAL DA PÁGINA (CONTROLADOR DE TELAS)
-# ---------------------------------------------------------------------
 
 tela_login()

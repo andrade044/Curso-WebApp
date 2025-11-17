@@ -4,13 +4,11 @@ import os
 from dotenv import load_dotenv
 import time
 
-# --- Configuração e Variáveis de Ambiente ---
+
 def get_secret(key, default=None):
-    """Lê segredos de st.secrets ou de os.environ."""
-    # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
+
     if 'secrets' in st.session_state and key in st.secrets:
         return st.secrets[key]
-    # 2. Tenta ler de os.environ (para Codespace/Local com .env)
     return os.getenv(key, default)
 
 load_dotenv()
@@ -62,10 +60,7 @@ st.markdown("""
     
 
 def tela_redefinir_senha():
-    """
-    Controla o fluxo de Esqueceu Senha (solicitação de link) e
-    Redefinição de Senha (uso do token).
-    """
+
     st.title("🔒 Redefinir Senha")
     st.markdown("---")
 
@@ -78,21 +73,16 @@ def tela_redefinir_senha():
     # st.query_params retorna um dict-like com os parâmetros da URL
     query_params = st.query_params
     
-    # 🚨 PONTO CRÍTICO: Garantir que a chave usada aqui ("token") é a mesma 
-    # que a sua API Flask coloca no link de e-mail.
+
     reset_token = query_params.get("token") 
 
     if reset_token:
-        # Se houver um token, mostra o formulário para a nova senha
         show_reset_form(reset_token)
     else:
-        # Se não houver token, mostra o formulário para solicitação do link
         show_forgot_form()
 
-# --- Formulário de Solicitação de Link (/forgot_password) ---
 
 def show_forgot_form():
-    """Pede o e-mail para enviar o link de redefinição."""
     st.subheader("Passo 1: Enviar Link de Redefinição")
     st.info("Insira seu e-mail abaixo. Enviaremos um link para criar uma nova senha.")
 
@@ -146,8 +136,7 @@ def show_reset_form(token):
             payload = {
                 "token": token,
                 "new_password": new_password
-            }
-            
+            }           
             # Remove a parte "/auth" da URL para acessar /reset_password
             base_api_url = URL_API_AUTH.removesuffix('/auth') 
             response = requests.post(f"{base_api_url}/reset_password", json=payload)

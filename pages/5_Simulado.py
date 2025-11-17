@@ -48,15 +48,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Adiciona um CSS para esconder os botões de menu e footer, se necessário
-# st.markdown("""
-# <style>
-#     #MainMenu {visibility: hidden;}
-#     footer {visibility: hidden;}
-#     header {visibility: hidden;}
-# </style>
-# """, unsafe_allow_html=True)
-
 st.markdown("""
 <style>
     /* Esconde o link da página de Cadastro (Usando a capitalização 'CADASTRO') */
@@ -101,10 +92,9 @@ if 'user_answer' not in st.session_state:
     st.session_state['user_answer'] = None
 
 def proxima_pergunta():
-    """Lógica para avançar para a próxima pergunta e verificar a resposta."""
-    global SIMULADO_DATA # Garante que a variável SIMULADO_DATA está no escopo
 
-    # 1. Se o usuário respondeu, verifica e atualiza o score
+    global SIMULADO_DATA 
+
     if st.session_state.get('user_answer') is not None:
         
         # Pega a pergunta atual antes de avançar o índice
@@ -117,34 +107,31 @@ def proxima_pergunta():
         else:
             st.toast(f"❌ Resposta Incorreta. A correta era: {pergunta_atual['resposta_correta']}", icon='👎')
     
-    # 2. Avança para o próximo índice
+    # Avança para o próximo índice
     st.session_state['current_question'] += 1
     st.session_state['user_answer'] = None # Limpa a resposta do usuário para a próxima pergunta
 
-    # 3. Verifica se o simulado terminou
+    # Verifica se o simulado terminou
     if st.session_state['current_question'] >= len(SIMULADO_DATA):
         st.session_state['quiz_finished'] = True
 
 def questao_anterior():
-    """Volta para a questão anterior, se não for a primeira."""
-    # Garante que não volta para um índice negativo (mínimo é 0)
+
     if st.session_state['current_question'] > 0:
         st.session_state['current_question'] -= 1
-        st.session_state['user_answer'] = None # Limpa a resposta, forçando a seleção novamente
-        # st.rerun()
+        st.session_state['user_answer'] = None 
+
     else:
         st.toast("Você já está na primeira questão!", icon='⚠️')
-# --- Lógica para o caminho do arquivo (necessária fora da função cacheada) ---
+
+
 dir_atual_script = os.path.dirname(os.path.abspath(__file__))
 CAMINHO_CSV = os.path.join(dir_atual_script, '..', 'todos_simulados.csv')
 
 
 @st.cache_data
 def load_all_simulados_data(file_mtime):
-    """
-    Carrega o arquivo CSV, transforma os dados e os agrupa por 'simulado_id'.
-    O argumento `file_mtime` força o recarregamento do cache se o arquivo mudar.
-    """
+
     try:
         if not os.path.exists(CAMINHO_CSV):
              st.error(f"Arquivo CSV não encontrado no caminho: {CAMINHO_CSV}")
@@ -156,7 +143,7 @@ def load_all_simulados_data(file_mtime):
                          engine='python', 
                          on_bad_lines='skip')
 
-        # Assegura que o DataFrame tem a estrutura correta (após a correção de CSV)
+        # Assegura que o DataFrame tem a estrutura correta
         colunas_esperadas = ['simulado_id', 
                              'id', 
                              'pergunta', 
@@ -177,7 +164,6 @@ def load_all_simulados_data(file_mtime):
             st.error(f"O carregamento resultou em {df.shape[1]} colunas, o que é insuficiente. Esperado: {len(colunas_esperadas)}. Verifique o cabeçalho do CSV.")
             return {}
         
-        # Alerta se poucas questões forem carregadas (agora que o CSV foi corrigido)
         if df.empty or df.shape[0] < 5: 
             st.warning(
                 f"Atenção: Apenas {df.shape[0]} linhas foram carregadas. Embora o formato CSV pareça correto, "
@@ -187,7 +173,6 @@ def load_all_simulados_data(file_mtime):
 
         df = df.fillna('')
         
-        # 🟢 PASSO CRÍTICO: Agrupar por Simulados
         simulados_agrupados = {}
         
         lista_de_simulados = df['simulado_id'].unique()
@@ -207,7 +192,6 @@ def load_all_simulados_data(file_mtime):
                 
                 imagens = row.get('imagens_locais', '')
                 if isinstance(imagens, str) and imagens:
-                    # Se houver mais de uma imagem separada por ';', cria uma lista
                     imagens_list = [img.strip() for img in imagens.split(';') if img.strip()]
                 else:
                     imagens_list = []
@@ -231,43 +215,38 @@ def load_all_simulados_data(file_mtime):
         st.error(f"Erro fatal ao carregar os dados do simulado. Detalhe: {e}")
         return {}
 
-# --- LÓGICA DE CARREGAMENTO PARA FORÇAR O CACHE ---
+# LÓGICA DE CARREGAMENTO PARA FORÇAR O CACHE
 file_mtime = None
 if os.path.exists(CAMINHO_CSV):
     file_mtime = os.path.getmtime(CAMINHO_CSV)
 
 SIMULADOS_DATA_AGRUPADOS = load_all_simulados_data(file_mtime)
-# --- FIM DA LÓGICA DE CARREGAMENTO ---
 
 
 def tela_simulados():
-    """Interface principal para a tela de Simulado com acesso restrito a assinantes."""
-    
-    # Define o diretório raiz do projeto (necessário para encontrar a pasta de imagens)
     dir_projeto = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
     
     st.title("Página de Simulados")
 
     st.title("🧠 Simulado de Conhecimento")
 
-    # ------------------ VERIFICAÇÃO DE ACESSO (NOVA LÓGICA) ------------------
+    # VERIFICAÇÃO DE ACESSO
     if not verifica_assinante():
         st.warning("🔒 **ACESSO RESTRITO.**")
         st.subheader("Para realizar os simulados, você precisa ser um Assinante Premium.")
         st.info("Acesse a aba 'Pagamento' para liberar este conteúdo.")
         if st.button("💰 Desbloquear Conteúdo Premium Agora", use_container_width=True):
             st.switch_page("pages/6_Pagamento.py")
-        return # Interrompe a função aqui, não exibindo o quiz.
+        return 
     
     # --------------------------------------------------------------------------
     if not SIMULADOS_DATA_AGRUPADOS:
         st.error("Nenhum simulado carregado. Verifique o arquivo CSV e o erro acima.")
         return
 
-    # 1. PERMITE O USUÁRIO ESCOLHER O SIMULADO
+    # PERMITE O USUÁRIO ESCOLHER O SIMULADO
     nomes_dos_simulados = list(SIMULADOS_DATA_AGRUPADOS.keys())
-    
-    # Inicializa o nome do simulado selecionado no estado da sessão
+
     if 'selected_simulado' not in st.session_state:
         st.session_state['selected_simulado'] = nomes_dos_simulados[0]
         
@@ -277,14 +256,12 @@ def tela_simulados():
         key='simulado_selector'
     )
     
-    # 2. SE O SIMULADO MUDOU, REINICIA O ESTADO DO QUIZ
     if simulado_escolhido != st.session_state.get('current_simulado_name'):
-        # Força o reinício se o simulado mudou
         st.session_state['current_simulado_name'] = simulado_escolhido
         reiniciar_simulado()
-        st.stop() # Interrompe e recarrega para aplicar a mudança
+        st.stop() 
 
-    # 3. DEFINE OS DADOS DO SIMULADO ATUAL
+    # DEFINE OS DADOS DO SIMULADO ATUAL
     global SIMULADO_DATA
     SIMULADO_DATA = SIMULADOS_DATA_AGRUPADOS.get(simulado_escolhido, [])
     
@@ -292,11 +269,10 @@ def tela_simulados():
         st.warning("Simulado selecionado não possui questões.")
         return
 
-    # 3.2 Lógica de Finalização
     if st.session_state['quiz_finished']:
         total_questoes = len(SIMULADO_DATA)
         score_final = st.session_state['score']
-        aprovado = score_final >= 21 # Critério de aprovação (70% de 30 questões)
+        aprovado = score_final >= 21 
         
         if aprovado:
             st.balloons()
@@ -309,7 +285,6 @@ def tela_simulados():
         if st.button("Fazer Novo Simulado"):
             reiniciar_simulado()
 
-    # 3.3 Lógica de Exibição da Pergunta
     else:
         indice_atual = st.session_state['current_question']
         q = SIMULADO_DATA[indice_atual]
@@ -318,27 +293,22 @@ def tela_simulados():
         st.subheader(f"Questão {indice_atual + 1}/{len(SIMULADO_DATA)} ")
         st.markdown(f"**{q['pergunta']}**")
         
-        # --- NOVO BLOCO PARA EXIBIR IMAGENS ---
+        # BLOCO PARA EXIBIR IMAGENS 
         if q['imagens_locais']:
-            # Cria um container para centralizar as imagens
+
             with st.container():
                 cols = st.columns(len(q['imagens_locais']))
                 
                 for i, img_filename in enumerate(q['imagens_locais']):
-                    # Constrói o caminho completo: [Raiz do Projeto]/imagens/[Nome do Arquivo]
                     img_path = os.path.join(dir_projeto, 'imagens', img_filename)
                     
                     if os.path.exists(img_path):
                         with cols[i]:
-                            # Exibe a imagem com uma largura fixa para melhor visualização
                             st.image(img_path, caption=img_filename, width=400)
                     else:
                         st.warning(f"Imagem não encontrada: {img_filename}")
-        # --- FIM DO NOVO BLOCO ---
-        
-        # Exibe as opções (Radio Button)
-        # O valor do radio button é a chave (A, B, C, D)
-        
+
+        # Exibe as opções (Radio Button)  
         resposta_selecionada = st.radio(
             "Sua Resposta:",
             options=q['opcoes'].keys(), 
@@ -346,14 +316,10 @@ def tela_simulados():
             key=f"radio_{q['id']}" # Garante uma chave única para o widget
         )
         
-        # Armazena a resposta selecionada no state para uso na função de avanço
         st.session_state['user_answer'] = resposta_selecionada 
 
-        # Botão para Avançar
         col_ant, col_prox = st.columns([1, 1])
         
-        # Botão "Questão Anterior"
-        # Só aparece se não for a primeira questão (índice_atual > 0)
         if indice_atual > 0:
             with col_ant:
                 st.button(
@@ -363,7 +329,6 @@ def tela_simulados():
                     type="secondary"
                 )
         
-        # Botão "Próxima Questão" ou "Finalizar Simulado"
         proxima_texto = "✅ Finalizar Simulado" if indice_atual == len(SIMULADO_DATA) - 1 else "➡️ Próxima Questão"
         
         with col_prox:

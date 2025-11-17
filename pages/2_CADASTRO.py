@@ -2,10 +2,7 @@ import streamlit as st
 import re
 import os 
 import time
-
-# from api_mercadopago import api_pagamento
 import requests
-from auth import cadastro
 from webhook_server import enviar_email_ativacao_sendgrid
 
 
@@ -84,8 +81,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
     
 
-# --- Configuração do Banco de Dados SQLite ---
-
 def validar_cpf(cpf):
     cpf = re.sub(r'[^0-9]', '', cpf)
     return len(cpf) == 11
@@ -94,9 +89,8 @@ def validar_email(email):
     return bool(re.match(r"[^@]+@[^@]+\.[^@]+", email))
 
 def tela_cadastro():
-    """Mostra o formulário de cadastro e envia dados para a API."""
-    
-    # Verifica se já está logado e redireciona (boa prática)
+    """Mostra o formulário de cadastro e envia dados para a API."""   
+    # Verifica se já está logado e redireciona
     if st.session_state.get('logged_in'):
         st.warning("Você já está logado. Redirecionando para o curso.")
         time.sleep(1)
@@ -108,27 +102,25 @@ def tela_cadastro():
     
     with st.form(key='cadastro_form'):
         # Campos de entrada
-        # Adicione chaves (key) nos inputs se precisar reter o valor após submissão falha
         cpf_input = st.text_input(label="CPF (apenas números)", max_chars=11, placeholder="12345678900")
         email_input = st.text_input(label="Email", placeholder="seu.email@exemplo.com")
         nome_input = st.text_input(label="Nome Completo", placeholder="Seu nome")
         senha_input = st.text_input(label="Senha", type="password")
         confirma_senha_input = st.text_input(label="Confirma senha", type="password")
         
-        col1, col3 ,col4 = st.columns([2, 6, 1])
+        col1, col2 ,col3 = st.columns([2, 6, 1])
 
         with col1:
             submit_button = st.form_submit_button(label='Cadastrar')    
         
-        with col4:
+        with col3:
             st.markdown(
                 '<div style="text-align: right;">'
                 '   <a href="/" target="_self">Já tem conta? Fazer Login</a>'
                 '</div>', 
                 unsafe_allow_html=True
             )
-            
-            
+                        
     if submit_button:
         erros = False
         
@@ -166,18 +158,16 @@ def tela_cadastro():
             status_message = st.empty()
             status_message.info("Processando cadastro...")
             
-            # --- REMOVIDO DEBUG DE CÓDIGO (st.code()) ---
-
             try:
                 # 3. Chama a API
                 response = requests.post(
                     URL_API_AUTH, 
                     json=payload, 
-                    timeout=20 # Adiciona um timeout de 10 segundos
+                    timeout= 10# Adiciona um timeout de 10 segundos
                 )
                 
                 # 4. Trata a Resposta da API
-                if response.status_code == 201: # Sucesso no Cadastro
+                if response.status_code == 201: 
                     token = response.json().get("token") # Pega o token se o backend retornar
                     
                     status_message.success(response.json().get("message", "Cadastro realizado com sucesso!"))
@@ -210,7 +200,6 @@ def tela_cadastro():
             except requests.exceptions.ConnectionError:
                 status_message.error(f"Erro de conexão Não foi possível se conectar .")
             except requests.exceptions.RequestException as e:
-                # Catch-all para outros erros de requisição
                 status_message.error(f"Erro inesperado de requisição: {e}")
 
 
