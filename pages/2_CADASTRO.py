@@ -107,7 +107,8 @@ def tela_cadastro():
         nome_input = st.text_input(label="Nome Completo", placeholder="Seu nome")
         senha_input = st.text_input(label="Senha", type="password")
         confirma_senha_input = st.text_input(label="Confirma senha", type="password")
-        
+        termos = st.checkbox (label='Concorda com termos de uso e políticas de privacidade', value=False,)
+
         col1, col2 ,col3 = st.columns([2, 6, 1])
 
         with col1:
@@ -138,8 +139,11 @@ def tela_cadastro():
         if len(senha_input) < 6:
             st.error("A senha deve ter pelo menos 6 caracteres.")
             erros = True
-        if senha_input != confirma_senha_input: # Corrigida a verificação da senha (simplificada)
+        if senha_input != confirma_senha_input: 
             st.error('As senhas digitadas não são iguais.')
+            erros = True
+        if not termos : 
+            st.error('Você não concordou com os termos de uso e políticas de privacidade ')
             erros = True
             
         

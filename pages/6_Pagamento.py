@@ -9,9 +9,7 @@ sys.path.insert(0, parent_dir)
 from auth import verifica_assinante, logout, criar_preferencia_pagamento
 
 
-def get_secret(key, default=None):
-    
-   
+def get_secret(key, default=None): 
     if 'secrets' in st.session_state and key in st.secrets:
         return st.secrets[key]
 
@@ -48,7 +46,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Adiciona um CSS para esconder os botões de menu e footer, se necessário
+# Adiciona um CSS para esconder os botões de menu e footer
 st.markdown("""
 <style>
     #MainMenu {visibility: hidden;}
@@ -125,7 +123,7 @@ def tela_pagamento():
             if link_pagamento:
                 # 2. Redireciona o usuário (Usando HTML para abertura segura)
                 st.session_state['payment_link'] = link_pagamento
-                
+            
                 st.markdown(f"""
                     <a href="{link_pagamento}" target="_blank" style="text-decoration: none;">
                         <button style="background-color:#009ee3; color:white; padding: 10px 20px; border:none; border-radius:5px; font-size: 16px; cursor: pointer;">
