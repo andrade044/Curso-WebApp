@@ -1,14 +1,6 @@
 import streamlit as st
 import os 
 import requests
-from auth import logout, verifica_assinante
-
-def get_secret(key, default=None):
-    
-    if 'secrets' in st.session_state and key in st.secrets:
-        return st.secrets[key]
-
-    return os.getenv(key, default)
 
 st.set_page_config(
     page_title="Curso",
