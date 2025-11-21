@@ -208,58 +208,54 @@ def criar_preferencia_pagamento():
     
 def add_fixed_footer_button(termos_link: str, politicas_link: str):
     """
-    Adiciona um rodapé fixo na parte inferior da tela do Streamlit com links para
-    Termos de Uso e Políticas de Privacidade.
-    
-    Args:
-        termos_link (str): O URL para a página de Termos de Uso.
-        politicas_link (str): O URL para a página de Políticas de Privacidade.
+    Adiciona um rodapé fixo e transparente na parte inferior da tela do Streamlit
+    com links para Termos de Uso e Políticas de Privacidade.
     """
     
-    # Injeta o CSS (Estilo e Posicionamento Fixo)
     st.markdown(
         """
         <style>
-        /* Contêiner que fica fixo na parte inferior */
+        /* Contêiner que fica fixo na parte inferior, agora transparente */
         #fixed-footer-container {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background-color: #f0f2f6; /* Cor de fundo suave */
-            border-top: 1px solid #e6e6e6; 
-            padding: 8px 10px;
+            background-color: transparent; /* Fundo transparente */
+            border-top: none; /* Remove a borda superior */
+            padding: 10px 10px; /* Um pouco mais de padding para os links */
             text-align: center;
             z-index: 1000;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+            box-shadow: none; /* Remove a sombra */
         }
         
         /* Estilo dos Links */
         .footer-link {
-            color: #0078ff; 
+            color: #b0b0b0; /* Cor mais clara para se destacar em fundos escuros */
             text-decoration: none;
             margin: 0 10px;
             font-size: 14px;
+            transition: color 0.3s ease; /* Transição suave para o hover */
         }
         
         .footer-link:hover {
+            color: #ffffff; /* Cor branca no hover */
             text-decoration: underline;
         }
         
         .separator {
-            color: #aaa;
+            color: #888888; /* Cor do separador */
         }
 
-        /* Adiciona preenchimento para evitar que o conteúdo da página fique escondido pelo rodapé */
+        /* Ajuste do preenchimento do conteúdo principal para não ser coberto pelo rodapé */
         .main {
-            padding-bottom: 60px; /* Ajuste este valor se o seu rodapé for mais alto */
+            padding-bottom: 50px; /* Ajuste se necessário */
         }
         </style>
         """,
         unsafe_allow_html=True
     )
     
-    # Injeta o HTML do rodapé com os links dinâmicos
     footer_html = f"""
     <div id="fixed-footer-container">
         <a href="{termos_link}" target="_blank" class="footer-link">Termos de Uso</a>
