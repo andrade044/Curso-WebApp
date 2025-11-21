@@ -216,7 +216,7 @@ def tela_cadastro():
 
 add_fixed_footer_button(
     termos_link="https://autoescolaemvideo.streamlit.app/termos",
-    politicas_link="https://autoescolaemvideo.streamlit.app/politica"
+    politicas_link="https://autoescolaemvideo.streamlit.app/termos"
 )
 
 tela_cadastro()

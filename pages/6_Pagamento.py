@@ -6,7 +6,7 @@ import sys
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.insert(0, parent_dir)
-from auth import verifica_assinante, logout, criar_preferencia_pagamento
+from auth import verifica_assinante, logout, criar_preferencia_pagamento, add_fixed_footer_button
 
 
 def get_secret(key, default=None): 
@@ -82,10 +82,6 @@ st.markdown("""
     [data-testid="stSidebarNav"] a[href*="termos"] {
         display: none !important;
     }
-    /* Esconde o link da página de Politica (Usando a capitalização 'politica') */
-    [data-testid="stSidebarNav"] a[href*="politica"] {
-        display: none !important;
-    }
 </style>
 """, unsafe_allow_html=True)
     
@@ -154,5 +150,10 @@ def tela_pagamento():
         # Redireciona para Home após logout
         st.switch_page("Home.py") 
         st.stop()
+
+add_fixed_footer_button(
+    termos_link="https://autoescolaemvideo.streamlit.app/termos",
+    politicas_link="https://autoescolaemvideo.streamlit.app/termos"
+)
 
 tela_pagamento()

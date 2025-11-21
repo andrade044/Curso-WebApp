@@ -2,9 +2,8 @@ import streamlit as st
 import re
 import os 
 from dotenv import load_dotenv
-import random
 import requests
-
+from auth import add_fixed_footer_button
 
 load_dotenv()
 
@@ -79,10 +78,7 @@ st.markdown("""
     [data-testid="stSidebarNav"] a[href*="termos"] {
         display: none !important;
     }
-    /* Esconde o link da página de Politica (Usando a capitalização 'politica') */
-    [data-testid="stSidebarNav"] a[href*="politica"] {
-        display: none !important;
-    }
+
 </style>
 """, unsafe_allow_html=True)
     
@@ -210,5 +206,10 @@ def tela_login():
 
     
     return
+
+add_fixed_footer_button(
+    termos_link="https://autoescolaemvideo.streamlit.app/termos",
+    politicas_link="https://autoescolaemvideo.streamlit.app/termos"
+)
 
 tela_login()

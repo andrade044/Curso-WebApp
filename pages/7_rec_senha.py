@@ -3,7 +3,7 @@ import requests
 import os
 from dotenv import load_dotenv
 import time
-
+from auth import add_fixed_footer_button
 
 def get_secret(key, default=None):
 
@@ -59,10 +59,6 @@ st.markdown("""
     [data-testid="stSidebarNav"] a[href*="termos"] {
         display: none !important;
     }
-    /* Esconde o link da página de Politica (Usando a capitalização 'politica') */
-    [data-testid="stSidebarNav"] a[href*="politica"] {
-        display: none !important;
-    }        
 </style>
 """, unsafe_allow_html=True)
     
@@ -160,6 +156,9 @@ def show_reset_form(token):
         except requests.exceptions.RequestException:
             status_message.error("Erro de conexão. Verifique se o servidor está online.")
 
-
+add_fixed_footer_button(
+    termos_link="https://autoescolaemvideo.streamlit.app/termos",
+    politicas_link="https://autoescolaemvideo.streamlit.app/termos"
+)
 # --- Execução ---
 tela_redefinir_senha()

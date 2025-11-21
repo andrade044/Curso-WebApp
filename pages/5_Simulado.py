@@ -75,10 +75,6 @@ st.markdown("""
     [data-testid="stSidebarNav"] a[href*="termos"] {
         display: none !important;
     }
-    /* Esconde o link da página de Politica (Usando a capitalização 'politica') */
-    [data-testid="stSidebarNav"] a[href*="politica"] {
-        display: none !important;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -359,7 +355,7 @@ def tela_simulados():
         
 add_fixed_footer_button(
     termos_link="https://autoescolaemvideo.streamlit.app/termos",
-    politicas_link="https://autoescolaemvideo.streamlit.app/politica"
+    politicas_link="https://autoescolaemvideo.streamlit.app/termos"
 )
 
 
