@@ -10,29 +10,6 @@ def get_secret(key, default=None):
 
     return os.getenv(key, default)
 
-MERCADO_PAGO_ACCESS_TOKEN = get_secret('MERCADO_PAGO_ACCESS_TOKEN')
-REFERENCIA_ASSINATURA = get_secret('REFERENCIA_ASSINATURA')
-
-VALOR_ASSINATURA = get_secret('VALOR_ASSINATURA') 
-TITULO_ASSINATURA = "Assinatura Premium do Curso de Python"
-
-CHAVE_API_SENDGRID = get_secret('CHAVE_API_SENDGRID')
-EMAIL_REMETENTE =  get_secret('EMAIL_REMETENTE')
-TOKEN_LENGTH_BYTES= get_secret('TOKEN_LENGTH_BYTES')
-TOKEN_EXPIRATION_HOURS= get_secret('TOKEN_EXPIRATION_HOURS')
-
-URL_BASE_ATIVACAO = get_secret("URL_BASE_ATIVACAO") 
-MP_ACCESS_TOKEN = get_secret('MP_ACCESS_TOKEN')
-MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
-URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
-URL_API_AUTH = get_secret("URL_API_AUTH")
-URL_PERFIL = get_secret("URL_PERFIL")
-
-if 'logged_in' not in st.session_state:
-    st.session_state['logged_in'] = False
-if 'user_email' not in st.session_state:
-    st.session_state['user_email'] = None
-
 st.set_page_config(
     page_title="Curso",
     page_icon="🚗",
