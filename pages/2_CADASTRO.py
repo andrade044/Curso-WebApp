@@ -4,7 +4,7 @@ import os
 import time
 import requests
 from webhook_server import enviar_email_ativacao_sendgrid
-
+from auth import add_fixed_footer_button
 
 def get_secret(key, default=None):
     
@@ -75,6 +75,14 @@ st.markdown("""
 
     /* Esconde o link da página de Pagamento (Usando a capitalização 'Pagamento') */
     [data-testid="stSidebarNav"] a[href*="Pagamento"] {
+        display: none !important;
+    }
+    /* Esconde o link da página de termos (Usando a capitalização 'Termos') */
+    [data-testid="stSidebarNav"] a[href*="termos"] {
+        display: none !important;
+    }
+    /* Esconde o link da página de Politica (Usando a capitalização 'politica') */
+    [data-testid="stSidebarNav"] a[href*="politica"] {
         display: none !important;
     }
 </style>
@@ -206,5 +214,9 @@ def tela_cadastro():
             except requests.exceptions.RequestException as e:
                 status_message.error(f"Erro inesperado de requisição: {e}")
 
+add_fixed_footer_button(
+    termos_link="https://autoescolaemvideo.streamlit.app/termos",
+    politicas_link="https://autoescolaemvideo.streamlit.app/politica"
+)
 
 tela_cadastro()

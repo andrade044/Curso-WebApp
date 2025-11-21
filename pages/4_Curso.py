@@ -1,7 +1,7 @@
 import streamlit as st
 import os 
 import requests
-from auth import logout, verifica_assinante
+from auth import logout, verifica_assinante, add_fixed_footer_button
 
 def get_secret(key, default=None):
     
@@ -61,6 +61,15 @@ st.markdown("""
 
     /* Esconde o link da página de Pagamento (Usando a capitalização 'Pagamento') */
     [data-testid="stSidebarNav"] a[href*="Pagamento"] {
+        display: none !important;
+    }
+    
+    /* Esconde o link da página de termos (Usando a capitalização 'Termos') */
+    [data-testid="stSidebarNav"] a[href*="termos"] {
+        display: none !important;
+    }
+    /* Esconde o link da página de Politica (Usando a capitalização 'politica') */
+    [data-testid="stSidebarNav"] a[href*="politica"] {
         display: none !important;
     }
 </style>
@@ -244,6 +253,11 @@ def tela_curso():
         st.success("Você saiu da conta. Redirecionando...")
         st.switch_page("Home.py") 
         st.stop()
+
+add_fixed_footer_button(
+    termos_link="https://autoescolaemvideo.streamlit.app/termos",
+    politicas_link="https://autoescolaemvideo.streamlit.app/politica"
+)
 
     
 tela_curso()

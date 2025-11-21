@@ -78,6 +78,14 @@ st.markdown("""
     [data-testid="stSidebarNav"] a[href*="Pagamento"] {
         display: none !important;
     }
+     /* Esconde o link da página de termos (Usando a capitalização 'Termos') */
+    [data-testid="stSidebarNav"] a[href*="termos"] {
+        display: none !important;
+    }
+    /* Esconde o link da página de Politica (Usando a capitalização 'politica') */
+    [data-testid="stSidebarNav"] a[href*="politica"] {
+        display: none !important;
+    }
 </style>
 """, unsafe_allow_html=True)
     
