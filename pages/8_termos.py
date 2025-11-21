@@ -153,6 +153,3 @@ if opcao == "Política de Privacidade":
 elif opcao == "Termos de Uso":
     # Exibe o conteúdo dos Termos de Uso usando Markdown
     st.markdown(termos_uso_markdown, unsafe_allow_html=False)
-
-st.switch_page("pages/4_Curso.py")
-st.switch_page("pages/5_Simulado.py")
