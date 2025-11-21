@@ -7,7 +7,7 @@ import numpy as np
 # from api_mercadopago import api_pagamento
 from data import SIMULADO_DATA
 
-from auth import verifica_assinante, logout
+from auth import verifica_assinante, logout,add_fixed_footer_button
 def get_secret(key, default=None):
     
     # 1. Tenta ler de st.secrets (para deploy no Streamlit Cloud)
@@ -349,4 +349,10 @@ def tela_simulados():
                  type="primary"):
         logout()
         
+add_fixed_footer_button(
+    termos_link="https://autoescolaemvideo.streamlit.app/termos",
+    politicas_link="https://autoescolaemvideo.streamlit.app/politica"
+)
+
+
 tela_simulados()

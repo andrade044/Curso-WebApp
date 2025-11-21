@@ -205,3 +205,66 @@ def criar_preferencia_pagamento():
     except Exception as e:
         st.error(f"Erro inesperado no Mercado Pago: {e}")
         return None
+    
+def add_fixed_footer_button(termos_link: str, politicas_link: str):
+    """
+    Adiciona um rodapé fixo na parte inferior da tela do Streamlit com links para
+    Termos de Uso e Políticas de Privacidade.
+    
+    Args:
+        termos_link (str): O URL para a página de Termos de Uso.
+        politicas_link (str): O URL para a página de Políticas de Privacidade.
+    """
+    
+    # Injeta o CSS (Estilo e Posicionamento Fixo)
+    st.markdown(
+        """
+        <style>
+        /* Contêiner que fica fixo na parte inferior */
+        #fixed-footer-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #f0f2f6; /* Cor de fundo suave */
+            border-top: 1px solid #e6e6e6; 
+            padding: 8px 10px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Estilo dos Links */
+        .footer-link {
+            color: #0078ff; 
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 14px;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+        
+        .separator {
+            color: #aaa;
+        }
+
+        /* Adiciona preenchimento para evitar que o conteúdo da página fique escondido pelo rodapé */
+        .main {
+            padding-bottom: 60px; /* Ajuste este valor se o seu rodapé for mais alto */
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    # Injeta o HTML do rodapé com os links dinâmicos
+    footer_html = f"""
+    <div id="fixed-footer-container">
+        <a href="{termos_link}" target="_blank" class="footer-link">Termos de Uso</a>
+        <span class="separator">|</span>
+        <a href="{politicas_link}" target="_blank" class="footer-link">Políticas de Privacidade</a>
+    </div>
+    """
+    st.markdown(footer_html, unsafe_allow_html=True)
