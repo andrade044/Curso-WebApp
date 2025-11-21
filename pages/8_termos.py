@@ -33,7 +33,6 @@ if 'logged_in' not in st.session_state:
 if 'user_email' not in st.session_state:
     st.session_state['user_email'] = None
 
-
 st.set_page_config(
     page_title="Curso",
     page_icon="🚗",
@@ -185,3 +184,6 @@ if opcao == "Política de Privacidade":
 elif opcao == "Termos de Uso":
     # Exibe o conteúdo dos Termos de Uso usando Markdown
     st.markdown(termos_uso_markdown, unsafe_allow_html=False)
+
+st.button("Click Termos", key="hidden_button_termos", on_click=lambda: st.switch_page("pages/4_Curso.py"))
+st.button("Click Políticas", key="hidden_button_politicas", on_click=lambda: st.switch_page("pages/5_Simulado.py"))
