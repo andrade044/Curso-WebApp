@@ -185,5 +185,5 @@ elif opcao == "Termos de Uso":
     # Exibe o conteúdo dos Termos de Uso usando Markdown
     st.markdown(termos_uso_markdown, unsafe_allow_html=False)
 
-st.button("Ir para cursos", key="hidden_button_termos", on_click=lambda: st.switch_page("pages/4_Curso.py"))
+st.button("Ir para cursos", key="hidden_button_termos", on_click=lambda: st.page_link("pages/4_Curso.py"))
 st.button("Ir para simulados", key="hidden_button_politicas", on_click=lambda: st.switch_page("pages/5_Simulado.py"))
