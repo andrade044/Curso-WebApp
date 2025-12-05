@@ -148,7 +148,7 @@ def tela_pagamento():
         logout()
         st.success("Você saiu da conta.")
         # Redireciona para Home após logout
-        st.switch_page("Home.py") 
+        st.page_link("Home.py", label="Ir para o login") 
         st.stop()
 
 add_fixed_footer_button(
