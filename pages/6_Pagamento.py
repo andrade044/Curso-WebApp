@@ -139,7 +139,7 @@ def tela_pagamento():
                 st.info("Você será redirecionado para o ambiente seguro do Mercado Pago para concluir a transação.")
             else:
                 st.error("Não foi possível iniciar o processo de pagamento. Tente novamente mais tarde.")
-    st.page_link("4_Curso.py", label="Ir para a página do Curso")
+        st.page_link("pages/4_Curso.py", label="Ir para a página do Curso")
    
     st.markdown("---")
 
