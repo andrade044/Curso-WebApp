@@ -51,6 +51,10 @@ URL_CURSO = get_secret("URL_CURSO")
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
+BUNNY_STREAM_LIBRARY_ID = os.getenv("BUNNY_STREAM_LIBRARY_ID")
+BUNNY_STREAM_API_SIGNING_KEY = os.getenv("BUNNY_STREAM_API_SIGNING_KEY")
+
+
 
 # Carrega variáveis de ambiente
 load_dotenv()
@@ -605,8 +609,7 @@ def mercadopago_webhook():
         return jsonify({"status": "error", "message": "Erro interno do servidor"}), 500
 
 
-BUNNY_STREAM_LIBRARY_ID = "LIBRARY_ID_AQUI"
-BUNNY_STREAM_API_SIGNING_KEY = "TOKEN_SECRET_AQUI"  # Bunny → Security → "Embed token authentication"
+
 
 # tempo de expiração do token
 EXPIRE_SECONDS = 3600
