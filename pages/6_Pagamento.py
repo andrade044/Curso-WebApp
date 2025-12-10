@@ -1,6 +1,7 @@
-import streamlit as st
 import os 
 import sys
+
+import streamlit as st
 
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -148,7 +149,7 @@ def tela_pagamento():
         logout()
         st.success("Você saiu da conta.")
         # Redireciona para Home após logout
-        st.switch_page("Home.py") 
+        st.page_link("Home.py") 
         st.stop()
 
 add_fixed_footer_button(

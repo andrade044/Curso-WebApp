@@ -13,7 +13,7 @@ from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 import sendgrid
 from python_http_client.exceptions import BadRequestsError
-from typing import Optional, Tuple, Dict, Any
+from typing import Optional, Tuple
 
 
 
