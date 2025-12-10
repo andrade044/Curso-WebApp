@@ -27,6 +27,9 @@ MP_NOTIFICATION_URL = get_secret('MP_NOTIFICATION_URL')
 URL_API_ATIVACAO =get_secret('URL_API_ATIVACAO')
 URL_API_AUTH = get_secret("URL_API_AUTH")
 URL_PERFIL = get_secret("URL_PERFIL")
+BACKEND = get_secret("BACKEND")
+
+
 
 if 'logged_in' not in st.session_state:
     st.session_state['logged_in'] = False
@@ -140,12 +143,27 @@ def tela_curso():
         # CONTEÚDO LIBERADO
         with st.expander("📝 Módulo 2: Direção Defensiva", expanded=False):
             st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
-            
+
             # VÍDEO 2.1 (PAGO)
             with st.expander("▶️ Aula 2.1: Introdução a direção defensiva"):
-                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Detalhamento sobre hasheamento de senhas e proteção contra ameaças.")
+                
+                video_id = "66675ad3-8d3c-460c-985f-cd36d334d32e"
+        
+                req = requests.get(f"{BACKEND}/video/{video_id}")
+                data = req.json()
 
+                iframe = f"""
+                <iframe
+                    src="{data['iframe']}"
+                    width="100%"
+                    height="450"
+                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                    allowfullscreen="true">
+                </iframe>
+                """
+
+                st.components.v1.html(iframe, height=480)
             # VÍDEO 2.2 (PAGO)
             with st.expander("▶️ Aula 2.2: Integração com Bancos NoSQL e Desempenho"):
                 try:

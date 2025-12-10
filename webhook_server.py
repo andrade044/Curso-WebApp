@@ -14,6 +14,10 @@ from sendgrid.helpers.mail import Mail
 import sendgrid
 from python_http_client.exceptions import BadRequestsError
 from typing import Optional, Tuple
+import hmac
+import hashlib
+import time
+import base64
 
 
 
@@ -599,6 +603,42 @@ def mercadopago_webhook():
         # Erro geral (importante para evitar loop de retentativa do MP)
         print(f"ERRO FATAL no Webhook: {e}")
         return jsonify({"status": "error", "message": "Erro interno do servidor"}), 500
+
+
+BUNNY_STREAM_LIBRARY_ID = "LIBRARY_ID_AQUI"
+BUNNY_STREAM_API_SIGNING_KEY = "TOKEN_SECRET_AQUI"  # Bunny → Security → "Embed token authentication"
+
+# tempo de expiração do token
+EXPIRE_SECONDS = 3600
+
+def generate_signed_url(video_id):
+    expires = int(time.time()) + EXPIRE_SECONDS
+    # string que o bunny usa
+    signature_string = f"{BUNNY_STREAM_LIBRARY_ID}/{video_id}{expires}"
+
+    signature = hmac.new(
+        key=BUNNY_STREAM_API_SIGNING_KEY.encode("utf-8"),
+        msg=signature_string.encode("utf-8"),
+        digestmod=hashlib.sha256
+    ).digest()
+
+    token = base64.urlsafe_b64encode(signature).decode("utf-8").rstrip("=")
+
+    iframe_url = (
+        f"https://iframe.mediadelivery.net/embed/"
+        f"{BUNNY_STREAM_LIBRARY_ID}/{video_id}"
+        f"?token={token}&expires={expires}"
+    )
+    return iframe_url
+
+
+@app.get("/video/<video_id>")
+def video(video_id):
+    url = generate_signed_url(video_id)
+    return jsonify({"iframe": url})
+
+
+
 
 if __name__ == "__main__":
     app.run(debug=True)
