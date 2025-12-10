@@ -140,7 +140,7 @@ def tela_pagamento():
                 st.info("Você será redirecionado para o ambiente seguro do Mercado Pago para concluir a transação.")
             else:
                 st.error("Não foi possível iniciar o processo de pagamento. Tente novamente mais tarde.")
-        st.page_link("4_Curso.py", label="Ir para a página do Curso")
+        st.page_link("pages/4_Curso.py", label="Ir para a página do Curso")
    
     st.markdown("---")
 
@@ -149,7 +149,11 @@ def tela_pagamento():
         logout()
         st.success("Você saiu da conta.")
         # Redireciona para Home após logout
+<<<<<<< HEAD
         st.page_link("Home.py") 
+=======
+        st.page_link("Home.py", label="Ir para o login") 
+>>>>>>> b115638d5d6a69e75e483e302d4e0753e8362071
         st.stop()
 
 add_fixed_footer_button(
