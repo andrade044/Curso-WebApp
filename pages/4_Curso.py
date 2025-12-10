@@ -145,10 +145,10 @@ def tela_curso():
             st.success("🎉 ACESSO LIBERADO! Desfrute do conteúdo exclusivo.")
 
             # VÍDEO 2.1 (PAGO)
-            with st.expander("▶️ Aula 2.1: Introdução a direção defensiva"):
-                st.write("Descrição: Detalhamento sobre hasheamento de senhas e proteção contra ameaças.")
+            with st.expander("▶️ Aula 2.1: Introdução e conceito de direção defensiva"):
+                st.write("Descrição: ")
                 
-                video_id = "66675ad3-8d3c-460c-985f-cd36d334d32e"
+                video_id = "e34640a9-b5e6-473c-b90e-cdbe143eb4f4"
         
                 req = requests.get(f"{BACKEND}/video/{video_id}")
                 data = req.json()
@@ -165,17 +165,122 @@ def tela_curso():
 
                 st.components.v1.html(iframe, height=480)
             # VÍDEO 2.2 (PAGO)
-            with st.expander("▶️ Aula 2.2: Integração com Bancos NoSQL e Desempenho"):
-                try:
-                    video_file = open('video.mp4', 'rb')
-                    video_byts = video_file.read()
-                    st.video(video_byts) 
-                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
-                except FileNotFoundError:
-                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
+            with st.expander("▶️ Aula 2.2: Condições adversas"):
+                st.write("Descrição: .")
+                
+                video_id = "bbe1c1c7-7a49-4d87-8e1a-d7fa39b1307a"
+        
+                req = requests.get(f"{BACKEND}/video/{video_id}")
+                data = req.json()
+
+                iframe = f"""
+                <iframe
+                    src="{data['iframe']}"
+                    width="100%"
+                    height="450"
+                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                    allowfullscreen="true">
+                </iframe>
+                """
+
+                st.components.v1.html(iframe, height=480)
                 
             st.markdown("---")
-            st.write("Material complementar e exercícios práticos do Módulo 2.")
+
+
+            with st.expander("▶️ Aula 2.3: Derrapagens"):
+                    st.write("Descrição: .")
+                    
+                    video_id = "69352220-2277-4fd1-815a-a253818398d7"
+            
+                    req = requests.get(f"{BACKEND}/video/{video_id}")
+                    data = req.json()
+
+                    iframe = f"""
+                    <iframe
+                        src="{data['iframe']}"
+                        width="100%"
+                        height="450"
+                        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                        allowfullscreen="true">
+                    </iframe>
+                    """
+
+                    st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+            
+            
+            with st.expander("▶️ Aula 2.4: Importância do cinto de segurança"):
+                    st.write("Descrição: .")
+                    
+                    video_id = "9ea57e15-43b6-468a-bb2d-0732ff336ebe"
+            
+                    req = requests.get(f"{BACKEND}/video/{video_id}")
+                    data = req.json()
+
+                    iframe = f"""
+                    <iframe
+                        src="{data['iframe']}"
+                        width="100%"
+                        height="450"
+                        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                        allowfullscreen="true">
+                    </iframe>
+                    """
+
+                    st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+            with st.expander("▶️ Aula 2.5: Comportamentos seguros"):
+                    st.write("Descrição: .")
+                    
+                    video_id = "91d9841c-a3e3-460b-8f17-771f386049bc"
+            
+                    req = requests.get(f"{BACKEND}/video/{video_id}")
+                    data = req.json()
+
+                    iframe = f"""
+                    <iframe
+                        src="{data['iframe']}"
+                        width="100%"
+                        height="450"
+                        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                        allowfullscreen="true">
+                    </iframe>
+                    """
+
+                    st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+            with st.expander("▶️ Aula 2.6: Importância do cinto de segurança"):
+                    st.write("Descrição: .")
+                    
+                    video_id = "9ea57e15-43b6-468a-bb2d-0732ff336ebe"
+            
+                    req = requests.get(f"{BACKEND}/video/{video_id}")
+                    data = req.json()
+
+                    iframe = f"""
+                    <iframe
+                        src="{data['iframe']}"
+                        width="100%"
+                        height="450"
+                        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                        allowfullscreen="true">
+                    </iframe>
+                    """
+
+                    st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+
+
+
+            # st.write("Material complementar e exercícios práticos do Módulo 2.")
 
         with st.expander("📝 Módulo 3: Legislação de trânsito ", expanded=False):
             
