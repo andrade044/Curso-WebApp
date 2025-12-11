@@ -149,16 +149,12 @@ def tela_pagamento():
         logout()
         st.success("Você saiu da conta.")
         # Redireciona para Home após logout
-<<<<<<< HEAD
         st.page_link("Home.py") 
-=======
-        st.page_link("Home.py", label="Ir para o login") 
->>>>>>> b115638d5d6a69e75e483e302d4e0753e8362071
         st.stop()
 
 add_fixed_footer_button(
-    termos_link="https://autoescolaemvideo.streamlit.app/termos",
-    politicas_link="https://autoescolaemvideo.streamlit.app/termos"
+    termos_link="https://autoescolaemvideo.onrender.com/termos"
+
 )
 
 tela_pagamento()

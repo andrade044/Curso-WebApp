@@ -206,7 +206,7 @@ def criar_preferencia_pagamento():
         st.error(f"Erro inesperado no Mercado Pago: {e}")
         return None
     
-def add_fixed_footer_button(termos_link: str, politicas_link: str):
+def add_fixed_footer_button(termos_link: str,):
     """
     Adiciona um rodapé fixo e transparente na parte inferior da tela do Streamlit
     com links para Termos de Uso e Políticas de Privacidade.
@@ -258,9 +258,8 @@ def add_fixed_footer_button(termos_link: str, politicas_link: str):
     
     footer_html = f"""
     <div id="fixed-footer-container">
-        <a href="{termos_link}" target="_blank" class="footer-link">Termos de Uso</a>
+        <a href="{termos_link}" target="_blank" class="footer-link">Termos de Uso e Políticas de Privacidade</a>
         <span class="separator">|</span>
-        <a href="{politicas_link}" target="_blank" class="footer-link">Políticas de Privacidade</a>
     </div>
     """
     st.markdown(footer_html, unsafe_allow_html=True)

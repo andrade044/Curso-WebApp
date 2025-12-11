@@ -354,8 +354,8 @@ def tela_simulados():
         logout()
         
 add_fixed_footer_button(
-    termos_link="https://autoescolaemvideo.streamlit.app/termos",
-    politicas_link="https://autoescolaemvideo.streamlit.app/termos"
+    termos_link="https://autoescolaemvideo.onrender.com/termos"
+
 )
 
 

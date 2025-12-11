@@ -214,6 +214,7 @@ Você concorda em receber de tempos em tempos mensagens promocionais e materiais
 ## Lei aplicável
 
 Estes Termos, os direitos e recursos aqui previstos, e todas e quaisquer reclamações e disputas relacionadas a ele e / ou aos serviços, serão regidos, interpretados e aplicados em todos os aspectos única e exclusivamente de acordo com as leis internas da República Federativa do Brasil, sem respeito aos seus conflitos de princípios legais. Todas e quaisquer reclamações e disputas serão apresentadas, e você consente que elas sejam decididas exclusivamente por um tribunal de jurisdição competente localizado em Porto Alegre, Rio Grande do Sul, Brasil. A aplicação da Convenção das Nações Unidas de Contratos para a Venda Internacional de Bens é expressamente excluída.
+
 ---
 """
 

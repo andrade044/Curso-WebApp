@@ -375,8 +375,7 @@ def tela_curso():
         st.stop()
 
 add_fixed_footer_button(
-    termos_link="https://autoescolaemvideo.onrender.com/termos",
-    politicas_link="https://autoescolaemvideo.onrender.com/termos"
+    termos_link="https://autoescolaemvideo.onrender.com/termos"
 )
     
 tela_curso()

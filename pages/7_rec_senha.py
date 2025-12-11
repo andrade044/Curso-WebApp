@@ -157,8 +157,7 @@ def show_reset_form(token):
             status_message.error("Erro de conexão. Verifique se o servidor está online.")
 
 add_fixed_footer_button(
-    termos_link="https://autoescolaemvideo.streamlit.app/termos",
-    politicas_link="https://autoescolaemvideo.streamlit.app/termos"
+    termos_link="https://autoescolaemvideo.onrender.com/termos",
 )
 # --- Execução ---
 tela_redefinir_senha()

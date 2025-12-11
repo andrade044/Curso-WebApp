@@ -215,8 +215,7 @@ def tela_cadastro():
                 status_message.error(f"Erro inesperado de requisição: {e}")
 
 add_fixed_footer_button(
-    termos_link="https://autoescolaemvideo.streamlit.app/termos",
-    politicas_link="https://autoescolaemvideo.streamlit.app/termos"
+    termos_link="https://autoescolaemvideo.onrender.com/termos"
 )
 
 tela_cadastro()
