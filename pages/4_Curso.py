@@ -154,13 +154,13 @@ def tela_curso():
                 data = req.json()
 
                 iframe = f"""
-                        <iframe
-                            src="{data['iframe']}?autoplay=false"
-                            width="100%"
-                            height="450"
-                            allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
-                            allowfullscreen="true">
-                        </iframe>
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
                         """
 
                 st.components.v1.html(iframe, height=480)
@@ -174,13 +174,13 @@ def tela_curso():
                 data = req.json()
 
                 iframe = f"""
-                        <iframe
-                            src="{data['iframe']}?autoplay=false"
-                            width="100%"
-                            height="450"
-                            allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
-                            allowfullscreen="true">
-                        </iframe>
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
                         """
 
                 st.components.v1.html(iframe, height=480)
@@ -197,13 +197,13 @@ def tela_curso():
                     data = req.json()
 
                     iframe = f"""
-                        <iframe
-                            src="{data['iframe']}?autoplay=false"
-                            width="100%"
-                            height="450"
-                            allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
-                            allowfullscreen="true">
-                        </iframe>
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
                         """
 
                     st.components.v1.html(iframe, height=480)
@@ -220,13 +220,13 @@ def tela_curso():
                     data = req.json()
 
                     iframe = f"""
-                        <iframe
-                            src="{data['iframe']}?autoplay=false"
-                            width="100%"
-                            height="450"
-                            allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
-                            allowfullscreen="true">
-                        </iframe>
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
                         """
 
                     st.components.v1.html(iframe, height=480)
@@ -242,13 +242,13 @@ def tela_curso():
                     data = req.json()
 
                     iframe = f"""
-                        <iframe
-                            src="{data['iframe']}?autoplay=false"
-                            width="100%"
-                            height="450"
-                            allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
-                            allowfullscreen="true">
-                        </iframe>
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
                         """
 
                     st.components.v1.html(iframe, height=480)
@@ -264,13 +264,13 @@ def tela_curso():
                     data = req.json()
 
                     iframe = f"""
-                        <iframe
-                            src="{data['iframe']}?autoplay=false"
-                            width="100%"
-                            height="450"
-                            allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
-                            allowfullscreen="true">
-                        </iframe>
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
                         """
 
                     st.components.v1.html(iframe, height=480)

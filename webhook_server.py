@@ -616,7 +616,8 @@ EXPIRE_SECONDS = 3600
 
 def generate_signed_url(video_id):
     expires = int(time.time()) + EXPIRE_SECONDS
-    # string que o bunny usa
+
+    # string correta usada pelo Bunny
     signature_string = f"{BUNNY_STREAM_LIBRARY_ID}/{video_id}{expires}"
 
     signature = hmac.new(
@@ -627,11 +628,13 @@ def generate_signed_url(video_id):
 
     token = base64.urlsafe_b64encode(signature).decode("utf-8").rstrip("=")
 
+    # ADIÇÃO CORRETA DO AUTOPLAY (SEM QUEBRAR O TOKEN)
     iframe_url = (
         f"https://iframe.mediadelivery.net/embed/"
         f"{BUNNY_STREAM_LIBRARY_ID}/{video_id}"
-        f"?token={token}&expires={expires}"
+        f"?token={token}&expires={expires}&autoplay=false"
     )
+
     return iframe_url
 
 
