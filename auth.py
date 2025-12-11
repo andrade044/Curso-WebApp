@@ -259,7 +259,6 @@ def add_fixed_footer_button(termos_link: str,):
     footer_html = f"""
     <div id="fixed-footer-container">
         <a href="{termos_link}" target="_blank" class="footer-link">Termos de Uso e Políticas de Privacidade</a>
-        <span class="separator">|</span>
     </div>
     """
     st.markdown(footer_html, unsafe_allow_html=True)
