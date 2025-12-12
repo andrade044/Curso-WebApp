@@ -257,6 +257,13 @@ def add_fixed_footer_button(termos_link: str,):
     )
     
     footer_html = f"""
+    <style>
+        #fixed-footer-container {{
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }}
+    </style>
     <div id="fixed-footer-container">
         <a href="{termos_link}" target="_blank" class="footer-link">Termos de Uso e Políticas de Privacidade</a>
     </div>
