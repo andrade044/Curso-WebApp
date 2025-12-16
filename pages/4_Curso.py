@@ -410,34 +410,4 @@ html_code_fixed = f"""
 # Injeta o código HTML/CSS na página
 st.html(html_code_fixed)
 
-
-link_whatsapp = "https://wa.me/5599999999999?text=Ol%C3%A1%2C%20preciso%20de%20suporte%20sobre%20o%20curso%20online."
-
-# Use um container para agrupar e garantir que ele fique na parte de baixo da página
-with st.container():
-    # Adicione uma linha horizontal opcional para separar o rodapé
-    st.divider() 
-
-    # HTML para o botão de WhatsApp
-    html_code = f"""
-    <div style="text-align: center; margin: 20px 0;">
-        <a href="{link_whatsapp}" target="_blank" style="
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #25D366; /* Cor do WhatsApp */
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-        ">
-            💬 Fale com o Suporte (WhatsApp)
-        </a>
-    </div>
-    """
-    st.html(html_code)
-
-    st.markdown("<p style='text-align: center; color: gray;'>Acesse nosso suporte se tiver dúvidas.</p>", unsafe_allow_html=True)
-
-
 tela_curso()
