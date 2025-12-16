@@ -377,5 +377,23 @@ def tela_curso():
 add_fixed_footer_button(
     termos_link="https://autoescolaemvideo.onrender.com/termos"
 )
-    
+
+link_whatsapp = "https://wa.me/5599999999999?text=Ol%C3%A1%2C%20preciso%20de%20suporte%20sobre%20o%20curso%20online."
+
+# Exemplo simples de HTML
+html_code = f"""
+<a href="{link_whatsapp}" target="_blank" style="
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #25D366; /* Cor do WhatsApp */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+">
+    Fale com o Suporte (WhatsApp)
+</a>
+"""
+st.html(html_code)
+
 tela_curso()
