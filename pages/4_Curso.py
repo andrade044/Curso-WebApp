@@ -380,20 +380,64 @@ add_fixed_footer_button(
 
 link_whatsapp = "https://wa.me/5599999999999?text=Ol%C3%A1%2C%20preciso%20de%20suporte%20sobre%20o%20curso%20online."
 
-# Exemplo simples de HTML
-html_code = f"""
-<a href="{link_whatsapp}" target="_blank" style="
-    display: inline-block;
-    padding: 10px 20px;
-    background-color: #25D366; /* Cor do WhatsApp */
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    font-weight: bold;
+# Código HTML e CSS corrigido para posicionamento fixo (fixed)
+html_code_fixed = f"""
+<div style="
+    /* Posicionamento Fixo */
+    position: fixed;
+    bottom: 20px; /* Distância do fundo da página */
+    right: 20px; /* Distância da direita da página */
+    z-index: 1000; /* Garante que fique acima de outros elementos */
 ">
-    Fale com o Suporte (WhatsApp)
-</a>
+    <a href="{link_whatsapp}" target="_blank" style="
+        /* Estilo do Botão */
+        display: inline-flex; /* Usar flex para centralizar o conteúdo se adicionar um ícone */
+        align-items: center;
+        padding: 10px 20px;
+        background-color: #25D366; /* Cor do WhatsApp */
+        color: white;
+        text-decoration: none;
+        border-radius: 30px; /* Deixa o botão mais arredondado */
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar */
+        transition: background-color 0.3s;
+    ">
+        💬 Fale com o Suporte
+    </a>
+</div>
 """
-st.html(html_code)
+
+# Injeta o código HTML/CSS na página
+st.html(html_code_fixed)
+
+
+link_whatsapp = "https://wa.me/5599999999999?text=Ol%C3%A1%2C%20preciso%20de%20suporte%20sobre%20o%20curso%20online."
+
+# Use um container para agrupar e garantir que ele fique na parte de baixo da página
+with st.container():
+    # Adicione uma linha horizontal opcional para separar o rodapé
+    st.divider() 
+
+    # HTML para o botão de WhatsApp
+    html_code = f"""
+    <div style="text-align: center; margin: 20px 0;">
+        <a href="{link_whatsapp}" target="_blank" style="
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #25D366; /* Cor do WhatsApp */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+        ">
+            💬 Fale com o Suporte (WhatsApp)
+        </a>
+    </div>
+    """
+    st.html(html_code)
+
+    st.markdown("<p style='text-align: center; color: gray;'>Acesse nosso suporte se tiver dúvidas.</p>", unsafe_allow_html=True)
+
 
 tela_curso()
