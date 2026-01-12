@@ -29,6 +29,31 @@ URL_API_AUTH = get_secret("URL_API_AUTH")
 URL_PERFIL = get_secret("URL_PERFIL")
 BACKEND = get_secret("BACKEND")
 
+video_id_1 = get_secret("video_id_1")
+video_id_2 = get_secret("video_id_2")
+video_id_3 = get_secret("video_id_3")
+video_id_4 = get_secret("video_id_4")
+video_id_5 = get_secret("video_id_5")
+video_id_6 = get_secret("video_id_6")
+video_id_7 = get_secret("video_id_7")
+
+video_id_1 = get_secret("video_id_1")
+video_id_1 = get_secret("video_id_1")
+video_id_1 = get_secret("video_id_1")
+video_id_1 = get_secret("video_id_1")
+video_id_1 = get_secret("video_id_1")
+video_id_1 = get_secret("video_id_1")
+video_id_1 = get_secret("video_id_1")
+
+
+
+
+
+
+
+
+
+
 
 
 if 'logged_in' not in st.session_state:
@@ -147,10 +172,8 @@ def tela_curso():
             # VÍDEO 2.1 (PAGO)
             with st.expander("▶️ Aula 2.1: Introdução e conceito de direção defensiva"):
                 st.write("Descrição: ")
-                
-                video_id = "e34640a9-b5e6-473c-b90e-cdbe143eb4f4"
         
-                req = requests.get(f"{BACKEND}/video/{video_id}")
+                req = requests.get(f"{BACKEND}/video/{video_id_1}")
                 data = req.json()
 
                 iframe = f"""
@@ -167,10 +190,8 @@ def tela_curso():
             # VÍDEO 2.2 (PAGO)
             with st.expander("▶️ Aula 2.2: Condições adversas"):
                 st.write("Descrição: .")
-                
-                video_id = "bbe1c1c7-7a49-4d87-8e1a-d7fa39b1307a"
-        
-                req = requests.get(f"{BACKEND}/video/{video_id}")
+
+                req = requests.get(f"{BACKEND}/video/{video_id_2}")
                 data = req.json()
 
                 iframe = f"""
@@ -190,10 +211,8 @@ def tela_curso():
 
             with st.expander("▶️ Aula 2.3: Derrapagens"):
                     st.write("Descrição: .")
-                    
-                    video_id = "69352220-2277-4fd1-815a-a253818398d7"
             
-                    req = requests.get(f"{BACKEND}/video/{video_id}")
+                    req = requests.get(f"{BACKEND}/video/{video_id_3}")
                     data = req.json()
 
                     iframe = f"""
@@ -213,10 +232,8 @@ def tela_curso():
             
             with st.expander("▶️ Aula 2.4: Importância do cinto de segurança"):
                     st.write("Descrição: .")
-                    
-                    video_id = "9ea57e15-43b6-468a-bb2d-0732ff336ebe"
             
-                    req = requests.get(f"{BACKEND}/video/{video_id}")
+                    req = requests.get(f"{BACKEND}/video/{video_id_4}")
                     data = req.json()
 
                     iframe = f"""
@@ -236,9 +253,7 @@ def tela_curso():
             with st.expander("▶️ Aula 2.5: Comportamentos seguros"):
                     st.write("Descrição: .")
                     
-                    video_id = "91d9841c-a3e3-460b-8f17-771f386049bc"
-            
-                    req = requests.get(f"{BACKEND}/video/{video_id}")
+                    req = requests.get(f"{BACKEND}/video/{video_id_5}")
                     data = req.json()
 
                     iframe = f"""
@@ -257,10 +272,8 @@ def tela_curso():
 
             with st.expander("▶️ Aula 2.6: Importância do cinto de segurança"):
                     st.write("Descrição: .")
-                    
-                    video_id = "9ea57e15-43b6-468a-bb2d-0732ff336ebe"
             
-                    req = requests.get(f"{BACKEND}/video/{video_id}")
+                    req = requests.get(f"{BACKEND}/video/{video_id_6}")
                     data = req.json()
 
                     iframe = f"""
