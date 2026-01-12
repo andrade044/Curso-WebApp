@@ -35,15 +35,14 @@ video_id_3 = get_secret("video_id_3")
 video_id_4 = get_secret("video_id_4")
 video_id_5 = get_secret("video_id_5")
 video_id_6 = get_secret("video_id_6")
-video_id_7 = get_secret("video_id_7")
 
-video_id_1 = get_secret("video_id_1")
-video_id_1 = get_secret("video_id_1")
-video_id_1 = get_secret("video_id_1")
-video_id_1 = get_secret("video_id_1")
-video_id_1 = get_secret("video_id_1")
-video_id_1 = get_secret("video_id_1")
-video_id_1 = get_secret("video_id_1")
+video_id_7 =  get_secret("video_id_7")
+video_id_8 = get_secret("video_id_8")
+video_id_9 = get_secret("video_id_9")
+video_id_10 = get_secret("video_id_10")
+video_id_11 = get_secret("video_id_11")
+video_id_12 = get_secret("video_id_12")
+video_id_13 = get_secret("video_id_13")
 
 
 
@@ -290,29 +289,149 @@ def tela_curso():
                     
             st.markdown("---")
 
-
-
-
             # st.write("Material complementar e exercícios práticos do Módulo 2.")
 
         with st.expander("📝 Módulo 3: Legislação de trânsito ", expanded=False):
             
-            with st.expander("▶️ Aula 3.1: Introdução a direção defensiva"):
-                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
-                st.write("Descrição: Tudo sobre Legislação de Transito.")
+            with st.expander("▶️ Aula 3.1: Legislação de trânsito - Parte 1"):
+                st.write("Descrição: .")
+            
+                req = requests.get(f"{BACKEND}/video/{video_id_7}")
+                data = req.json()
 
-            with st.expander("▶️ Aula 3.2: Legislação Generico!"):
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
 
-                try:
-                    video_file = open('video.mp4', 'rb')
-                    video_byts = video_file.read()
-                    st.video(video_byts) 
-                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
-                except FileNotFoundError:
-                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
-                
+                st.components.v1.html(iframe, height=480)
+                    
             st.markdown("---")
-            st.write("Material complementar e exercícios práticos do Módulo 3.")
+
+            with st.expander("▶️ Aula 3.2: Legislação de trânsito - Parte 2"):
+                st.write("Descrição: Categorias  A e B")
+            
+                req = requests.get(f"{BACKEND}/video/{video_id_8}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+            
+            with st.expander("▶️ Aula 3.3: Legislação de trânsito - Parte 3"):
+                st.write("Descrição: Categorias  C,D e E")
+            
+                req = requests.get(f"{BACKEND}/video/{video_id_9}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+            with st.expander("▶️ Aula 3.4: Legislação de trânsito - Parte 4"):
+                st.write("Descrição: Maneiras de estacionar corretamente.")
+            
+                req = requests.get(f"{BACKEND}/video/{video_id_10}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+            with st.expander("▶️ Aula 3.5: Legislação de trânsito - Parte 5"):
+                st.write("Descrição: IPVA e acc.")
+            
+                req = requests.get(f"{BACKEND}/video/{video_id_11}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+            with st.expander("▶️ Aula 3.6: Legislação de trânsito - Parte 6"):
+                st.write("Descrição: Maneiras corretas de circulação.")
+            
+                req = requests.get(f"{BACKEND}/video/{video_id_12}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+            with st.expander("▶️ Aula 3.7: Legislação de trânsito - Parte 7"):
+                st.write("Descrição: Manobras de mudança de direção.")
+            
+                req = requests.get(f"{BACKEND}/video/{video_id_13}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
 
         with st.expander("📝 Módulo 4: Primeiros socorros ", expanded=False):
            
