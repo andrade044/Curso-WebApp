@@ -84,6 +84,7 @@ def tela_redefinir_senha():
         show_reset_form(reset_token)
     else:
         show_forgot_form()
+   
 
 
 def show_forgot_form():
@@ -92,8 +93,11 @@ def show_forgot_form():
 
     with st.form(key='forgot_form'):
         email = st.text_input("Seu Email", key="forgot_email")
+        if email == '':
+            st.warning("Por favor, insira um email válido.")
+            return
         submitted = st.form_submit_button("Enviar Link")
-
+        st.page_link("Home.py", label="Ir para a tela de Login", icon="🚪")
     if submitted:
         status_message = st.empty()
         status_message.info("Processando solicitação...")
