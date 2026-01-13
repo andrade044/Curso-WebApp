@@ -43,12 +43,7 @@ video_id_10 = get_secret("video_id_10")
 video_id_11 = get_secret("video_id_11")
 video_id_12 = get_secret("video_id_12")
 video_id_13 = get_secret("video_id_13")
-
-
-
-
-
-
+video_id_14 = get_secret("video_id_14")
 
 
 
@@ -417,6 +412,26 @@ def tela_curso():
                 st.write("Descrição: Manobras de mudança de direção.")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_13}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+            with st.expander("▶️ Aula 3.8: Legislação de trânsito - Parte 8"):
+                st.write("Descrição: Classificação das Vias.")
+            
+                req = requests.get(f"{BACKEND}/video/{video_id_14}")
                 data = req.json()
 
                 iframe = f"""
