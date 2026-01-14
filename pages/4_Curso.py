@@ -293,7 +293,7 @@ def tela_curso():
 
         with st.expander("📝 Módulo 3: Legislação de trânsito ", expanded=False):
             
-            with st.expander("▶️ Aula 3.1: Legislação de trânsito - Parte 1"):
+            with st.expander("▶️ Aula 3.1: Legislação de trânsito - Introdução"):
                 st.write("Descrição: .")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_7}")
@@ -313,8 +313,8 @@ def tela_curso():
                     
             st.markdown("---")
 
-            with st.expander("▶️ Aula 3.2: Legislação de trânsito - Parte 2"):
-                st.write("Descrição: Categorias  A e B")
+            with st.expander("▶️ Aula 3.2: Legislação de trânsito - Categorias  A e B"):
+                st.write("Descrição: ...")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_8}")
                 data = req.json()
@@ -333,8 +333,8 @@ def tela_curso():
                     
             st.markdown("---")
             
-            with st.expander("▶️ Aula 3.3: Legislação de trânsito - Parte 3"):
-                st.write("Descrição: Categorias  C,D e E")
+            with st.expander("▶️ Aula 3.3: Legislação de trânsito - Categorias  C,D e E"):
+                st.write("Descrição: ...")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_9}")
                 data = req.json()
@@ -353,8 +353,8 @@ def tela_curso():
                     
             st.markdown("---")
 
-            with st.expander("▶️ Aula 3.4: Legislação de trânsito - Parte 4"):
-                st.write("Descrição: Maneiras de estacionar corretamente.")
+            with st.expander("▶️ Aula 3.4: Legislação de trânsito - Maneiras de estacionar corretamente."):
+                st.write("Descrição: ...")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_10}")
                 data = req.json()
@@ -373,8 +373,8 @@ def tela_curso():
                     
             st.markdown("---")
 
-            with st.expander("▶️ Aula 3.5: Legislação de trânsito - Parte 5"):
-                st.write("Descrição: IPVA e acc.")
+            with st.expander("▶️ Aula 3.5: Legislação de trânsito - Descrição: IPVA e acc 5"):
+                st.write("Descrição: ...")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_11}")
                 data = req.json()
@@ -393,8 +393,8 @@ def tela_curso():
                     
             st.markdown("---")
 
-            with st.expander("▶️ Aula 3.6: Legislação de trânsito - Parte 6"):
-                st.write("Descrição: Maneiras corretas de circulação.")
+            with st.expander("▶️ Aula 3.6: Legislação de trânsito - Maneiras corretas de circulação"):
+                st.write("Descrição: ...")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_12}")
                 data = req.json()
@@ -413,8 +413,8 @@ def tela_curso():
                     
             st.markdown("---")
 
-            with st.expander("▶️ Aula 3.7: Legislação de trânsito - Parte 7"):
-                st.write("Descrição: Manobras de mudança de direção.")
+            with st.expander("▶️ Aula 3.7: Legislação de trânsito - Manobras de mudança de direção."):
+                st.write("Descrição: ...")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_13}")
                 data = req.json()
@@ -433,8 +433,8 @@ def tela_curso():
                     
             st.markdown("---")
 
-            with st.expander("▶️ Aula 3.8: Legislação de trânsito - Parte 8"):
-                st.write("Descrição: Classificação das Vias.")
+            with st.expander("▶️ Aula 3.8: Legislação de trânsito - Classificação das Vias."):
+                st.write("Descrição: ...")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_14}")
                 data = req.json()
@@ -455,7 +455,7 @@ def tela_curso():
         
         with st.expander("📝 Módulo 4: Meio ambiente e cidadania ", expanded=False):
 
-            with st.expander("▶️ Aula 4.1: Meio ambiente e cidadaniao - Apresentação"):
+            with st.expander("▶️ Aula 4.1: Meio ambiente e cidadania - Apresentação"):
                 st.write("Descrição: ...")
             
                 req = requests.get(f"{BACKEND}/video/{video_id_15}")
@@ -475,7 +475,7 @@ def tela_curso():
                     
             st.markdown("---")
 
-            with st.expander("▶️ Aula 4.2: Meio ambiente e cidadaniao - Conceito"):
+            with st.expander("▶️ Aula 4.2: Meio ambiente e cidadania - Conceito"):
                 st.write("Descrição: ...")
 
                 req = requests.get(f"{BACKEND}/video/{video_id_16}")
@@ -495,7 +495,7 @@ def tela_curso():
                     
             st.markdown("---")
             
-            with st.expander("▶️ Aula 4.3: Meio ambiente e cidadaniao - Detecção De Veiculos Poluidores "):
+            with st.expander("▶️ Aula 4.3: Meio ambiente e cidadania - Detecção De Veiculos Poluidores "):
                 st.write("Descrição: ...")
 
                 req = requests.get(f"{BACKEND}/video/{video_id_17}")
@@ -515,7 +515,7 @@ def tela_curso():
                     
             st.markdown("---")
             
-            with st.expander("▶️ Aula 4.4: Meio ambiente e cidadaniao - Efeitos Causados Pela Exposição Ao Ruidos"):
+            with st.expander("▶️ Aula 4.4: Meio ambiente e cidadania - Efeitos Causados Pela Exposição Ao Ruidos"):
                 st.write("Descrição: ...")
 
                 req = requests.get(f"{BACKEND}/video/{video_id_16}")
@@ -535,41 +535,43 @@ def tela_curso():
                     
             st.markdown("---")
 
-        with st.expander("📝 Módulo 5: Primeiros socorros ", expanded=False):
-           
-            with st.expander("▶️ Aula 5.1: Introdução a Primeiros socorros!"):
-                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
-                st.write("Descrição: Tudo sobre Legislação de Transito.")
+        with st.expander("📝 Módulo 5: Primeiros socorros - Em breve ", expanded=False):
+           pass
+            # with st.expander("▶️ Aula 5.1: Introdução a Primeiros socorros!"):
 
-            with st.expander("▶️ Aula 5.2: Legislação Generico!"):
-                try:
-                    video_file = open('video.mp4', 'rb')
-                    video_byts = video_file.read()
-                    st.video(video_byts) 
-                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
-                except FileNotFoundError:
-                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
+            #     st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
+            #     st.write("Descrição: Tudo sobre Legislação de Transito.")
+
+            # with st.expander("▶️ Aula 5.2: Legislação Generico!"):
+            #     try:
+            #         video_file = open('video.mp4', 'rb')
+            #         video_byts = video_file.read()
+            #         st.video(video_byts) 
+            #         st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
+            #     except FileNotFoundError:
+            #         st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
                 
-            st.markdown("---")
-            st.write("Material complementar e exercícios práticos do Módulo 4.")
+            # st.markdown("---")
+            # st.write("Material complementar e exercícios práticos do Módulo 4.")
 
-        with st.expander("📝 Módulo 6: Mecânica ", expanded=False):
-        
-            with st.expander("▶️ Aula 6.1: Introdução a Mecânica Básica !"):
-                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
-                st.write("Descrição: Tudo sobre Legislação de Transito.")
+        with st.expander("📝 Módulo 6: Mecânica - Em breve", expanded=False):
+            pass
+            
+            # with st.expander("▶️ Aula 6.1: Introdução a Mecânica Básica !"):
+            #     st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
+            #     st.write("Descrição: Tudo sobre Legislação de Transito.")
 
-            with st.expander("▶️ Aula 6.2: Mecânica Generica !"):
-                try:
-                    video_file = open('video.mp4', 'rb')
-                    video_byts = video_file.read()
-                    st.video(video_byts) 
-                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
-                except FileNotFoundError:
-                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
+            # with st.expander("▶️ Aula 6.2: Mecânica Generica !"):
+            #     try:
+            #         video_file = open('video.mp4', 'rb')
+            #         video_byts = video_file.read()
+            #         st.video(video_byts) 
+            #         st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
+            #     except FileNotFoundError:
+            #         st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
                 
-            st.markdown("---")
-            st.write("Material complementar e exercícios práticos do Módulo 5.")
+            # st.markdown("---")
+            # st.write("Material complementar e exercícios práticos do Módulo 5.")
 
          
     else:
