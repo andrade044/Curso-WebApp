@@ -44,7 +44,12 @@ video_id_11 = get_secret("video_id_11")
 video_id_12 = get_secret("video_id_12")
 video_id_13 = get_secret("video_id_13")
 video_id_14 = get_secret("video_id_14")
-
+video_id_15 = get_secret("video_id_15")
+video_id_16 = get_secret("video_id_16")
+video_id_17 = get_secret("video_id_17")
+video_id_18 = get_secret("video_id_18")
+video_id_19 = get_secret("video_id_19")
+video_id_20 = get_secret("video_id_20") 
 
 
 
@@ -447,15 +452,96 @@ def tela_curso():
                 st.components.v1.html(iframe, height=480)
                     
             st.markdown("---")
+        
+        with st.expander("📝 Módulo 4: Meio ambiente e cidadania ", expanded=False):
 
-        with st.expander("📝 Módulo 4: Primeiros socorros ", expanded=False):
+            with st.expander("▶️ Aula 4.1: Meio ambiente e cidadaniao - Apresentação"):
+                st.write("Descrição: ...")
+            
+                req = requests.get(f"{BACKEND}/video/{video_id_15}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+            with st.expander("▶️ Aula 4.2: Meio ambiente e cidadaniao - Conceito"):
+                st.write("Descrição: ...")
+
+                req = requests.get(f"{BACKEND}/video/{video_id_16}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+            
+            with st.expander("▶️ Aula 4.3: Meio ambiente e cidadaniao - Detecção De Veiculos Poluidores "):
+                st.write("Descrição: ...")
+
+                req = requests.get(f"{BACKEND}/video/{video_id_17}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+            
+            with st.expander("▶️ Aula 4.4: Meio ambiente e cidadaniao - Efeitos Causados Pela Exposição Ao Ruidos"):
+                st.write("Descrição: ...")
+
+                req = requests.get(f"{BACKEND}/video/{video_id_16}")
+                data = req.json()
+
+                iframe = f"""
+                            <iframe
+                                src="{data['iframe']}"
+                                width="100%"
+                                height="450"
+                                allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
+                                allowfullscreen="true">
+                            </iframe>
+                        """
+
+                st.components.v1.html(iframe, height=480)
+                    
+            st.markdown("---")
+
+        with st.expander("📝 Módulo 5: Primeiros socorros ", expanded=False):
            
-            with st.expander("▶️ Aula 4.1: Introdução a Primeiros socorros!"):
+            with st.expander("▶️ Aula 5.1: Introdução a Primeiros socorros!"):
                 st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Tudo sobre Legislação de Transito.")
 
-            with st.expander("▶️ Aula 4.2: Legislação Generico!"):
-
+            with st.expander("▶️ Aula 5.2: Legislação Generico!"):
                 try:
                     video_file = open('video.mp4', 'rb')
                     video_byts = video_file.read()
@@ -467,14 +553,13 @@ def tela_curso():
             st.markdown("---")
             st.write("Material complementar e exercícios práticos do Módulo 4.")
 
-        with st.expander("📝 Módulo 5: Mecânica ", expanded=False):
+        with st.expander("📝 Módulo 6: Mecânica ", expanded=False):
         
-            with st.expander("▶️ Aula 5.1: Introdução a Mecânica Básica !"):
+            with st.expander("▶️ Aula 6.1: Introdução a Mecânica Básica !"):
                 st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
                 st.write("Descrição: Tudo sobre Legislação de Transito.")
 
-            with st.expander("▶️ Aula 5.2: Mecânica Generica !"):
-
+            with st.expander("▶️ Aula 6.2: Mecânica Generica !"):
                 try:
                     video_file = open('video.mp4', 'rb')
                     video_byts = video_file.read()
@@ -486,24 +571,6 @@ def tela_curso():
             st.markdown("---")
             st.write("Material complementar e exercícios práticos do Módulo 5.")
 
-        with st.expander("📝 Módulo 6: Meio ambiente e cidadania ", expanded=False):
-
-            with st.expander("▶️ Aula 6.1: Introdução a Meio ambiente !"):
-                st.video('https://www.youtube.com/watch?v=f5R-6Pp2w5E') 
-                st.write("Descrição: Tudo sobre Legislação de Transito.")
-
-            with st.expander("▶️ Aula 6.2: Meio Ambiente Generica !"):
-
-                try:
-                    video_file = open('video.mp4', 'rb')
-                    video_byts = video_file.read()
-                    st.video(video_byts) 
-                    st.write("Descrição: Estratégias para armazenar dados não estruturados de forma eficiente.")
-                except FileNotFoundError:
-                    st.error("Arquivo de vídeo 'video.mp4' não encontrado.")
-                
-            st.markdown("---")
-            st.write("Material complementar e exercícios práticos do Módulo 6.")
          
     else:
         # CONTEÚDO BLOQUEADO
