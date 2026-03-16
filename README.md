@@ -1,6 +1,6 @@
 # Plataforma de Curso e Simulados de Trânsito Online
 
-## 📌 Sobre o Projeto
+## Sobre o Projeto
 
 Esta plataforma foi desenvolvida para oferecer **preparação online para provas teóricas de trânsito**, permitindo que alunos estudem conteúdos e realizem **simulados semelhantes aos exames oficiais do DETRAN**.
 
