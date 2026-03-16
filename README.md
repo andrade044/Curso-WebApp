@@ -1,4 +1,4 @@
-# 🚦 Plataforma de Curso e Simulados de Trânsito Online
+# Plataforma de Curso e Simulados de Trânsito Online
 
 ## 📌 Sobre o Projeto
 
@@ -13,9 +13,9 @@ https://autoescolaemvideo.com.br
 
 ---
 
-# 🎯 Principais Funcionalidades
+# Principais Funcionalidades
 
-## 👤 Sistema de Usuários
+## Sistema de Usuários
 
 - Cadastro de usuários
 - Login seguro
@@ -25,7 +25,7 @@ https://autoescolaemvideo.com.br
 
 ---
 
-## 📚 Curso de Trânsito Online
+## Curso de Trânsito Online
 
 - Conteúdos teóricos sobre legislação de trânsito
 - Acesso liberado após confirmação de pagamento
@@ -34,7 +34,7 @@ https://autoescolaemvideo.com.br
 
 ---
 
-## 📝 Simulados de Prova
+## Simulados de Prova
 
 - Banco de questões
 - Simulados de múltipla escolha
@@ -44,7 +44,7 @@ https://autoescolaemvideo.com.br
 
 ---
 
-## 💳 Integração de Pagamentos
+## Integração de Pagamentos
 
 A plataforma possui integração com **Mercado Pago**, permitindo:
 
@@ -54,7 +54,7 @@ A plataforma possui integração com **Mercado Pago**, permitindo:
 
 ---
 
-## 📧 Sistema de Email
+## Sistema de Email
 
 Utilizando **SendGrid**, a plataforma envia automaticamente:
 
@@ -64,7 +64,7 @@ Utilizando **SendGrid**, a plataforma envia automaticamente:
 
 ---
 
-# 🔒 Segurança
+# Segurança
 
 A aplicação utiliza boas práticas de segurança:
 
@@ -76,7 +76,7 @@ A aplicação utiliza boas práticas de segurança:
 
 ---
 
-# ☁️ Infraestrutura e Deploy
+# Infraestrutura e Deploy
 
 A plataforma está **em produção na AWS (Amazon Web Services)**, garantindo disponibilidade, escalabilidade e confiabilidade para os usuários.
 
@@ -91,7 +91,7 @@ Essa arquitetura permite:
 
 ---
 
-# 🏗️ Arquitetura do Projeto
+# Arquitetura do Projeto
 
 O sistema é dividido em duas partes principais.
 
@@ -123,7 +123,7 @@ A interface foi construída com **Streamlit**, permitindo uma aplicação web si
 
 ---
 
-# 🗄️ Banco de Dados
+# Banco de Dados
 
 O projeto utiliza **PostgreSQL**, com conexão realizada via:
 
@@ -132,7 +132,7 @@ O projeto utiliza **PostgreSQL**, com conexão realizada via:
 
 ---
 
-# 🧰 Tecnologias Utilizadas
+# Tecnologias Utilizadas
 
 | Tecnologia | Função |
 |---|---|
@@ -153,9 +153,9 @@ O projeto utiliza **PostgreSQL**, com conexão realizada via:
 
 ---
 
-# 📦 Instalação do Projeto
+# Instalação do Projeto
 
-## 1️⃣ Clonar o repositório
+## Clonar o repositório
 
 ```bash
 git clone https://github.com/andrade044/Curso-WebApp.git
